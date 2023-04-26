@@ -107,8 +107,11 @@ function(model)
 ################################################################################
 
 #### File data
-filein1 <- "~/CMEM/SPY-15m-adj-20091201.txt"
+filein1 <- "~/CMEM/Test_SPY-15m-adj-20091201.txt"
 rangeDate <- c(20020101, 20061231)
+
+# filein1 <- "~/CMEM/A.txt"
+# rangeDate <- c(20170705, 20171228)
 
 #### Fileout
 fileout1 <- "~/CMEM/SPY-residuals-LBstats-20091201.txt"

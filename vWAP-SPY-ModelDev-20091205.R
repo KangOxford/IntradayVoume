@@ -108,6 +108,7 @@ function(model)
 
 #### File data
 filein1 <- "~/CMEM/SPY-15m-adj-20091201.txt"
+# filein1 <- "~/CMEM/Test_SPY-15m-adj-20091201.txt"
 rangeDate <- c(20020101, 20061231)
 
 #### Fileout
@@ -121,7 +122,7 @@ model <- c(
             "gammaE[1]",  0.0,
             "betaE[1]" ,  0.6,
             "alphaM[1]",  0.3,
-#           "gammaM[1]",  0.0,
+          "gammaM[1]",  0.0,
 #           "alphaM[2]",  0.0,
             "betaM[1]" ,  0.4,
 #           "deltaM[1]",  0.0,
