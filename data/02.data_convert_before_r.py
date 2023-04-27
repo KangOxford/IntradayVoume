@@ -43,7 +43,7 @@ for i in tqdm(range(len(onlyfiles))):
     bins = np.tile(np.arange(1,27),df1.shape[0]//26)
     df1['bin'] = bins
     df1['turnover'] = df1.qty
-    columns_chosen = ['date','bin','turnover','price']
+    columns_chosen = ['date','bin','turnover','vwap_price']
     df2 = df1[columns_chosen]
     lines = ['date\tbin\tturnover\tprice\n']
     for _, row in df2.iterrows():

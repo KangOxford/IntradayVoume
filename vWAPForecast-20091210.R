@@ -196,10 +196,10 @@ function( parmVal, infoFilter, x, diControl )
   nDFor1 <- min(nDFor)
   nDForL <- max(nDFor)
   ## First/last dates in forecasts
-  if ( nDForL > nDx)
-  {
-  	stop("Forecast days go beyond the data")
-  }
+  # if ( nDForL > nDx)
+  # {
+  # 	stop("Forecast days go beyond the data")
+  # }
   
   #### Time point for estimates
   ## Last date in the estimates = first date in the forecasts - 1

@@ -89,14 +89,24 @@ for i in tqdm(range(10)):
     value = dfsum.iloc[:,4:]
     index1 = dfmin.iloc[:,[1,2,3]]
     index2 = dfmax.iloc[:,[4,5]]
-    df = pd.concat([index1, index2, value],axis=1).dropna(axis =0)
+
+    def get_vwap_price(gpd):
+        vwap_item = gpd[['askPx', 'askQty', 'bidPx', 'bidQty']]
+        vwap_func = lambda x: (x['askPx'] * x["askQty"] + x["bidPx"] * x["bidQty"]).sum() / (
+                    x["askQty"] + x["bidQty"]).sum()
+        vwap = vwap_item.apply(vwap_func)
+        vwap.name = "vwap_price"
+        return vwap
+    vwap_price = get_vwap_price(gpd)
+
+    df = pd.concat([index1, index2, value, vwap_price],axis=1).dropna(axis =0)
 
     df["VO"] = df.qty.diff(1).shift(-1)/df.qty*100
     # df["VO"] = df.qty.shift(-1)
     df = df.dropna(axis=0)
     # def adding_price():
-    df['price'] = (df['askPx'] * df['askQty'] + df['bidPx'] * df['bidQty'])/ (df['askQty'] + df['bidQty'])
-    result_columns = columns + ['VO','price']
+    # df['price'] = (df['askPx'] * df['askQty'] + df['bidPx'] * df['bidQty'])/ (df['askQty'] + df['bidQty'])
+    result_columns = columns + ['VO','vwap_price']
     df = df[result_columns]
     df.to_pickle(out_path+sym+'.pkl')
 
