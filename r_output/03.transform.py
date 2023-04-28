@@ -99,21 +99,26 @@ def get_result_data():
     return rst
 
 
+def get_r2df(df):
+    _, onlyfiles = platform()
+    symbols = [file[:-4]for file in onlyfiles]
+    r2_dct={}
+    for symbol in symbols:
+        print(symbol)
+        gpd = df.groupby('date')
+        r2lst= []
+        for index, item in gpd:
+            r2 = r2_score(item[symbol],item[symbol+'_pred'])
+            r2lst.append(r2)
+        r2_dct[symbol] = pd.Series(r2lst)
+    r2df = pd.DataFrame(r2_dct)
+    r2df.drop(['ACN','ADI','AEP',"AFL"],axis=1,inplace=True)
+    r2df.index = df.date.drop_duplicates()
+    return r2df
+
+
 df = get_result_data()
-_, onlyfiles = platform()
-symbols = [file[:-4]for file in onlyfiles]
-r2_dct={}
-for symbol in symbols:
-    print(symbol)
-    gpd = df.groupby('date')
-    r2lst= []
-    for index, item in gpd:
-        r2 = r2_score(item[symbol],item[symbol+'_pred'])
-        r2lst.append(r2)
-    r2_dct[symbol] = pd.Series(r2lst)
-r2df = pd.DataFrame(r2_dct)
-r2df.drop(['ACN'],axis=1,inplace=True)
-r2df.index = df.date.drop_duplicates()
+r2df = get_r2df(df)
 
 m1= r2df.mean(axis=0)
 m2 = r2df.mean(axis=1)
@@ -124,7 +129,7 @@ def plot(m2):
     x_axis = pd.to_datetime(dates, format='%Y%m%d')
     plt.plot(x_axis, m2.values)
     plt.plot(x_axis, np.tile(m2.values.mean(),x_axis.shape[0]),
-             label=f'Mean+Std: {m2.values.mean():.2f}')
+             label=f'Mean: {m2.values.mean():.2f}')
     import matplotlib.dates as mdates
     # Set the x-axis format to display dates
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%Y'))

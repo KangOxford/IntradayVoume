@@ -37,7 +37,9 @@ except:import os;os.mkdir(out_path);already_done = [f[:-4] for f in listdir(out_
 
 
 # for i in tqdm(range(len(syms))):
-for i in tqdm(range(10)):
+# for i in tqdm(range(10)):
+# for i in tqdm(range(20)):
+for i in tqdm(range(100)):
     sym = syms.iloc[i]
     print(f">>> stock {i} {sym}")
     df_list = []
