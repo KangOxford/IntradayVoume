@@ -118,7 +118,19 @@ r2df.index = df.date.drop_duplicates()
 m1= r2df.mean(axis=0)
 m2 = r2df.mean(axis=1)
 
-import matplotlib.pyplot as plt
-plt.plot()
-
+def plot(m2):
+    import matplotlib.pyplot as plt
+    dates = m2.index
+    x_axis = pd.to_datetime(dates, format='%Y%m%d')
+    plt.plot(x_axis, m2.values)
+    plt.plot(x_axis, np.tile(m2.values.mean(),x_axis.shape[0]),
+             label=f'Mean+Std: {m2.values.mean():.2f}')
+    import matplotlib.dates as mdates
+    # Set the x-axis format to display dates
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%Y'))
+    # Rotate the x-axis tick labels to avoid overlap
+    plt.gcf().autofmt_xdate()
+    plt.legend()
+    plt.show()
+plot(m2)
 
