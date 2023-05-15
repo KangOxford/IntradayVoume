@@ -130,6 +130,10 @@ function( parmVal, infoFilter, x, fltLag, flt0, day )
 		data1[, 1:2] <- NA
 		data1 <- .make.data(data1 = data1, meanX = meansX$x, meanZM = meansX$zM)
 		forecast <- .filter.diMEM.1(parmVal, infoFilter, data1, fltLag, flt0, ind0)$filter
+
+     # save j-th position eta, seas and mu
+
+
 		## Adjust forecasts
 		times <- indx[ind1 : ind2]
 		calendar <- .calendar(times, nBin)
