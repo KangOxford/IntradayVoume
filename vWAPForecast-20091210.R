@@ -113,6 +113,8 @@ function( parmVal, infoFilter, x, fltLag, flt0, day )
   colnames(forStore) <- as.character( (ind1 - 1) : (indL - 1) ) ## From in columns
   rownames(forStore) <- as.character( ind1 : indL )             ## To   in rows
 
+
+  results_df <- data.frame()
 	#### Forecasts (j is the from bin for the forecast)
   ind1 <- ind1 - 1
   for ( j in 0 : (nBin - 1) )
@@ -131,8 +133,17 @@ function( parmVal, infoFilter, x, fltLag, flt0, day )
 		data1 <- .make.data(data1 = data1, meanX = meansX$x, meanZM = meansX$zM)
 		forecast <- .filter.diMEM.1(parmVal, infoFilter, data1, fltLag, flt0, ind0)$filter
 
-     # save j-th position eta, seas and mu
+        # save j-th position eta, seas and mu
+        forecast_df <- data.frame(
+          eta = rep(forecast$eta, length(forecast$seas)),
+          seas = forecast$seas,
+          mu = forecast$mu
+        )
+        # print(j)
+        forecast_line <- forecast_df[j,]
 
+        # Append to results_df
+        results_df <- rbind(results_df, forecast_line)
 
 		## Adjust forecasts
 		times <- indx[ind1 : ind2]

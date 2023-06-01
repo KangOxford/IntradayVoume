@@ -1,13 +1,16 @@
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-import warnings;warnings.simplefilter("ignore", category=FutureWarning)
-from os import listdir;from os.path import isfile, join
+import warnings;
+
+warnings.simplefilter("ignore", category=FutureWarning)
+from os import listdir;
+from os.path import isfile, join
 from r_output import Config
 from sklearn.metrics import r2_score
 
-
 pd.set_option('display.max_columns', None)
+
 
 def platform():
     import pandas as pd
@@ -36,7 +39,7 @@ def platform():
 
 
 def get_predict_update_per_day():
-    import platform # Check the system platform
+    import platform  # Check the system platform
     if platform.system() == 'Darwin':
         print("Running on MacOS")
         data_path = Config.r_output_datapath
@@ -48,7 +51,8 @@ def get_predict_update_per_day():
     elif platform.system() == 'Linux':
         print("Running on Linux")
         raise NotImplementedError
-    else:print("Unknown operating system")
+    else:
+        print("Unknown operating system")
 
     onlyfiles = sorted([f for f in listdir(data_path) if isfile(join(data_path, f))])
     # pred = []
@@ -56,7 +60,7 @@ def get_predict_update_per_day():
     for i in tqdm(range(len(onlyfiles))):
         file = onlyfiles[i]
         symbol = file[10:-4]
-        df = pd.read_csv(data_path + file,header=None)
+        df = pd.read_csv(data_path + file, header=None)
 
         # df.iloc[:,0] = (df.iloc[:,0]-27)//26
         # df.columns = ['date'] + ["A"+str(i+1) for i in range(26)]
@@ -67,15 +71,15 @@ def get_predict_update_per_day():
         #     diagonal_elements = np.diag(item.values)
         #     diagonal_elements_list.extend(diagonal_elements)
 
-        straight_elements_list = df.iloc[:,1]
-        info = pd.Series(straight_elements_list,name = symbol+"_pred")
+        straight_elements_list = df.iloc[:, 1]
+        info = pd.Series(straight_elements_list, name=symbol + "_pred")
         info_list.append(info)
     rst = pd.DataFrame(info_list).T
     return rst
 
 
 def get_predict_update_per_bin():
-    import platform # Check the system platform
+    import platform  # Check the system platform
     if platform.system() == 'Darwin':
         print("Running on MacOS")
         data_path = Config.r_output_datapath
@@ -87,7 +91,8 @@ def get_predict_update_per_bin():
     elif platform.system() == 'Linux':
         print("Running on Linux")
         raise NotImplementedError
-    else:print("Unknown operating system")
+    else:
+        print("Unknown operating system")
 
     onlyfiles = sorted([f for f in listdir(data_path) if isfile(join(data_path, f))])
     # pred = []
@@ -95,19 +100,20 @@ def get_predict_update_per_bin():
     for i in tqdm(range(len(onlyfiles))):
         file = onlyfiles[i]
         symbol = file[10:-4]
-        df = pd.read_csv(data_path + file,header=None)
-        df.iloc[:,0] = (df.iloc[:,0]-27)//26
-        df.columns = ['date'] + ["A"+str(i+1) for i in range(26)]
+        df = pd.read_csv(data_path + file, header=None)
+        df.iloc[:, 0] = (df.iloc[:, 0] - 27) // 26
+        df.columns = ['date'] + ["A" + str(i + 1) for i in range(26)]
         groupped = df.groupby('date')
         diagonal_elements_list = []
         for index, item in groupped:
             item.set_index('date', inplace=True)
             diagonal_elements = np.diag(item.values)
             diagonal_elements_list.extend(diagonal_elements)
-        info = pd.Series(diagonal_elements_list,name = symbol+"_pred")
+        info = pd.Series(diagonal_elements_list, name=symbol + "_pred")
         info_list.append(info)
     rst = pd.DataFrame(info_list).T
     return rst
+
 
 def get_df():
     data_path, onlyfiles = platform()
@@ -115,17 +121,17 @@ def get_df():
     for i in range(len(onlyfiles)):
         file = onlyfiles[i]
         df = pd.read_csv(data_path + file, sep='\t|\n', engine='python')
-        df = df.loc[:,['date','bin','turnover']]
-        df.columns = ['date','bin',file[:-4]]
+        df = df.loc[:, ['date', 'bin', 'turnover']]
+        df.columns = ['date', 'bin', file[:-4]]
         df_list.append(df)
 
     # merge all dataframes on 'date' and 'bin' columns, keeping only the last column of each dataframe
     merged = pd.concat([df.set_index(['date', 'bin']).iloc[:, -1] for df in df_list], axis=1, keys=range(len(df_list)))
     # reset index to get back 'date' and 'bin' as columns
     merged = merged.reset_index()
-    merged.columns = ['date','bin'] + [file[:-4] for file in onlyfiles]
+    merged.columns = ['date', 'bin'] + [file[:-4] for file in onlyfiles]
     rst = merged.iloc[26:, :].reset_index()
-    rst.drop(['index'],inplace = True, axis = 1)
+    rst.drop(['index'], inplace=True, axis=1)
     assert rst.shape[0] // 26 == rst.shape[0] / 26
     return rst
 
@@ -134,28 +140,28 @@ def get_result_data():
     df1 = get_df()
     predict = get_predict_update_per_bin()
     # predict = get_predict_update_per_day()
-    rst = pd.concat([df1,predict],axis=1)
+    rst = pd.concat([df1, predict], axis=1)
     return rst
 
 
 def get_r2df(df):
     _, onlyfiles = platform()
-    symbols = [file[:-4]for file in onlyfiles]
-    r2_dct={}
+    symbols = [file[:-4] for file in onlyfiles]
+    r2_dct = {}
     for symbol in symbols:
         print(symbol)
         gpd = df.groupby('date')
-        r2lst= []
+        r2lst = []
         for index, item in gpd:
-            r2 = r2_score(item[symbol],item[symbol+'_pred'])
+            r2 = r2_score(item[symbol], item[symbol + '_pred'])
             r2lst.append(r2)
         r2_dct[symbol] = pd.Series(r2lst)
     r2df = pd.DataFrame(r2_dct)
     m1 = r2df.mean(axis=0)
     m2 = r2df.mean(axis=1)
     # dropped_cols = ['ACN', 'ADI', 'AEP', "AFL"]
-    dropped_cols = m1[m1<=0].index.to_list()
-    r2df.drop(dropped_cols,axis=1,inplace=True)
+    dropped_cols = m1[m1 <= 0].index.to_list()
+    r2df.drop(dropped_cols, axis=1, inplace=True)
     r2df.index = df.date.drop_duplicates()
     return r2df
 
@@ -166,12 +172,13 @@ r2df = get_r2df(df)
 m1 = r2df.mean(axis=0)
 m2 = r2df.mean(axis=1)
 
+
 def plot(m2):
     import matplotlib.pyplot as plt
     dates = m2.index
     x_axis = pd.to_datetime(dates, format='%Y%m%d')
     plt.plot(x_axis, m2.values)
-    plt.plot(x_axis, np.tile(m2.values.mean(),x_axis.shape[0]),
+    plt.plot(x_axis, np.tile(m2.values.mean(), x_axis.shape[0]),
              label=f'Mean: {m2.values.mean():.2f}')
     import matplotlib.dates as mdates
     # Set the x-axis format to display dates
@@ -180,12 +187,12 @@ def plot(m2):
     plt.gcf().autofmt_xdate()
     plt.legend()
     plt.show()
+
+
 plot(m2)
 
-
-
 df = pd.read_csv("/Users/kang/Volume-Forecasting/05.1_result_data_path/r2_score.csv")
-value=df.iloc[:,-1]
+value = df.iloc[:, -1]
 value[:26].mean()
 '''
 dropped_r2df = r2df[dropped_cols]
@@ -207,24 +214,28 @@ plot(dropped_r2df['CMCSA'])
 
 '''
 take stock ACN for an example'''
+
+
 def get_r2df(df):
-    df = df.set_index(['date','bin'])
-    acn = df.loc[:,'ACN']
+    df = df.set_index(['date', 'bin'])
+    acn = df.loc[:, 'ACN']
     acn = acn.reset_index()
     groupped = acn.groupby('date')
     df_lst = []
     for date, item in groupped:
-        item = item.iloc[:,-1]
+        item = item.iloc[:, -1]
         item.name = date
         df_lst.append(item)
         item.reset_index(drop=True, inplace=True)
-    acndf = pd.concat(df_lst,axis=1).T
-    acndf['mean'] = acndf.apply(np.mean,axis=1)
+    acndf = pd.concat(df_lst, axis=1).T
+    acndf['mean'] = acndf.apply(np.mean, axis=1)
     return r2df
+
+
 def get_r2df(df):
     symbol = "ACN"
-    df = df.set_index(['date','bin'])
-    acn = df.loc[:,[symbol,symbol+"_pred"]]
+    df = df.set_index(['date', 'bin'])
+    acn = df.loc[:, [symbol, symbol + "_pred"]]
     # acn['r2'] = r2_score(item[symbol],item[symbol+'_pred'])
     acn = acn.reset_index()
     import matplotlib.pyplot as plt
@@ -239,11 +250,10 @@ def get_r2df(df):
     for date, item in groupped:
         # pass
         r2 = r2_score(item[symbol], item[symbol + '_pred'])
-        item = item.iloc[:,-1]
+        item = item.iloc[:, -1]
         item.name = date
         df_lst.append(item)
         item.reset_index(drop=True, inplace=True)
-    acndf = pd.concat(df_lst,axis=1).T
-    acndf['mean'] = acndf.apply(np.mean,axis=1)
+    acndf = pd.concat(df_lst, axis=1).T
+    acndf['mean'] = acndf.apply(np.mean, axis=1)
     return r2df
-
