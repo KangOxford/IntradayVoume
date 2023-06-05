@@ -19,7 +19,7 @@
 ## PRELIMINARIES
 ################################################################################
 
-rm(list = ls(all=TRUE))
+ rm(list = ls(all=TRUE))
 options(warn = 1)
 source("~/CMEM/vWAPMain_20081010.R")
 

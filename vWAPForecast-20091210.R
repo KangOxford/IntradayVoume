@@ -109,11 +109,12 @@ function( parmVal, infoFilter, x, fltLag, flt0, day )
   ##############################################################################
 
   #### Initialize output
+  # forStore <- matrix(NA, nBin, nBin)
   forStore <- matrix(NA, nBin, nBin)
   colnames(forStore) <- as.character( (ind1 - 1) : (indL - 1) ) ## From in columns
   rownames(forStore) <- as.character( ind1 : indL )             ## To   in rows
 
-
+  forStore1 <- matrix(NA, nBin, nBin)
   results_df <- data.frame()
 	#### Forecasts (j is the from bin for the forecast)
   ind1 <- ind1 - 1
@@ -134,16 +135,22 @@ function( parmVal, infoFilter, x, fltLag, flt0, day )
 		forecast <- .filter.diMEM.1(parmVal, infoFilter, data1, fltLag, flt0, ind0)$filter
 
         # save j-th position eta, seas and mu
-        forecast_df <- data.frame(
-          eta = rep(forecast$eta, length(forecast$seas)),
-          seas = forecast$seas,
-          mu = forecast$mu
-        )
-        # print(j)
-        forecast_line <- forecast_df[j,]
-
+        # forecast_df <- data.frame(
+        #   eta = rep(forecast$eta, length(forecast$seas)),
+        #   seas = forecast$seas,
+        #   mu = forecast$mu
+        # )
+        # # print(j)
+        # forecast_line <- forecast_df[j,]
         # Append to results_df
-        results_df <- rbind(results_df, forecast_line)
+        # results_df <- rbind(results_df, forecast_line)
+        cat("j is :", j, "\n")
+
+
+        forStore1[j,1:3] <- forecast$eta
+        forStore1[j,1:3] <- forecast$seas[j]
+        forStore1[j,1:3] <- forecast$mu[j]
+
 
 		## Adjust forecasts
 		times <- indx[ind1 : ind2]
@@ -159,6 +166,7 @@ function( parmVal, infoFilter, x, fltLag, flt0, day )
 
     #### Store
     forStore[j:nBin,j] <- forecast
+
   }
 
 
