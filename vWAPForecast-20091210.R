@@ -144,12 +144,13 @@ function( parmVal, infoFilter, x, fltLag, flt0, day )
         # forecast_line <- forecast_df[j,]
         # Append to results_df
         # results_df <- rbind(results_df, forecast_line)
-        cat("j is :", j, "\n")
+
+        # cat("j is :", j, "\n")
 
 
-        forStore1[j,1:3] <- forecast$eta
-        forStore1[j,1:3] <- forecast$seas[j]
-        forStore1[j,1:3] <- forecast$mu[j]
+        forStore1[j,1] <- forecast$eta
+        forStore1[j,2] <- forecast$seas[j]
+        forStore1[j,3] <- forecast$mu[1]
 
 
 		## Adjust forecasts
@@ -175,7 +176,8 @@ function( parmVal, infoFilter, x, fltLag, flt0, day )
   ##############################################################################
 
   #### Answer
-  list(forecast = forStore, lagged = fltLag)
+  # list(forecast = forStore, lagged = fltLag)
+  list(forecast = forStore1, lagged = fltLag)
 }
 # ------------------------------------------------------------------------------
 
