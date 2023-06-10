@@ -28,8 +28,11 @@ path01Files, path01_1Files, path02Files, path04Files, path05Files = map(readFrom
 for i in range(100):
     df = pd.read_csv(path02 + path02Files[i], delimiter='\t')
     raw = df.iloc[26:,:].loc[:,['date','turnover']].reset_index(drop=True)
+    # ==========
+    raw['log_turnover'] = raw['turnover'].apply(np.log)
+    # ==========
     fore = pd.read_pickle(path05 + path05Files[i]).reset_index(drop=True)
-    fore.columns = ['eta','seas','mu']
+    # fore.columns = ['eta','seas','mu']
     result = pd.concat([raw, fore], axis = 1)
     # item = pd.read_csv(path01_1 + path01_1Files[i],header=None,index_col=0).dropna(axis=1)
     result.to_pickle(path06+path02Files[i][:-3]+'pkl')

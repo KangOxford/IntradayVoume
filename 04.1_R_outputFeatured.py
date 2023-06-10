@@ -24,6 +24,7 @@ readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile
 path04Files, path04_1Files, path05Files = map(readFromPath, [path04, path04_1, path05])
 for i in range(len(path04Files)):
     df = pd.read_csv(path04 + path04Files[i],header=None, index_col=0).dropna(axis=1).reset_index(drop=True)
+    df = df.apply(abs)
     df.columns = ['eta','seas','mu','x']
     df['eta*seas'] = df['eta'] * df['seas']
     # ============= milestone here ============

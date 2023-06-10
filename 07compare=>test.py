@@ -80,15 +80,19 @@ for i in range(100):
     r2_list = []
     # index = 0 for index in range(0, index_max+1)
     # index = 0 for index in range(0, index_max+0) # not sure
+    # x_list = ['eta','seas','mu']
+    # y_list = ['turnover']
+    x_list = ['log_x', 'log_eta*seas', 'log_eta', 'log_seas', 'log_mu']
+    y_list = ['log_turnover']
     for index in range(0, index_max + 1):
         train_end_index = index * bin_size + train_size
         def get_trainData(df):
-            x_train = df.loc[index * bin_size : index * bin_size + train_size,['eta','seas','mu']]
-            y_train = df.loc[index * bin_size : index * bin_size + train_size,['turnover']]
+            x_train = df.loc[index * bin_size : index * bin_size + train_size,x_list]
+            y_train = df.loc[index * bin_size : index * bin_size + train_size,y_list]
             return x_train, y_train
         def get_testData(df):
-            x_test = df.loc[train_end_index:train_end_index+test_size,['eta','seas','mu']]
-            y_test = df.loc[train_end_index:train_end_index+test_size,['turnover']]
+            x_test = df.loc[train_end_index:train_end_index+test_size,x_list]
+            y_test = df.loc[train_end_index:train_end_index+test_size,y_list]
             return x_test, y_test
         X_train, y_train = get_trainData(df)
         X_test, y_test = get_testData(df)
