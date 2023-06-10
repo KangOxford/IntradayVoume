@@ -27,7 +27,10 @@ path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =
 
 
 def regularity_ols(X_train, y_train, X_test, regulator):
-    if regulator == "OLS":
+    if regulator == "None":
+        y_pred = X_test.to_numpy().flatten()
+        return y_pred
+    elif regulator == "OLS":
         # print("OLS")
         import statsmodels.api as sm
         def ols_with_summary(X, y):
@@ -61,9 +64,10 @@ def regularity_ols(X_train, y_train, X_test, regulator):
             from sklearn.linear_model import Ridge
             reg = Ridge(alpha=best_regularity_alpha, max_iter=10000000, tol=1e-2)
         reg.fit(X_train, y_train)
-        X = pd.DataFrame(X_test).T
-        y_pred = reg.predict(X)
-        return y_pred[0]
+        # X = pd.DataFrame(X_test).T
+        # y_pred = reg.predict(X)
+        y_pred = reg.predict(X_test)
+        return y_pred
     else:
         raise NotImplementedError
 
@@ -80,10 +84,23 @@ for i in range(100):
     r2_list = []
     # index = 0 for index in range(0, index_max+1)
     # index = 0 for index in range(0, index_max+0) # not sure
+    x_list = ['x', 'eta*seas', 'eta', 'seas', 'mu']
+    y_list = ['turnover']
+
     # x_list = ['eta','seas','mu']
     # y_list = ['turnover']
-    x_list = ['log_x', 'log_eta*seas', 'log_eta', 'log_seas', 'log_mu']
+    # x_list = ['log_x', 'log_eta*seas', 'log_eta', 'log_seas', 'log_mu']
+    # y_list = ['log_turnover']
+    x_list = ['log_eta', 'log_seas', 'log_mu']
     y_list = ['log_turnover']
+    # x_list = ['x']
+    # y_list = ['turnover']
+
+    # x_list = ['log_x']
+    # y_list = ['log_turnover']
+
+
+    original_space = ['turnover']
     for index in range(0, index_max + 1):
         train_end_index = index * bin_size + train_size
         def get_trainData(df):
@@ -98,14 +115,24 @@ for i in range(100):
         X_test, y_test = get_testData(df)
 
         regulator = "OLS"
+        # regulator = "Lasso"
+        # regulator = "None"
         y_pred = regularity_ols(X_train, y_train, X_test, regulator)
         min_limit, max_limit = y_train.min(), y_train.max()
         broadcast = lambda x:np.full(y_pred.shape[0], x.to_numpy())
         min_limit, max_limit= map(broadcast, [min_limit, max_limit])
         y_pred_clipped = np.clip(y_pred, min_limit, max_limit)
+        if any('log' in x for x in x_list):
+            y_pred_clipped = np.exp(y_pred_clipped)
         test_date = df.date[train_end_index]
+
+
         from sklearn.metrics import r2_score
-        r2 = r2_score(y_test, y_pred)
+        original_images = df.loc[train_end_index:train_end_index+test_size,original_space]
+        # r2 = r2_score(y_test, y_pred_clipped)
+        r2 = r2_score(original_images, y_pred_clipped)
+
+
         r2_list.append([test_date,r2])
         # y_list.append([test_date, y_test, y_pred_clipped])
     r2arr = np.array(r2_list)

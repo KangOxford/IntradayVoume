@@ -33,6 +33,6 @@ for i in range(len(path04Files)):
     df['log_mu'] = df['mu'].apply(np.log)
     df['log_x'] = df['x'].apply(np.log)
     df['log_eta*seas'] = df['eta*seas'].apply(np.log)
-    new_df = df[['log_x','log_eta*seas','log_eta','log_seas','log_mu']]
+    new_df = df[['log_x','log_eta*seas','log_eta','log_seas','x','eta*seas','log_mu', 'eta','seas','mu']]
     # ============= milestone here ============
     new_df.to_csv(path04_1 + path04Files[i])
