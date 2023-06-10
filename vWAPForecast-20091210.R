@@ -115,8 +115,7 @@ function( parmVal, infoFilter, x, fltLag, flt0, day )
   rownames(forStore) <- as.character( ind1 : indL )             ## To   in rows
 
   forStore1 <- matrix(NA, nBin, nBin)
-  results_df <- data.frame()
-	#### Forecasts (j is the from bin for the forecast)
+  #### Forecasts (j is the from bin for the forecast)
   ind1 <- ind1 - 1
   for ( j in 0 : (nBin - 1) )
   {
@@ -167,6 +166,7 @@ function( parmVal, infoFilter, x, fltLag, flt0, day )
 
     #### Store
     forStore[j:nBin,j] <- forecast
+    forStore1[j,4] <-forStore[j,j]
 
   }
 
