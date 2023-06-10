@@ -118,7 +118,8 @@ function(model)
 
 
 
-dir_path <- "/Users/kang/CMEM/data/02_r_input_10/"
+dir_path <- "/Users/kang/CMEM/data/02_r_input/"
+# dir_path <- "/Users/kang/CMEM/data/02_r_input_10/"
 file_names <- list.files(dir_path)
 
 
@@ -247,7 +248,8 @@ for (i in seq_along(file_names))
   df <- do.call(rbind, forecasts)
   # write the all_forecasts data frame to a single file
   # out_dir_path <- "/Users/kang/CMEM/r_output/r_output_raw_data/"
-  out_dir_path <- "/Users/kang/CMEM/r_output/r_output_raw_data_10/"
+  # out_dir_path <- "/Users/kang/CMEM/r_output/r_output_raw_data_10/"
+  out_dir_path <- "/Users/kang/CMEM/r_output/04_r_output_raw_data/"
   filename <- paste0(out_dir_path, "forecasts_", substr(file_names[i], 1,nchar(file_names[i])-4), ".csv")
   write.table(df, file = filename, sep = ",", col.names = FALSE, append = FALSE)
 }

@@ -27,7 +27,7 @@ def platform():
     import platform  # Check the system platform
     if platform.system() == 'Darwin':
         print("Running on MacOS")
-        data_path = "/Users/kang/CMEM/r_output/r_output_raw_data_10/"
+        data_path = "/r_output/04_r_output_raw_data_10/"
     elif platform.system() == 'Linux':
         print("Running on Linux")
         raise NotImplementedError
