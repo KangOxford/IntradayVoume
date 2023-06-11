@@ -38,6 +38,10 @@ for i in range(100):
     result = pd.concat([raw, forecast], axis = 1)
     shift_result = result.shift(-1)
     new_result = pd.concat([shift_result, feature],axis=1)
+    new_result = new_result.dropna()
+    frequency_counts = new_result.date.value_counts()
+    unique_dates = sorted(frequency_counts[frequency_counts == 26].index.tolist())
+    newResult = new_result[new_result['date'].isin(unique_dates)]
     # newResult = new_result.iloc[:-25,:].dropna(axis = 0).reset_index(drop=True)
     # newResult.to_pickle(path06+path02Files[i][:-3]+'pkl')
 
