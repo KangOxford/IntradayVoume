@@ -44,12 +44,14 @@ for i in range(len(path04Files)):
     selected_rows = ft[ft['date'].isin(common_dates)].reset_index(drop=True)
     assert len(list(set(selected_rows.date))) == len(common_dates)
     assert selected_rows.shape[0] == 122 * 26
-    features = selected_rows.columns[5:-2]
+    features = list(selected_rows.columns[5:-2]) + ['qty']
+    # features = list(selected_rows.columns[5:-2])
+    assert type(features) == list
     for feature in features:
         new_ft = "log_"+feature
         selected_rows[new_ft] = selected_rows[feature].apply(np.log)
-    new_features = list(features) + ["log_"+feature for feature in features]
+    new_features = features + ["log_"+feature for feature in features]
     df_with_newFeatures = selected_rows[new_features]
     merged_df = pd.concat([new_df, df_with_newFeatures],axis = 1)
     # ============= milestone here ============
-    merged_df.to_csv(path04_1 + path04Files[i])
+    merged_df.to_csv(path04_1 + path04Files[i], mode = 'w+')

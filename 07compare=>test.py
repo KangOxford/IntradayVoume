@@ -10,10 +10,7 @@ path02 = "/Users/kang/CMEM/data/02_r_input/"
 path04 = "/Users/kang/CMEM/r_output/04_r_output_raw_data/"
 path05 = "/Users/kang/CMEM/r_output/05_r_output_raw_pkl/"
 path06 = '/Users/kang/CMEM/r_output/06_r_output_raw_pkl/'
-# path02 = "/Users/kang/CMEM/data/02_r_input_10/"
-# path04 = "/Users/kang/CMEM/r_output/04_r_output_raw_data_10/"
-# path05 = "/Users/kang/CMEM/r_output/05_r_output_raw_pkl_10/"
-# path06 = '/Users/kang/CMEM/r_output/06_r_output_raw_pkl_10/'
+
 
 def tryMkdir(path):
     try: listdir(path)
@@ -21,7 +18,7 @@ def tryMkdir(path):
     return 0
 _,_ = map(tryMkdir,[path05,path06])
 
-readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f))])
+readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f)) and f != '.DS_Store'])
 path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =\
     map(readFromPath, [path01, path01_1, path02, path04, path05, path06])
 
@@ -84,15 +81,30 @@ for i in range(100):
     r2_list = []
     # index = 0 for index in range(0, index_max+1)
     # index = 0 for index in range(0, index_max+0) # not sure
-    x_list = ['x', 'eta*seas', 'eta', 'seas', 'mu']
-    y_list = ['turnover']
+
+    # x_list = ['x', 'eta*seas', 'eta', 'seas', 'mu']
+    # y_list = ['turnover']
 
     # x_list = ['eta','seas','mu']
     # y_list = ['turnover']
-    # x_list = ['log_x', 'log_eta*seas', 'log_eta', 'log_seas', 'log_mu']
-    # y_list = ['log_turnover']
-    x_list = ['log_eta', 'log_seas', 'log_mu']
+
+    our_log_features = ['log_ntn', 'log_volBuyNotional', 'log_volSellNotional', 'log_nrTrades', 'log_ntr',
+                        'log_volBuyNrTrades_lit', 'log_volSellNrTrades_lit', 'log_volBuyQty', 'log_volSellQty',
+                        'log_daily_ntn', 'log_daily_volBuyNotional', 'log_daily_volSellNotional', 'log_daily_nrTrades',
+                        'log_daily_ntr', 'log_daily_volBuyNrTrades_lit', 'log_daily_volSellNrTrades_lit',
+                        'log_daily_volBuyQty', 'log_daily_volSellQty', 'log_daily_qty', 'log_intraday_ntn',
+                        'log_intraday_volBuyNotional', 'log_intraday_volSellNotional', 'log_intraday_nrTrades',
+                        'log_intraday_ntr', 'log_intraday_volBuyNrTrades_lit', 'log_intraday_volSellNrTrades_lit',
+                        'log_intraday_volBuyQty', 'log_intraday_volSellQty', 'log_intraday_qty', 'log_ntn_2',
+                        'log_volBuyNotional_2', 'log_volSellNotional_2', 'log_nrTrades_2', 'log_ntr_2',
+                        'log_volBuyNrTrades_lit_2', 'log_volSellNrTrades_lit_2', 'log_volBuyQty_2', 'log_volSellQty_2',
+                        'log_ntn_8', 'log_volBuyNotional_8', 'log_volSellNotional_8', 'log_nrTrades_8', 'log_ntr_8',
+                        'log_volBuyNrTrades_lit_8', 'log_volSellNrTrades_lit_8', 'log_volBuyQty_8', 'log_volSellQty_8']
+    x_list = ['log_x', 'log_eta*seas', 'log_eta', 'log_seas', 'log_mu']
+    x_list = x_list +  our_log_features
     y_list = ['log_turnover']
+    # x_list = ['log_eta', 'log_seas', 'log_mu']
+    # y_list = ['log_turnover']
     # x_list = ['x']
     # y_list = ['turnover']
 
@@ -145,4 +157,4 @@ for i in range(100):
     pivot_df = df.pivot(index='test_date', columns='symbol', values='r2')
     dflst.append(pivot_df)
 r2df = pd.concat(dflst,axis =1)
-r2df.to_csv(path00 + "07_r2df.csv")
+r2df.to_csv(path00 + "07_r2df.csv", mode = 'w')

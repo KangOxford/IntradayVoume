@@ -17,7 +17,7 @@ from os import listdir;
 from os.path import isfile, join;
 import pandas as pd
 
-readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f))])
+readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f)) and f != '.DS_Store'])
 path01Files, path04_1Files, path05Files = map(readFromPath, [path01, path04_1, path05])
 
 for i in range(len(path04_1Files)):
