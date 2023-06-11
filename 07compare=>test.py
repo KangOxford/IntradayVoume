@@ -22,6 +22,10 @@ readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile
 path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =\
     map(readFromPath, [path01, path01_1, path02, path04, path05, path06])
 
+array1 = np.concatenate( [np.arange(1,10,0.01), np.arange(10,50,0.1) ])
+array2 = np.arange(1,0.001,-0.001)
+combined_array = np.array(list(zip(array1, array2))).flatten()
+# used for alphas
 
 def regularity_ols(X_train, y_train, X_test, regulator):
     if regulator == "None":
@@ -64,6 +68,7 @@ def regularity_ols(X_train, y_train, X_test, regulator):
         # X = pd.DataFrame(X_test).T
         # y_pred = reg.predict(X)
         y_pred = reg.predict(X_test)
+        y_pred = y_pred.flatten()
         return y_pred
     else:
         raise NotImplementedError
@@ -126,8 +131,9 @@ for i in range(100):
         X_train, y_train = get_trainData(df)
         X_test, y_test = get_testData(df)
 
-        regulator = "OLS"
+        # regulator = "OLS"
         # regulator = "Lasso"
+        regulator = "Ridge"
         # regulator = "None"
         y_pred = regularity_ols(X_train, y_train, X_test, regulator)
         min_limit, max_limit = y_train.min(), y_train.max()
