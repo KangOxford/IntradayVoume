@@ -1,9 +1,15 @@
 import numpy as np
 
+path00 = "/Users/kang/CMEM/"
 path01 = "/Users/kang/CMEM/data/01_raw/"
 path01_1 = "/Users/kang/CMEM/data/01.1_raw/"
-path02 = "/Users/kang/CMEM/data/02_r_input_10/"
-path03 = "/Users/kang/CMEM/data/03_r_input_10/"
+path02 = "/Users/kang/CMEM/data/02_r_input/"
+path04 = "/Users/kang/CMEM/r_output/04_r_output_raw_data/"
+path04_1 = "/Users/kang/CMEM/r_output/04_1_rOuputFeatured/"
+path04_2 = "/Users/kang/Volume-Forecasting/02_raw_component/"
+path05 = "/Users/kang/CMEM/r_output/05_r_output_raw_pkl/"
+path06 = '/Users/kang/CMEM/r_output/06_r_output_raw_pkl/'
+
 
 from os import listdir;
 from os.path import isfile, join;
@@ -27,6 +33,8 @@ for i in range(len(path01Files)):
 
 common_elements = lambda nested_list: sorted(list(set(nested_list[0]).intersection(*nested_list[1:])))
 common_dates = common_elements(date_list)
+
+np.save(path00 + 'common_dates.npy', common_dates)
 
 def tryMkdir(path):
     try: listdir(path)
