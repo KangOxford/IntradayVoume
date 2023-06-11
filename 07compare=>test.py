@@ -3,13 +3,14 @@ import pandas as pd
 from os import listdir;
 from os.path import isfile, join;
 
-path00 = "/Users/kang/CMEM/"
-path01 = "/Users/kang/CMEM/data/01_raw/"
-path01_1 = "/Users/kang/CMEM/data/01.1_raw/"
-path02 = "/Users/kang/CMEM/data/02_r_input/"
-path04 = "/Users/kang/CMEM/r_output/04_r_output_raw_data/"
-path05 = "/Users/kang/CMEM/r_output/05_r_output_raw_pkl/"
-path06 = '/Users/kang/CMEM/r_output/06_r_output_raw_pkl/'
+# path00 = "/Users/kang/CMEM/"
+path00 = "/home/kanli/cmem/"
+path01 = path00 + "data/01_raw/"
+path01_1=path00 + "data/01.1_raw/"
+path02 = path00 + "data/02_r_input/"
+path04 = path00 + "r_output/04_r_output_raw_data/"
+path05 = path00 + "r_output/05_r_output_raw_pkl/"
+path06 = path00 + "r_output/06_r_output_raw_pkl/"
 
 
 def tryMkdir(path):
@@ -132,8 +133,8 @@ for i in range(100):
         X_test, y_test = get_testData(df)
 
         # regulator = "OLS"
-        # regulator = "Lasso"
-        regulator = "Ridge"
+        regulator = "Lasso"
+        # regulator = "Ridge"
         # regulator = "None"
         y_pred = regularity_ols(X_train, y_train, X_test, regulator)
         min_limit, max_limit = y_train.min(), y_train.max()
@@ -163,4 +164,4 @@ for i in range(100):
     pivot_df = df.pivot(index='test_date', columns='symbol', values='r2')
     dflst.append(pivot_df)
 r2df = pd.concat(dflst,axis =1)
-r2df.to_csv(path00 + "07_r2df.csv", mode = 'w')
+r2df.to_csv(path00 + "07_r2df_"+regulator+"_.csv", mode = 'w')

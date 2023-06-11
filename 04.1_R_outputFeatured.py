@@ -9,11 +9,11 @@ path05 = "/Users/kang/CMEM/r_output/05_r_output_raw_pkl/"
 path06 = '/Users/kang/CMEM/r_output/06_r_output_raw_pkl/'
 
 
-def tryMkdir(path):
-    try: listdir(path)
-    except:import os;os.mkdir(path)
-    return 0
-_,_ = map(tryMkdir,[path01,path05])
+# def tryMkdir(path):
+#     try: listdir(path)
+#     except:import os;os.mkdir(path)
+#     return 0
+# _,_ = map(tryMkdir,[path01,path05])
 
 from os import listdir;
 from os.path import isfile, join;

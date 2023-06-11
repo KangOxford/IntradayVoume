@@ -44,5 +44,13 @@ for i in range(100):
     newResult = new_result[new_result['date'].isin(unique_dates)]
     newResult = newResult.reset_index(drop=True)
     newResult.to_pickle(path06+path02Files[i][:-3]+'pkl')
-
-
+    def shift_check(newResult):
+        columns = list(newResult.columns)
+        columns.remove('log_qty')
+        columns.remove('qty')
+        columns.remove('date')
+        columns.remove('turnover')
+        columns.remove('log_turnover')
+        newCol = ['date','turnover','qty','log_turnover','log_qty']+columns
+        NewResult = newResult[newCol]
+        return NewResult
