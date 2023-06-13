@@ -186,8 +186,9 @@ for index in tqdm(range(111)):
     y_pred_clipped.columns = ['pred']
     original_images.reset_index(inplace=True,drop=True)
     original_images.columns = ['true']
-    original_images.index =  np.repeat(np.arange(26), 100)
-    y_pred_clipped.index =  np.repeat(np.arange(26), 100)
+    repeated =  np.repeat(np.arange(100), 26)
+    original_images.index = repeated
+    y_pred_clipped.index = repeated
     test = pd.concat([original_images, y_pred_clipped], axis = 1)
     test.reset_index(inplace=True)
     from sklearn.metrics import r2_score
@@ -198,9 +199,10 @@ for index in tqdm(range(111)):
         r2v = r2_score(item['true'], item['pred'])
         lst.append(r2v)
     r2 = np.mean(lst)
+    assert type(r2) == np.float64
     r2_list.append([test_date,r2])
     # y_list.append([test_date, y_test, y_pred_clipped])
-
+assert len(r2_list) == 111
 
 
 
@@ -209,10 +211,9 @@ for index in tqdm(range(111)):
 
 r2arr = np.array(r2_list)
 df1 = pd.DataFrame(r2arr)
-# r2arr[:,1].mean()
 df1.columns = ['test_date','r2']
-
-
+df1
+df1.r2.mean()
 #
 #
 # df.test_date = df.test_date.astype(int)

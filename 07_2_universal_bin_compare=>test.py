@@ -153,6 +153,7 @@ for index in tqdm(range(111)):
     for bin in range(bin_size):
         train_start_index = (index * bin_size + bin) * num
         train_end_index = (index * bin_size + train_size + bin) * num -1
+        test_start_index =  train_end_index +
         test_end_index = train_end_index+test_size * num - 1
         def get_trainData(df):
             x_train = df.loc[train_start_index : train_end_index, x_list]
