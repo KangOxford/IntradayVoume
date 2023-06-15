@@ -1,10 +1,9 @@
-#%%
 import numpy as np
 import pandas as pd
 from os import listdir;
 from os.path import isfile, join;
-
-from config import *
+from sklearn.metrics import r2_score
+import sys;sys.path.append("/homes/80/kang/cmem/");from src.config import *
 
 
 def tryMkdir(path):
@@ -69,17 +68,6 @@ def regularity_ols(X_train, y_train, X_test, regulator):
         raise NotImplementedError
 # ================================
 # num = 100
-# num = 90
-# num = 80
-# num = 70
-# num = 60
-# num = 50
-# num = 40
-# num = 30
-# num = 20
-# num = 10
-# num = 3
-# num = 2
 num = 1
 def get_universal_df():
     df_lst = []
@@ -111,7 +99,7 @@ df = get_universal_df()
 # ================================
 bin_size = 26
 train_size = 10 * 26
-test_size = 1 * 26
+test_size = 1
 index_max  = int((df.shape[0] -(train_size + test_size))/bin_size)
 r2_list = []
 # index = 0 for index in range(0, index_max+1)
@@ -149,75 +137,82 @@ original_space = ['turnover']
 # ================================
 
 
-
-from tqdm import tqdm
 # for index in tqdm(range(0, index_max + 1)):
 #     print(index)
+
+from tqdm import tqdm
 for index in tqdm(range(111)):
-    train_start_index = index * bin_size * num
-    train_end_index = (index * bin_size + train_size) * num -1
-    test_start_index = train_end_index + 1
-    test_end_index = train_end_index+test_size * num
-    def get_trainData(df):
-        x_train = df.loc[train_start_index: train_end_index, x_list]
-        y_train = df.loc[train_start_index: train_end_index, y_list]
-        return x_train, y_train
-    def get_testData(df):
-        x_test = df.loc[test_start_index:test_end_index , x_list]
-        y_test = df.loc[test_start_index:test_end_index , y_list]
-        return x_test, y_test
-    original_images = df.loc[test_start_index:test_end_index , original_space]
-    X_train, y_train = get_trainData(df)
-    X_test, y_test = get_testData(df)
-    def no_overlap_assert(y_test, y_train):
-        assert y_test.index[0] > y_train.index[-1]
-    no_overlap_assert(y_test, y_train)
 
-    regulator = "OLS"
-    # regulator = "Lasso"
-    # regulator = "Ridge"
-    # regulator = "None"
-    y_pred = regularity_ols(X_train, y_train, X_test, regulator)
-    min_limit, max_limit = y_train.min(), y_train.max()
-    broadcast = lambda x:np.full(y_pred.shape[0], x.to_numpy())
-    min_limit, max_limit= map(broadcast, [min_limit, max_limit])
-    y_pred_clipped = np.clip(y_pred, min_limit, max_limit)
-    if any('log' in x for x in x_list):
-        y_pred_clipped = np.exp(y_pred_clipped)
-    test_date = df.date[test_start_index]
+    bin_df_list = []
+    for bin in range(bin_size):
+        train_start_index = (index * bin_size + bin) * num
+        train_end_index = (index * bin_size + train_size + bin) * num -1
+        test_start_index =  train_end_index + 1
+        test_end_index = train_end_index+test_size * num
+        def get_trainData(df):
+            x_train = df.loc[train_start_index : train_end_index, x_list]
+            y_train = df.loc[train_start_index : train_end_index, y_list]
+            return x_train, y_train
+        def get_testData(df):
+            x_test = df.loc[train_end_index :  test_end_index, x_list]
+            y_test = df.loc[train_end_index : test_end_index , y_list]
+            return x_test, y_test
+        X_train, y_train = get_trainData(df)
+        X_test, y_test = get_testData(df)
+
+        regulator = "OLS"
+        # regulator = "Lasso"
+        # regulator = "Ridge"
+        # regulator = "None"
+        y_pred = regularity_ols(X_train, y_train, X_test, regulator)
+        min_limit, max_limit = y_train.min(), y_train.max()
+        broadcast = lambda x:np.full(y_pred.shape[0], x.to_numpy())
+        min_limit, max_limit= map(broadcast, [min_limit, max_limit])
+        y_pred_clipped = np.clip(y_pred, min_limit, max_limit)
+        if any('log' in x for x in x_list):
+            y_pred_clipped = np.exp(y_pred_clipped)
+        test_date = df.date[train_end_index+1]
+        # test_date = df.date[train_end_index] #TODO
 
 
-    # r2 = r2_score(y_test, y_pred_clipped)
-    y_pred_clipped = pd.DataFrame(y_pred_clipped)
-    y_pred_clipped.columns = ['pred']
-    original_images.reset_index(inplace=True,drop=True)
-    original_images.columns = ['true']
-    repeated = np.repeat(np.arange(num), 26)
-    original_images.index = repeated
-    y_pred_clipped.index = repeated
-    test = pd.concat([original_images, y_pred_clipped], axis = 1)
-    test.reset_index(inplace=True)
-    from sklearn.metrics import r2_score
-    g = test.groupby('index')
+        original_images = df.loc[train_end_index:test_end_index , original_space]
+        # r2 = r2_score(y_test, y_pred_clipped)
+        y_pred_clipped = pd.DataFrame(y_pred_clipped)
+        y_pred_clipped.columns = ['pred']
+        original_images.reset_index(inplace=True,drop=True)
+        original_images.columns = ['true']
+        original_images['date'] = test_date
+        original_images['bin'] = bin + 1
+        bin_df = pd.concat([original_images[['date','bin','true']],y_pred_clipped],axis=1)
+        bin_df_list.append(bin_df)
+
+
+    df0 = pd.concat(bin_df_list, axis = 0)
+    df0.reset_index(inplace=True)
+    g = df0.groupby('index')
     lst = []
     for index, item in g:
         pass
-        assert item.shape[0] == 26
-        r2v = r2_score(item['true'], item['pred'])
-        lst.append(r2v)
+        r2value = r2_score(item['true'], item['pred'])
+        lst.append(r2value)
+    # stock r2 by all bins for one date, len(lst) = 100
     r2 = np.mean(lst)
-    assert type(r2) == np.float64
     r2_list.append([test_date,r2])
     # y_list.append([test_date, y_test, y_pred_clipped])
-assert len(r2_list) == 111
+
+
+
+
 
 
 
 r2arr = np.array(r2_list)
 df1 = pd.DataFrame(r2arr)
+# r2arr[:,1].mean()
 df1.columns = ['test_date','r2']
-df1
+print(df1)
 df1.r2.mean()
+
 #
 #
 # df.test_date = df.test_date.astype(int)
@@ -228,5 +223,3 @@ df1.r2.mean()
 #
 # r2df = pd.concat(dflst,axis =1)
 # r2df.to_csv(path00 + "07_r2df_"+regulator+"_.csv", mode = 'w')
-
-# %%
