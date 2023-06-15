@@ -74,7 +74,19 @@ def regularity_ols(X_train, y_train, X_test, regulator):
     else:
         raise NotImplementedError
 # ================================
-num = 100
+# num = 100
+# num = 90
+# num = 80
+# num = 70
+# num = 60
+# num = 50
+# num = 40
+# num = 30
+# num = 20
+# num = 10
+# num = 3
+# num = 2
+num = 1
 def get_universal_df():
     df_lst = []
     from tqdm import tqdm
@@ -186,7 +198,7 @@ for index in tqdm(range(111)):
     y_pred_clipped.columns = ['pred']
     original_images.reset_index(inplace=True,drop=True)
     original_images.columns = ['true']
-    repeated =  np.repeat(np.arange(100), 26)
+    repeated = np.repeat(np.arange(num), 26)
     original_images.index = repeated
     y_pred_clipped.index = repeated
     test = pd.concat([original_images, y_pred_clipped], axis = 1)
@@ -196,6 +208,7 @@ for index in tqdm(range(111)):
     lst = []
     for index, item in g:
         pass
+        assert item.shape[0] == 26
         r2v = r2_score(item['true'], item['pred'])
         lst.append(r2v)
     r2 = np.mean(lst)

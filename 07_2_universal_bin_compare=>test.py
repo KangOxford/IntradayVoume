@@ -144,17 +144,18 @@ original_space = ['turnover']
 # ================================
 
 
+# for index in tqdm(range(0, index_max + 1)):
+#     print(index)
 
 from tqdm import tqdm
 for index in tqdm(range(111)):
-# for index in tqdm(range(0, index_max + 1)):
-#     print(index)
+
     bin_df_list = []
     for bin in range(bin_size):
         train_start_index = (index * bin_size + bin) * num
         train_end_index = (index * bin_size + train_size + bin) * num -1
-        test_start_index =  train_end_index +
-        test_end_index = train_end_index+test_size * num - 1
+        test_start_index =  train_end_index + 1
+        test_end_index = train_end_index+test_size * num
         def get_trainData(df):
             x_train = df.loc[train_start_index : train_end_index, x_list]
             y_train = df.loc[train_start_index : train_end_index, y_list]
@@ -192,6 +193,7 @@ for index in tqdm(range(111)):
         bin_df = pd.concat([original_images[['date','bin','true']],y_pred_clipped],axis=1)
         bin_df_list.append(bin_df)
 
+
     df0 = pd.concat(bin_df_list, axis = 0)
     df0.reset_index(inplace=True)
     g = df0.groupby('index')
@@ -212,11 +214,11 @@ for index in tqdm(range(111)):
 
 
 r2arr = np.array(r2_list)
-df = pd.DataFrame(r2arr)
+df1 = pd.DataFrame(r2arr)
 # r2arr[:,1].mean()
-df.columns = ['test_date','r2']
-print(df)
-
+df1.columns = ['test_date','r2']
+print(df1)
+df1.r2.mean()
 
 #
 #
