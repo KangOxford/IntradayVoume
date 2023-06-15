@@ -3,15 +3,8 @@ import pandas as pd
 from os import listdir;
 from os.path import isfile, join;
 from sklearn.metrics import r2_score
+from config import *
 
-# path00 = "/Users/kang/CMEM/"
-path00 = "/home/kanli/cmem/"
-path01 = path00 + "data/01_raw/"
-path01_1=path00 + "data/01.1_raw/"
-path02 = path00 + "data/02_r_input/"
-path04 = path00 + "r_output/04_r_output_raw_data/"
-path05 = path00 + "r_output/05_r_output_raw_pkl/"
-path06 = path00 + "r_output/06_r_output_raw_pkl/"
 
 
 def tryMkdir(path):

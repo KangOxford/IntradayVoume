@@ -363,7 +363,7 @@ function(fun, parmVal, control, ...)
     cat("iteration ", 0, "\n")
     out <- cbind(parNames, parmVal, NA)
     colnames(out) <- cnames
-    print(out, quote = FALSE, digits = 6, na.print = ".")
+    print(out, quote = FALSE, digits = 6, na.print = "..")
     
     #### Cycle
     for (i in 1:maxIter)
@@ -398,7 +398,7 @@ function(fun, parmVal, control, ...)
 					cat("iteration ", i, "\n")
 					out <- cbind(parNames, parmVal, gMean)
 					colnames(out) <- cnames
-					print(out, quote = FALSE, digits = 6, na.print = ".")
+					print(out, quote = FALSE, digits = 6, na.print = "..")
 				}
 			}
 
@@ -1543,18 +1543,18 @@ function(inference, diControl, fileout = "")
 
   cat(file = fileout, append = TRUE, "Fit Statistics:", "\n")
   write.table(file = fileout, append = TRUE, x = IC,
-       quote = FALSE, sep = " ", na = ".", row.names = FALSE, col.names = FALSE)
+              quote = FALSE, sep = " ", na = "..", row.names = FALSE, col.names = FALSE)
 
   cat(file = fileout, append = TRUE, "Ljung-Box Statistics:", "\n")
   write.table(file = fileout, append = TRUE, x = pmTest,
-       quote = FALSE, sep = " ", na = ".", row.names = FALSE, col.names = FALSE)
+              quote = FALSE, sep = " ", na = "..", row.names = FALSE, col.names = FALSE)
   cat(file = fileout, append = TRUE, "Percentage of significant statistics",
        "(alpha", apmTest, "\b, lags", lpmTest[1], "to", lpmTest[2], "):",
        pctSpmTest, "\b%", "\n")
 
   cat(file = fileout, append = TRUE, "Coefficient Estimates:", "\n")
   write.table(file = fileout, append = TRUE, x = out,
-       quote = FALSE, sep = " ", na = ".", row.names = FALSE, col.names = FALSE)
+              quote = FALSE, sep = " ", na = "..", row.names = FALSE, col.names = FALSE)
 
   cat(file = fileout, append = TRUE, "--------------------------------------------------------------------------------", "\n")
 
@@ -1774,7 +1774,7 @@ function(xDec, calendar, type, ylim)
   ##############################################################################
 
   #### Settings
-  if (type == "data")
+  if (type == "../data")
   {
     main1 <- "Data"
     main2 <- "Daily pattern"
@@ -2123,18 +2123,18 @@ function(x, inference, calendar)
 
   #### Plots
   par(mfrow = c(2,5))
-  .plotDiagnostics1(xDec  , calendar, "data", ylim)
+  .plotDiagnostics1(xDec  , calendar, "../data", ylim)
   .plotDiagnostics1(estDec, calendar, "fit" , ylim)
 
   x11()
   par(mfrow = c(2,5))
-  .plotDiagnostics2(xDec  , calendar,      "data")
+  .plotDiagnostics2(xDec  , calendar, "../data")
   .plotDiagnostics2(resDec, calendar, "residuals")
 
   x11()
   par(mfrow = c(2,2))
   nBin <- max(calendar$bin)
-  .plot.acfAllBins(xDec$mu  , nBin,      "data")
+  .plot.acfAllBins(xDec$mu  , nBin, "../data")
   .plot.acfAllBins(resDec$mu, nBin, "residuals")
 
 

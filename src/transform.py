@@ -1,4 +1,4 @@
-with open("/Users/kang/CMEM/SPY-15m-adj-20091201.txt") as f:
+with open("/src/SPY-15m-adj-20091201.txt") as f:
     head = f.readline()
     lines = f.readlines()
 new_lines = []
@@ -8,6 +8,6 @@ for line in lines:
     new_line = '\t'.join(splitted)
     new_lines.append(new_line)
 
-with open("/Users/kang/CMEM/Test_SPY-15m-adj-20091201.txt",'w+') as f:
+with open("/src/Test_SPY-15m-adj-20091201.txt", 'w+') as f:
     f.write(head)
     f.writelines(new_lines)

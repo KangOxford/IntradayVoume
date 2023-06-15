@@ -1,15 +1,8 @@
 import pandas as pd
 
 
-# path00 = "/Users/kang/CMEM/"
-path00 = "/home/kanli/cmem/"
+from config import *
 
-path01 = path00 + "data/01_raw/"
-path01_1=path00 + "data/01.1_raw/"
-path02 = path00 + "data/02_r_input/"
-path04 = path00 + "r_output/04_r_output_raw_data/"
-path05 = path00 + "r_output/05_r_output_raw_pkl/"
-path06 = path00 + "r_output/06_r_output_raw_pkl/"
 
 # r2df = pd.read_csv(path00 +"07_r2df.csv", index_col=0)
 # r2df = pd.read_csv(path00 +"07_r2df_Lasso_.csv", index_col=0)
