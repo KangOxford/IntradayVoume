@@ -106,7 +106,7 @@ if __name__ == "__main__":
         # ================================
         bin_size = 26
         train_size = 10 * 26
-        test_size = 1
+        test_size = 1 # for update per bin
         index_max  = int((df.shape[0] -(train_size + test_size))/bin_size)
         r2_list = []
         # index = 0 for index in range(0, index_max+1)

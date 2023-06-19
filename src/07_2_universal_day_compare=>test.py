@@ -99,7 +99,7 @@ df = get_universal_df()
 # ================================
 bin_size = 26
 train_size = 10 * 26
-test_size = 1
+test_size = 1 * 26
 index_max  = int((df.shape[0] -(train_size + test_size))/bin_size)
 r2_list = []
 # index = 0 for index in range(0, index_max+1)
@@ -146,16 +146,18 @@ for index in tqdm(range(111)):
     bin_df_list = []
     for bin in range(bin_size):
         train_start_index = (index * bin_size + bin) * num
-        train_end_index = (index * bin_size + train_size + bin) * num -1
-        test_start_index =  train_end_index + 1
-        test_end_index = train_end_index+test_size * num
+        train_end_index = (index * bin_size + train_size + bin) * num
+        test_start_index = train_end_index
+        test_end_index = train_end_index + test_size * num
         def get_trainData(df):
-            x_train = df.loc[train_start_index : train_end_index, x_list]
-            y_train = df.loc[train_start_index : train_end_index, y_list]
+            x_train = df.loc[:, x_list].iloc[train_start_index: train_end_index, :]
+            y_train = df.loc[:, y_list].iloc[train_start_index: train_end_index, :]
+            # x_train = df.iloc[train_start_index : train_end_index, x_list]
+            # y_train = df.loc[train_start_index : train_end_index, y_list]
             return x_train, y_train
         def get_testData(df):
-            x_test = df.loc[train_end_index :  test_end_index, x_list]
-            y_test = df.loc[train_end_index : test_end_index , y_list]
+            x_test = df.loc[:, x_list].iloc[train_end_index:  test_end_index, :]
+            y_test = df.loc[:, y_list].iloc[train_end_index: test_end_index, :]
             return x_test, y_test
         X_train, y_train = get_trainData(df)
         X_test, y_test = get_testData(df)
@@ -171,8 +173,7 @@ for index in tqdm(range(111)):
         y_pred_clipped = np.clip(y_pred, min_limit, max_limit)
         if any('log' in x for x in x_list):
             y_pred_clipped = np.exp(y_pred_clipped)
-        test_date = df.date[train_end_index+1]
-        # test_date = df.date[train_end_index] #TODO
+        test_date = df.date[train_end_index]
 
 
         original_images = df.loc[train_end_index:test_end_index , original_space]
