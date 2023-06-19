@@ -235,28 +235,59 @@ def print_mean(df3):
 df3lst = []
 # for start_index in tqdm(range(1)):
 # list(range(0, 100, 50))
-# num_stock_per_group = 1
+num_stock_per_group = 1
 # num_stock_per_group = 2
 # num_stock_per_group = 5
 # num_stock_per_group = 10
 # num_stock_per_group = 20
 # num_stock_per_group = 50
-num_stock_per_group = 100
+# num_stock_per_group = 100
 # for start_index in tqdm(range(0, 100, num_stock_per_group)):
 # for start_index in tqdm(range(20, 100, num_stock_per_group)):
 # for start_index in tqdm(range(40, 60, num_stock_per_group)):
 # for start_index in tqdm(range(60, 80, num_stock_per_group)):
 # for start_index in tqdm(range(80, 100, num_stock_per_group)):
-for start_index in tqdm(range(0, 100, num_stock_per_group)):
+# for start_index in tqdm(range(50, 60, num_stock_per_group)):
+# for start_index in tqdm(range(70, 80, num_stock_per_group)):
+# for start_index in tqdm(range(90, 100, num_stock_per_group)):
+# for start_index in tqdm(range(30, 40, num_stock_per_group)):
+for start_index in tqdm(range(10, 20, num_stock_per_group)):
     df3 = get_universal(start_index,num_stock_per_group)
     df3lst.append(df3)
-df4 = pd.concat(df3lst, axis=1)
+df3lst1 = df3lst[0:10]
+df4 = pd.concat(df3lst1, axis=1)
+# df4 = pd.concat(df3lst, axis=1)
 print_mean(df4)
 # df4.to_csv("100stocks_2stocksPerGroup"+".csv")
+# s,e=0,10
+# s,e=20,30
+# s,e=40,50
+# s,e=60,70
+# s,e=80,90
+# s,e=50,60
+# s,e=70,80
+# s,e=90,100
+# s,e=30,40
+# s,e=10,20
 
-df4.to_csv(f"100stocks_{num_stock_per_group}_stocksPerGroup"+".csv")
+df4.to_csv("/homes/80/kang/cmem/07_output_universal/"+f"100stocks_{num_stock_per_group}_stocksPerGroup_{s}_{e}"+".csv")
 
 # df4.to_csv("100stocks_5stocksPerGroup"+".csv")
 # df4.to_csv("100stocks_10stocksPerGroup"+".csv")
 # df4.to_csv("100stocks_20stocksPerGroup"+".csv")
 # df4.to_csv("100stocks_20stocksPerGroup"+".csv")
+
+
+path100 = "/homes/80/kang/cmem/07_output_universal/"
+readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f)) and f != '.DS_Store'])
+path01Files, path100Files =\
+    map(readFromPath, [path01, path100])
+
+dflst = []
+for i in range(len(path100Files)):
+    df = pd.read_csv(path100+path100Files[i])
+    df = df.set_index('test_date')
+    dflst.append(df)
+
+df5 = pd.concat(dflst,axis =1)
+print_mean(df5)
