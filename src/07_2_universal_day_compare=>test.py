@@ -231,9 +231,9 @@ def print_mean(df3):
     print(f">>>> aggregate mean: \n",df3.mean(axis=1).mean())
 
 df3lst = []
-for start_index in tqdm(range(5)):
+for start_index in tqdm(range(2)):
 # for start_index in range(100):
-    df3 = get_universal(start_index,2)
+    df3 = get_universal(start_index,5)
     df3lst.append(df3)
 df4 = pd.concat(df3lst, axis=1)
 print_mean(df4)
