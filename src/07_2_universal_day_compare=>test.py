@@ -21,6 +21,8 @@ path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =
 
 
 def get_universal(start_index, num_of_stocks):
+# def get_universal(start_index, num_of_stocks, end_index):
+    # assert (end_index - start_index) % num_of_stocks == 0
     array1 = np.concatenate( [np.arange(1,10,0.01), np.arange(10,50,0.1) ])
     array2 = np.arange(1,0.001,-0.001)
     combined_array = np.array(list(zip(array1, array2))).flatten()
@@ -231,9 +233,24 @@ def print_mean(df3):
     print(f">>>> aggregate mean: \n",df3.mean(axis=1).mean())
 
 df3lst = []
-for start_index in tqdm(range(2)):
-# for start_index in range(100):
-    df3 = get_universal(start_index,5)
+# for start_index in tqdm(range(1)):
+# list(range(0, 100, 50))
+num_stock_per_group = 1
+# num_stock_per_group = 2
+# num_stock_per_group = 5
+# num_stock_per_group = 10
+# num_stock_per_group = 20
+# num_stock_per_group = 50
+for start_index in tqdm(range(0, 100, num_stock_per_group)):
+    df3 = get_universal(start_index,num_stock_per_group)
     df3lst.append(df3)
 df4 = pd.concat(df3lst, axis=1)
 print_mean(df4)
+# df4.to_csv("100stocks_2stocksPerGroup"+".csv")
+
+df4.to_csv(f"100stocks_{num_stock_per_group}_stocksPerGroup"+".csv")
+
+# df4.to_csv("100stocks_5stocksPerGroup"+".csv")
+# df4.to_csv("100stocks_10stocksPerGroup"+".csv")
+# df4.to_csv("100stocks_20stocksPerGroup"+".csv")
+# df4.to_csv("100stocks_20stocksPerGroup"+".csv")
