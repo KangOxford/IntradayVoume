@@ -235,12 +235,18 @@ def print_mean(df3):
 df3lst = []
 # for start_index in tqdm(range(1)):
 # list(range(0, 100, 50))
-num_stock_per_group = 1
+# num_stock_per_group = 1
 # num_stock_per_group = 2
 # num_stock_per_group = 5
 # num_stock_per_group = 10
 # num_stock_per_group = 20
 # num_stock_per_group = 50
+num_stock_per_group = 100
+# for start_index in tqdm(range(0, 100, num_stock_per_group)):
+# for start_index in tqdm(range(20, 100, num_stock_per_group)):
+# for start_index in tqdm(range(40, 60, num_stock_per_group)):
+# for start_index in tqdm(range(60, 80, num_stock_per_group)):
+# for start_index in tqdm(range(80, 100, num_stock_per_group)):
 for start_index in tqdm(range(0, 100, num_stock_per_group)):
     df3 = get_universal(start_index,num_stock_per_group)
     df3lst.append(df3)
