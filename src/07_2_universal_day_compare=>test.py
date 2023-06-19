@@ -68,7 +68,8 @@ def regularity_ols(X_train, y_train, X_test, regulator):
         raise NotImplementedError
 # ================================
 # num = 100
-num = 1
+num = 2 # for 2 stocks
+# num = 1 # for single stock
 def get_universal_df():
     df_lst = []
     from tqdm import tqdm
@@ -101,7 +102,6 @@ bin_size = 26
 train_size = 10 * 26
 test_size = 1 * 26
 index_max  = int((df.shape[0] -(train_size + test_size))/bin_size)
-r2_list = []
 # index = 0 for index in range(0, index_max+1)
 # index = 0 for index in range(0, index_max+0) # not sure
 
@@ -124,7 +124,7 @@ our_log_features = ['log_ntn', 'log_volBuyNotional', 'log_volSellNotional', 'log
                     'log_ntn_8', 'log_volBuyNotional_8', 'log_volSellNotional_8', 'log_nrTrades_8', 'log_ntr_8',
                     'log_volBuyNrTrades_lit_8', 'log_volSellNrTrades_lit_8', 'log_volBuyQty_8', 'log_volSellQty_8']
 x_list = ['log_x', 'log_eta*seas', 'log_eta', 'log_seas', 'log_mu']
-x_list = x_list +  our_log_features
+x_list = x_list + our_log_features
 y_list = ['log_turnover']
 # x_list = ['log_eta', 'log_seas', 'log_mu']
 # y_list = ['log_turnover']
@@ -141,79 +141,73 @@ original_space = ['turnover']
 #     print(index)
 
 from tqdm import tqdm
+r2_list = []
 for index in tqdm(range(111)):
 
-    bin_df_list = []
-    for bin in range(bin_size):
-        train_start_index = (index * bin_size + bin) * num
-        train_end_index = (index * bin_size + train_size + bin) * num
-        test_start_index = train_end_index
-        test_end_index = train_end_index + test_size * num
-        def get_trainData(df):
-            x_train = df.loc[:, x_list].iloc[train_start_index: train_end_index, :]
-            y_train = df.loc[:, y_list].iloc[train_start_index: train_end_index, :]
-            # x_train = df.iloc[train_start_index : train_end_index, x_list]
-            # y_train = df.loc[train_start_index : train_end_index, y_list]
-            return x_train, y_train
-        def get_testData(df):
-            x_test = df.loc[:, x_list].iloc[train_end_index:  test_end_index, :]
-            y_test = df.loc[:, y_list].iloc[train_end_index: test_end_index, :]
-            return x_test, y_test
-        X_train, y_train = get_trainData(df)
-        X_test, y_test = get_testData(df)
+    train_start_index = (index * bin_size ) * num
+    train_end_index = (index * bin_size + train_size ) * num
+    test_start_index = train_end_index
+    test_end_index = train_end_index + test_size * num
+    def get_trainData(df):
+        x_train = df.loc[:, x_list].iloc[train_start_index: train_end_index, :]
+        y_train = df.loc[:, y_list].iloc[train_start_index: train_end_index, :]
+        # x_train = df.iloc[train_start_index : train_end_index, x_list]
+        # y_train = df.loc[train_start_index : train_end_index, y_list]
+        return x_train, y_train
+    def get_testData(df):
+        x_test = df.loc[:, x_list].iloc[train_end_index:  test_end_index, :]
+        y_test = df.loc[:, y_list].iloc[train_end_index: test_end_index, :]
+        return x_test, y_test
+    X_train, y_train = get_trainData(df)
+    X_test, y_test = get_testData(df)
+    original_images = df.loc[:, original_space].iloc[train_end_index:test_end_index,:]
 
-        regulator = "OLS"
-        # regulator = "Lasso"
-        # regulator = "Ridge"
-        # regulator = "None"
-        y_pred = regularity_ols(X_train, y_train, X_test, regulator)
-        min_limit, max_limit = y_train.min(), y_train.max()
-        broadcast = lambda x:np.full(y_pred.shape[0], x.to_numpy())
-        min_limit, max_limit= map(broadcast, [min_limit, max_limit])
-        y_pred_clipped = np.clip(y_pred, min_limit, max_limit)
-        if any('log' in x for x in x_list):
-            y_pred_clipped = np.exp(y_pred_clipped)
-        test_date = df.date[train_end_index]
-
-
-        original_images = df.loc[train_end_index:test_end_index , original_space]
-        # r2 = r2_score(y_test, y_pred_clipped)
-        y_pred_clipped = pd.DataFrame(y_pred_clipped)
-        y_pred_clipped.columns = ['pred']
-        original_images.reset_index(inplace=True,drop=True)
-        original_images.columns = ['true']
-        original_images['date'] = test_date
-        original_images['bin'] = bin + 1
-        bin_df = pd.concat([original_images[['date','bin','true']],y_pred_clipped],axis=1)
-        bin_df_list.append(bin_df)
+    regulator = "OLS"
+    # regulator = "Lasso"
+    # regulator = "Ridge"
+    # regulator = "None"
+    y_pred = regularity_ols(X_train, y_train, X_test, regulator)
+    min_limit, max_limit = y_train.min(), y_train.max()
+    broadcast = lambda x:np.full(y_pred.shape[0], x.to_numpy())
+    min_limit, max_limit= map(broadcast, [min_limit, max_limit])
+    y_pred_clipped = np.clip(y_pred, min_limit, max_limit)
+    if any('log' in x for x in x_list):
+        y_pred_clipped = np.exp(y_pred_clipped)
+    test_date = df.date[train_end_index]
 
 
-    df0 = pd.concat(bin_df_list, axis = 0)
-    df0.reset_index(inplace=True)
-    g = df0.groupby('index')
+    # r2 = r2_score(y_test, y_pred_clipped)
+    y_pred_clipped = pd.DataFrame(y_pred_clipped)
+    y_pred_clipped.columns = ['pred']
+    original_images.reset_index(inplace=True,drop=True)
+    original_images.columns = ['true']
+
+
+    original_images['date'] = test_date
+    stock_index = np.tile(np.arange(num),26)
+    original_images['stock_index']= stock_index
+    oneday_df = pd.concat([original_images,y_pred_clipped],axis=1)
     lst = []
-    for index, item in g:
+    g = oneday_df.groupby(stock_index)
+    for stock, item in g:
         pass
         r2value = r2_score(item['true'], item['pred'])
-        lst.append(r2value)
-    # stock r2 by all bins for one date, len(lst) = 100
-    r2 = np.mean(lst)
-    r2_list.append([test_date,r2])
-    # y_list.append([test_date, y_test, y_pred_clipped])
-
-
-
-
-
+        lst.append([test_date, stock, r2value])
+    r2_list.extend(lst)
 
 
 r2arr = np.array(r2_list)
 df1 = pd.DataFrame(r2arr)
-# r2arr[:,1].mean()
-df1.columns = ['test_date','r2']
-print(df1)
-df1.r2.mean()
+df1.columns = ['test_date','stock_index','r2']
+df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
 
+
+
+# r2arr[:,1].mean()
+print(df2)
+df2.mean(axis=0) # stock
+df2.mean(axis=1) # date
+df2.mean(axis=1).mean()
 #
 #
 # df.test_date = df.test_date.astype(int)
