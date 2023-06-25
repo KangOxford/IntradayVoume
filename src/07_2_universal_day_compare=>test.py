@@ -102,6 +102,16 @@ def get_universal(start_index, num_of_stocks):
         return df
     df = get_universal_df()
     # symbol = path06Files[i][:-4]
+    # ================================
+    from sklearn.cluster import KMeans
+
+    km = KMeans(
+        n_clusters=3, init='random',
+        n_init=10, max_iter=300,
+        tol=1e-04, random_state=0
+    )
+    y_km = km.fit_predict(X)
+    # ================================
 
 
 
