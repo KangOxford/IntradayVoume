@@ -20,9 +20,9 @@ path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =
 
 
 
-n_clusters = 2
+# n_clusters = 2
 # n_clusters = 5
-# n_clusters = 20
+n_clusters = 20
 # n_clusters = 50
 
 # def get_universal(start_index, num_of_stocks, end_index):
@@ -239,7 +239,8 @@ def process_data(date_index):
     component=pca.components_
     ratio=pca.explained_variance_ratio_
     # pca=PCA(n_components=40)
-    pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.8))
+    pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.99))
+    # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.8))
     pca.fit(corr_matrix)
     scores_pca = pca.transform(corr_matrix)
 
@@ -275,7 +276,8 @@ if __name__ == '__main__':
     results = []
 
     start = time.time()
-    with multiprocessing.Pool(processes=num_processes) as pool:
+    with multiprocessing.Pool(processes=64) as pool:
+    # with multiprocessing.Pool(processes=num_processes) as pool:
          results = pool.map(process_data,range(total_test_days))
     end = time.time()
     print(f"time {(end-start)/60}")
