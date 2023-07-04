@@ -240,8 +240,9 @@ def process_data(date_index):
     component=pca.components_
     ratio=pca.explained_variance_ratio_
     # pca=PCA(n_components=40)
+    pca=PCA(n_components=100)
     # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.99))
-    pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.8))
+    # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.8))
     pca.fit(corr_matrix)
     scores_pca = pca.transform(corr_matrix)
 
