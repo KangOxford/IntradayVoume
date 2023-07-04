@@ -59,17 +59,6 @@ for index, item in enumerate(new_dflst_lst):
 features = pd.concat(feature_list,axis = 1)
 features
 
-#     gs = [dflst.iterrows() for dflst in new_dflst_lst]
-#     dff = []
-#     for i in tqdm(range(dflst.shape[0])):
-#         for g in gs:
-#             elem = next(g)[1].T
-#             dff.append(elem)
-#     df = pd.concat(dff, axis=1).T
-#     df.reset_index(inplace=True,drop=True)
-#     return df
-# df = get_universal_df()
-
 
 
 # ================================
@@ -77,14 +66,6 @@ bin_size = 26
 train_size = 10 * 26
 test_size = 1 * 26
 index_max  = int((df.shape[0] -(train_size + test_size))/bin_size)
-# index = 0 for index in range(0, index_max+1)
-# index = 0 for index in range(0, index_max+0) # not sure
-
-# x_list = ['x', 'eta*seas', 'eta', 'seas', 'mu']
-# y_list = ['turnover']
-
-# x_list = ['eta','seas','mu']
-# y_list = ['turnover']
 
 our_log_features = ['log_ntn', 'log_volBuyNotional', 'log_volSellNotional', 'log_nrTrades', 'log_ntr',
                     'log_volBuyNrTrades_lit', 'log_volSellNrTrades_lit', 'log_volBuyQty', 'log_volSellQty',
@@ -101,13 +82,6 @@ our_log_features = ['log_ntn', 'log_volBuyNotional', 'log_volSellNotional', 'log
 x_list = ['log_x', 'log_eta*seas', 'log_eta', 'log_seas', 'log_mu']
 x_list = x_list + our_log_features
 y_list = ['log_turnover']
-# x_list = ['log_eta', 'log_seas', 'log_mu']
-# y_list = ['log_turnover']
-# x_list = ['x']
-# y_list = ['turnover']
-
-# x_list = ['log_x']
-# y_list = ['log_turnover']
 original_space = ['turnover']
 # ================================
 
@@ -287,78 +261,3 @@ df2.to_csv("n_clusters_"+str(n_clusters)+"_"+df2finalr2+"_.csv")
 df2.mean(axis=0) # stock
 df2.mean(axis=1) # date
 df2.mean(axis=1).mean()
-#     #
-#     #
-#     # df.test_date = df.test_date.astype(int)
-#     # pivot_df = df.pivot(index='test_date', columns='symbol', values='r2')
-#     # dflst.append(pivot_df)
-#     #
-#     #
-#     #
-#     # r2df = pd.concat(dflst,axis =1)
-#     # r2df.to_csv(path00 + "07_r2df_"+regulator+"_.csv", mode = 'w')
-#     return df2
-# def print_mean(df3):
-#     print(f">>>> stock mean: \n",df3.mean(axis=0))  # stock
-#     print(f">>>> date mean: \n",df3.mean(axis=1))   # date
-#     print(f">>>> aggregate mean: \n",df3.mean(axis=1).mean())
-#
-# df3lst = []
-# # for start_index in tqdm(range(1)):
-# # list(range(0, 100, 50))
-# num_stock_per_group = 1
-# # num_stock_per_group = 2
-# # num_stock_per_group = 5
-# # num_stock_per_group = 10
-# # num_stock_per_group = 20
-# # num_stock_per_group = 50
-# # num_stock_per_group = 100
-# # for start_index in tqdm(range(0, 100, num_stock_per_group)):
-# # for start_index in tqdm(range(20, 100, num_stock_per_group)):
-# # for start_index in tqdm(range(40, 60, num_stock_per_group)):
-# # for start_index in tqdm(range(60, 80, num_stock_per_group)):
-# # for start_index in tqdm(range(80, 100, num_stock_per_group)):
-# # for start_index in tqdm(range(50, 60, num_stock_per_group)):
-# # for start_index in tqdm(range(70, 80, num_stock_per_group)):
-# # for start_index in tqdm(range(90, 100, num_stock_per_group)):
-# # for start_index in tqdm(range(30, 40, num_stock_per_group)):
-# for start_index in tqdm(range(10, 20, num_stock_per_group)):
-#     df3 = get_universal(start_index,num_stock_per_group)
-#     df3lst.append(df3)
-# df3lst1 = df3lst[0:10]
-# df4 = pd.concat(df3lst1, axis=1)
-# # df4 = pd.concat(df3lst, axis=1)
-# print_mean(df4)
-# # df4.to_csv("100stocks_2stocksPerGroup"+".csv")
-# # s,e=0,10
-# # s,e=20,30
-# # s,e=40,50
-# # s,e=60,70
-# # s,e=80,90
-# # s,e=50,60
-# # s,e=70,80
-# # s,e=90,100
-# # s,e=30,40
-# # s,e=10,20
-#
-# df4.to_csv("/homes/80/kang/cmem/07_output_universal/"+f"100stocks_{num_stock_per_group}_stocksPerGroup_{s}_{e}"+".csv")
-#
-# # df4.to_csv("100stocks_5stocksPerGroup"+".csv")
-# # df4.to_csv("100stocks_10stocksPerGroup"+".csv")
-# # df4.to_csv("100stocks_20stocksPerGroup"+".csv")
-# # df4.to_csv("100stocks_20stocksPerGroup"+".csv")
-#
-#
-# path100 = "/homes/80/kang/cmem/07_output_universal/"
-# readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f)) and f != '.DS_Store'])
-# path01Files, path100Files =\
-#     map(readFromPath, [path01, path100])
-#
-# dflst = []
-# for i in range(len(path100Files)):
-#     df = pd.read_csv(path100+path100Files[i])
-#     df = df.set_index('test_date')
-#     dflst.append(df)
-#
-# df5 = pd.concat(dflst,axis =1)
-# print_mean(df5)
