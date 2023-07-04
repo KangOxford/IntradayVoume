@@ -18,8 +18,10 @@ path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =
     map(readFromPath, [path01, path01_1, path02, path04, path05, path06])
 
 
-n_clusters = 20
 
+
+n_clusters = 5
+# n_clusters = 20
 
 # def get_universal(start_index, num_of_stocks, end_index):
     # assert (end_index - start_index) % num_of_stocks == 0
@@ -281,10 +283,10 @@ if __name__ == '__main__':
     df1.columns = ['test_date','stock_index','r2']
     assert np.unique(df1.stock_index).shape == (100,)
     df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
-    
+
     print(df2)
     df2finalr2 = str(df2.mean(axis=1).mean())[:6]
     df2.to_csv("n_clusters_"+str(n_clusters)+"_"+df2finalr2+"_.csv")
     df2.mean(axis=0) # stock
     df2.mean(axis=1) # date
-    df2.mean(axis=1).mean()
+    print(df2.mean(axis=1).mean())
