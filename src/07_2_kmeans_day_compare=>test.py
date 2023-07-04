@@ -48,6 +48,12 @@ for index, dflst in enumerate(df_lst):
     if dflst.shape[0] == 3146:
         new_dflst_lst.append(dflst)
 one_stock_shape = 3146
+bin_size = 26
+train_days = 10 
+train_size = train_days * 26
+test_size = 1 * 26
+total_num_stocks = len(new_dflst_lst)
+total_test_days = new_dflst_lst[0].shape[0]//bin_size - train_days
 feature_list = []
 for index, item in enumerate(new_dflst_lst):
     pass
@@ -62,9 +68,6 @@ features
 
 
 # ================================
-bin_size = 26
-train_size = 10 * 26
-test_size = 1 * 26
 index_max  = int((df.shape[0] -(train_size + test_size))/bin_size)
 
 our_log_features = ['log_ntn', 'log_volBuyNotional', 'log_volSellNotional', 'log_nrTrades', 'log_ntr',
@@ -105,6 +108,9 @@ def regularity_ols(X_train, y_train, X_test, regulator):
         return y_pred
     elif regulator in ["Lasso", "Ridge"]:
         # print("LASSO / RIDGE")
+        import warnings
+        from sklearn.exceptions import DataConversionWarning
+        warnings.filterwarnings("ignore", category=DataConversionWarning)
         def find_best_regularity_alpha(X_train, y_train):
             if regulator == "Lasso":
                 from sklearn.linear_model import LassoCV
@@ -134,7 +140,7 @@ def regularity_ols(X_train, y_train, X_test, regulator):
 
 
 def return_lst(list_, index):
-    # print(f"\n+++ return_lst() called\n")
+    print(f"\n+++@ return_lst() called\n")
     groupped_dfs = [new_dflst_lst[i] for i in list_]
     gs = [dflst.iterrows() for dflst in groupped_dfs]
     dff = []
@@ -213,7 +219,7 @@ def process_data(date_index):
 
     # def classifyStocks(features):
     train_start_Index = (date_index * bin_size ) # for classification of stocks
-    train_end_Index = (index * bin_size + train_size)  # for classification
+    train_end_Index = (date_index * bin_size + train_size)  # for classification
     f = features.iloc[train_start_Index:train_end_Index,:]
     fv=f.values
     corr_matrix = np.corrcoef(fv, rowvar=False)
@@ -222,7 +228,9 @@ def process_data(date_index):
     from sklearn.decomposition import PCA
     pca = PCA()
     # Fit PCA on the correlation matrix
+    # print(corr_matrix)
     pca.fit(corr_matrix)
+    
     # Obtain the principal
     component=pca.components_
     ratio=pca.explained_variance_ratio_
@@ -249,44 +257,33 @@ def process_data(date_index):
     for i2, list_ in lst2:
         lst = return_lst(list_, date_index)
         sub_r2_list+=lst
+
     return sub_r2_list
 
 
 if __name__ == '__main__':
     import multiprocessing
     import time
-    start = time.time()
     num_processes = multiprocessing.cpu_count()  # Get the number of available CPU cores
     pool = multiprocessing.Pool(processes=num_processes)
 
     from tqdm import tqdm
     results = []
-    # len_date = 4
-    # len_date = 16
-    len_date = 111
 
+    start = time.time()
     with multiprocessing.Pool(processes=num_processes) as pool:
-         results = pool.map(process_data,range(0,50))
+         # results = pool.map(process_data,range(0,50))
+         # results = pool.map(process_data,range(50,100))
+         # results = pool.map(process_data,range(100,107))
+         # results = pool.map(process_data,range(107,109))
+         # process_data(109)
+         # results = pool.map(process_data,range(109,110))
+         # results = pool.map(process_data,range(109,111))
+         results = pool.map(process_data,range(total_test_days))
+    # process_data(109)
+    end = time.time()
+    print(f"time {(end-start)/60}")
 
-
-    # for index in range(len_date):
-    #     # print(index)
-    #     # result = process_data(index)
-    #     # result
-    #     result = pool.apply_async(process_data, args=(index,))
-    #     results.append(result)
-    #
-    # # r2_list = [result.get() for result in results]
-    # a =results[0].get()
-    # b =results[1].get()
-    # #
-    pool.close()
-    pool.join()
-    # end = time.time()
-    # delta = (end-start)/60
-    # print(">>>time:",delta)
-    #
-    #
     r2arr = np.array(results).reshape(-1,3)
     df1 = pd.DataFrame(r2arr)
     df1.columns = ['test_date','stock_index','r2']
