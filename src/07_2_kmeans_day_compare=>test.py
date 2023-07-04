@@ -18,7 +18,7 @@ path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =
     map(readFromPath, [path01, path01_1, path02, path04, path05, path06])
 
 
-
+n_clusters = 20
 
 
 # def get_universal(start_index, num_of_stocks, end_index):
@@ -133,22 +133,25 @@ def regularity_ols(X_train, y_train, X_test, regulator):
         raise NotImplementedError
 
 
-def return_lst():
+def return_lst(list_, index):
+    # print(f"\n+++ return_lst() called\n")
     groupped_dfs = [new_dflst_lst[i] for i in list_]
     gs = [dflst.iterrows() for dflst in groupped_dfs]
     dff = []
-    for i in tqdm(range(one_stock_shape)):
+    for i in range(one_stock_shape):
+    # for i in tqdm(range(one_stock_shape)):
         for g in gs:
             elem = next(g)[1].T
             dff.append(elem)
     df = pd.concat(dff, axis=1).T
     df.reset_index(inplace=True, drop=True)
-    print(df.shape)
+    # print(df.shape)
 
     num = len(groupped_dfs)
 
     train_start_index = (index * bin_size) * num
     train_end_index = (index * bin_size + train_size) * num
+    # print(f"train_end_index: {train_end_index} = (index: {index} * bin_size: {bin_size}+ train_size: {train_size}) * num: {num}")
     test_start_index = train_end_index
     test_end_index = train_end_index + test_size * num
 
@@ -179,7 +182,11 @@ def return_lst():
     y_pred_clipped = np.clip(y_pred, min_limit, max_limit)
     if any('log' in x for x in x_list):
         y_pred_clipped = np.exp(y_pred_clipped)
-    test_date = df.date[train_end_index]
+    test_date = df.date.iloc[train_end_index]
+    # print(f"test_date:{test_date} = df: {df.shape}.date[train_end_index: {train_end_index}]")
+    # print(df.index)
+    # print(df.date.iloc[train_end_index])
+    # print(df)
 
     # r2 = r2_score(y_test, y_pred_clipped)
     y_pred_clipped = pd.DataFrame(y_pred_clipped)
@@ -200,14 +207,12 @@ def return_lst():
         lst.append([int(test_date), stock, r2value])
     return lst
 
+def process_data(date_index):
+    print(f"index, {date_index}")
 
 
-from tqdm import tqdm
-r2_list = []
-n_clusters = 5
-for index in tqdm(range(111)):
     # def classifyStocks(features):
-    train_start_Index = (index * bin_size ) # for classification of stocks
+    train_start_Index = (date_index * bin_size ) # for classification of stocks
     train_end_Index = (index * bin_size + train_size)  # for classification
     f = features.iloc[train_start_Index:train_end_Index,:]
     fv=f.values
@@ -236,28 +241,66 @@ for index in tqdm(range(111)):
     v = pd.DataFrame({"a":labels,"b": np.arange(100)})
     g =v.groupby("a")
     lst2 = []
-    for index1,item in g:
-        lst2.append([index,item.b.values])
+    for i1,item in g:
+        lst2.append([i1,item.b.values])
 
-    for index2, list_ in lst2:
-        lst = return_lst()
-        r2_list.extend(lst)
-
-
-r2arr = np.array(r2_list)
-df1 = pd.DataFrame(r2arr)
-df1.columns = ['test_date','stock_index','r2']
-assert  np.unique(df1.stock_index).shape == (100,)
-# df1.sort_values("stock_index")
-# df11 = pd.concat(df1_lst.axis = 1)
-df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
+    sub_r2_list = []
+    # index2, list_ =  lst2[0]
+    for i2, list_ in lst2:
+        lst = return_lst(list_, date_index)
+        sub_r2_list+=lst
+    return sub_r2_list
 
 
+if __name__ == '__main__':
+    import multiprocessing
+    import time
+    start = time.time()
+    num_processes = multiprocessing.cpu_count()  # Get the number of available CPU cores
+    pool = multiprocessing.Pool(processes=num_processes)
 
-# r2arr[:,1].mean()
-print(df2)
-df2finalr2 = str(df2.mean(axis=1).mean())[:6]
-df2.to_csv("n_clusters_"+str(n_clusters)+"_"+df2finalr2+"_.csv")
-df2.mean(axis=0) # stock
-df2.mean(axis=1) # date
-df2.mean(axis=1).mean()
+    from tqdm import tqdm
+    results = []
+    # len_date = 4
+    # len_date = 16
+    len_date = 111
+
+    with multiprocessing.Pool(processes=num_processes) as pool:
+         results = pool.map(process_data,range(0,50))
+
+
+    # for index in range(len_date):
+    #     # print(index)
+    #     # result = process_data(index)
+    #     # result
+    #     result = pool.apply_async(process_data, args=(index,))
+    #     results.append(result)
+    #
+    # # r2_list = [result.get() for result in results]
+    # a =results[0].get()
+    # b =results[1].get()
+    # #
+    pool.close()
+    pool.join()
+    # end = time.time()
+    # delta = (end-start)/60
+    # print(">>>time:",delta)
+    #
+    #
+    r2arr = np.array(results).reshape(-1,3)
+    df1 = pd.DataFrame(r2arr)
+    df1.columns = ['test_date','stock_index','r2']
+    # g = df1.groupby("stock_index")
+    # for i,it in g:
+    #     pass
+    # it.shape
+    assert  np.unique(df1.stock_index).shape == (100,)
+    df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
+    #
+    #
+    # print(df2)
+    df2finalr2 = str(df2.mean(axis=1).mean())[:6]
+    df2.to_csv("n_clusters_"+str(n_clusters)+"_"+df2finalr2+"_.csv")
+    df2.mean(axis=0) # stock
+    df2.mean(axis=1) # date
+    df2.mean(axis=1).mean()
