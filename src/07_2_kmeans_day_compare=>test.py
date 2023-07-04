@@ -20,10 +20,10 @@ path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =
 
 
 
-# n_clusters = 2
+n_clusters = 2
 # n_clusters = 5
 # n_clusters = 20
-n_clusters = 50
+# n_clusters = 50
 
 # def get_universal(start_index, num_of_stocks, end_index):
     # assert (end_index - start_index) % num_of_stocks == 0
