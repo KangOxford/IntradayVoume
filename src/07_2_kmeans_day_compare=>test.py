@@ -26,6 +26,8 @@ n_clusters = 10
 # n_clusters = 20
 # n_clusters = 50
 
+ratio_cumsum = 0.99
+
 # def get_universal(start_index, num_of_stocks, end_index):
     # assert (end_index - start_index) % num_of_stocks == 0
 start_index, num_of_stocks = 0, 100
@@ -260,6 +262,7 @@ def process_data(date_index):
     train_end_Index = (date_index * bin_size + train_size)  # for classification
     def get_corr_matrix(train_start_Index, train_end_Index, features):
         if len(features.shape) ==2:
+            print(f"shape of features: {features.shape}")
             f = features.iloc[train_start_Index:train_end_Index,:]
             fv=f.values
             corr_matrix = np.corrcoef(fv, rowvar=False)
@@ -267,6 +270,7 @@ def process_data(date_index):
             print("Shape of correlation matrix:", corr_matrix.shape)
             return corr_matrix
         elif len(features.shape) ==3:
+            print(f"shape of features: {features.shape}")
             nfeatures = features
             f = np.array([nfeatures[i,train_start_Index:train_end_Index,:] for i in range(nfeatures.shape[0])])
             f.shape
@@ -274,7 +278,7 @@ def process_data(date_index):
             ncorr_matrix.shape
             corr_matrix = np.mean(ncorr_matrix,axis=0)
             # Print the shape of the correlation matrix
-            print("Shape of correlation matrix:", corr_matrix.shape)
+            # print("Shape of correlation matrix:", corr_matrix.shape)
             return corr_matrix
         else:
             raise NotImplementedError
@@ -293,7 +297,7 @@ def process_data(date_index):
     # pca=PCA(n_components=100)
     # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.9999))
     # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.99))
-    pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.8))
+    pca=PCA(n_components=np.argmax(ratio.cumsum() >= ratio_cumsum))
     pca.fit(corr_matrix)
     scores_pca = pca.transform(corr_matrix)
 
@@ -331,9 +335,12 @@ if __name__ == '__main__':
     start = time.time()
     # with multiprocessing.Pool(processes=64) as pool:
     with multiprocessing.Pool(processes=num_processes) as pool:
+         # results = pool.map(process_data,range(4))
          results = pool.map(process_data,range(total_test_days))
     end = time.time()
     print(f"time {(end-start)/60}")
+
+    # results = process_data(10)
 
     r2arr = np.array(results).reshape(-1,3)
     df1 = pd.DataFrame(r2arr)
