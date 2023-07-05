@@ -27,7 +27,8 @@ n_clusters = 10
 # n_clusters = 50
 
 # ratio_cumsum = 0.99
-ratio_cumsum = 0.9999
+# ratio_cumsum = 0.9999
+ratio_cumsum = 1.00
 
 # def get_universal(start_index, num_of_stocks, end_index):
     # assert (end_index - start_index) % num_of_stocks == 0
