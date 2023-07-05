@@ -22,15 +22,15 @@ path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =
 
 # n_clusters = 2
 # n_clusters = 5
-# n_clusters = 10
-n_clusters = 20
+n_clusters = 10
+# n_clusters = 20
 # n_clusters = 50
 
 
-ratio_cumsum = 0.80
+# ratio_cumsum = 0.80
 # ratio_cumsum = 0.99
 # ratio_cumsum = 0.9999
-# ratio_cumsum = 1.00
+ratio_cumsum = 1.00
 
 # def get_universal(start_index, num_of_stocks, end_index):
     # assert (end_index - start_index) % num_of_stocks == 0
@@ -257,6 +257,7 @@ def return_lst(list_, index):
         r2value = r2_score(item['true'], item['pred'])
         lst.append([int(test_date), stock, r2value])
     return lst
+
 date_index =0
 def process_data(date_index):
     print(f"index, {date_index}")
@@ -304,12 +305,11 @@ def process_data(date_index):
     # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.99))
     if ratio_cumsum == 1.00:
         pca = PCA(n_components=100)
-        print("n_components 100")
     else:
         pca = PCA(n_components=np.argmax(ratio.cumsum() >= ratio_cumsum))
-        print(f"n_components {np.argmax(ratio.cumsum() >= ratio_cumsum)}")
     pca.fit(corr_matrix)
     scores_pca = pca.transform(corr_matrix)
+    scores_pca.shape
 
     from sklearn.cluster import KMeans
     kmeans_pca = KMeans(n_clusters=n_clusters, init="k-means++",random_state=42)
@@ -341,34 +341,31 @@ if __name__ == '__main__':
     if home == '/homes/80/kang':
         num_processes = 80
     from tqdm import tqdm
-    results = []
-
-    # start = time.time()
-    # # with multiprocessing.Pool(processes=64) as pool:
-    # with multiprocessing.Pool(processes=num_processes) as pool:
-    #      # results = pool.map(process_data,range(4))
-    #      results = pool.map(process_data,range(total_test_days))
-    # end = time.time()
-    # print(f"time {(end-start)/60}")
-
-    # results20 = process_data(0)
-    # results10 = process_data(0)
-
-    # r2arr = np.array(results).reshape(-1,3)
-    # df1 = pd.DataFrame(r2arr)
-    # df1.columns = ['test_date','stock_index','r2']
-    # assert np.unique(df1.stock_index).shape == (100,)
-    # df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
+    # results = []
     #
-    # print(df2)
-    # df2finalr2 = str(df2.mean(axis=1).mean())[:6]
-    # df2.to_csv("n_clusters_"+str(n_clusters)+"_"+df2finalr2+"_.csv")
-    # df2.mean(axis=0) # stock
-    # df2.mean(axis=1) # date
-    # print(df2.mean(axis=1).mean())
-
-
-
+    # # start = time.time()
+    # # # with multiprocessing.Pool(processes=64) as pool:
+    # # with multiprocessing.Pool(processes=num_processes) as pool:
+    # #      # results = pool.map(process_data,range(4))
+    # #      results = pool.map(process_data,range(total_test_days))
+    # # end = time.time()
+    # # print(f"time {(end-start)/60}")
+    #
+    # # results20 = process_data(0)
+    # results10 = process_data(0)
+    #
+    # # r2arr = np.array(results).reshape(-1,3)
+    # # df1 = pd.DataFrame(r2arr)
+    # # df1.columns = ['test_date','stock_index','r2']
+    # # assert np.unique(df1.stock_index).shape == (100,)
+    # # df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
+    # #
+    # # print(df2)
+    # # df2finalr2 = str(df2.mean(axis=1).mean())[:6]
+    # # df2.to_csv("n_clusters_"+str(n_clusters)+"_"+df2finalr2+"_.csv")
+    # # df2.mean(axis=0) # stock
+    # # df2.mean(axis=1) # date
+    # # print(df2.mean(axis=1).mean())
     start = time.time()
     results = [process_data(i) for i in range(total_test_days)]
     end = time.time()
