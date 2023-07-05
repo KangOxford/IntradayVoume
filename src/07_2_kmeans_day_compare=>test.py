@@ -329,8 +329,8 @@ if __name__ == '__main__':
     results = []
 
     start = time.time()
-    with multiprocessing.Pool(processes=64) as pool:
-    # with multiprocessing.Pool(processes=num_processes) as pool:
+    # with multiprocessing.Pool(processes=64) as pool:
+    with multiprocessing.Pool(processes=num_processes) as pool:
          results = pool.map(process_data,range(total_test_days))
     end = time.time()
     print(f"time {(end-start)/60}")
