@@ -26,7 +26,8 @@ n_clusters = 10
 # n_clusters = 20
 # n_clusters = 50
 
-ratio_cumsum = 0.99
+# ratio_cumsum = 0.99
+ratio_cumsum = 0.9999
 
 # def get_universal(start_index, num_of_stocks, end_index):
     # assert (end_index - start_index) % num_of_stocks == 0
@@ -327,8 +328,9 @@ if __name__ == '__main__':
     import multiprocessing
     import time
     num_processes = multiprocessing.cpu_count()  # Get the number of available CPU cores
-    pool = multiprocessing.Pool(processes=num_processes)
-
+    import os; home = os.path.expanduser("~")
+    if home == '/homes/80/kang':
+        num_processes = 64
     from tqdm import tqdm
     results = []
 
