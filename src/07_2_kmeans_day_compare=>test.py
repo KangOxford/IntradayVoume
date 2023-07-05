@@ -299,7 +299,10 @@ def process_data(date_index):
     # pca=PCA(n_components=100)
     # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.9999))
     # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.99))
-    pca=PCA(n_components=np.argmax(ratio.cumsum() >= ratio_cumsum))
+    if ratio_cumsum == 1.00:
+        pca = PCA(n_components=100)
+    else:
+        pca = PCA(n_components=np.argmax(ratio.cumsum() >= ratio_cumsum))
     pca.fit(corr_matrix)
     scores_pca = pca.transform(corr_matrix)
 
