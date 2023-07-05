@@ -23,8 +23,8 @@ path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =
 # n_clusters = 2
 # n_clusters = 5
 # n_clusters = 10
-n_clusters = 20
-# n_clusters = 50
+# n_clusters = 20
+n_clusters = 50
 
 
 ratio_cumsum = 0.80
@@ -336,7 +336,7 @@ if __name__ == '__main__':
     num_processes = multiprocessing.cpu_count()  # Get the number of available CPU cores
     import os; home = os.path.expanduser("~")
     if home == '/homes/80/kang':
-        num_processes = 64
+        num_processes = 80
     from tqdm import tqdm
     results = []
 
