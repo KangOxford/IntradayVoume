@@ -366,6 +366,30 @@ if __name__ == '__main__':
     # # df2.mean(axis=0) # stock
     # # df2.mean(axis=1) # date
     # # print(df2.mean(axis=1).mean())
+
+
+
+    start = time.time()
+    with multiprocessing.Pool(processes=num_processes) as pool:
+         results = pool.map(process_data,range(total_test_days))
+    end = time.time()
+    print(f"time {(end-start)/60}")
+
+
+    r2arr = np.array(results).reshape(-1,3)
+    df1 = pd.DataFrame(r2arr)
+    df1.columns = ['test_date','stock_index','r2']
+    assert np.unique(df1.stock_index).shape == (100,)
+    df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
+
+    print(df2)
+    df2finalr2 = str(df2.mean(axis=1).mean())[:6]
+    df2.to_csv("n_clusters_"+str(n_clusters)+"_"+df2finalr2+"_.csv")
+    df2.mean(axis=0) # stock
+    df2.mean(axis=1) # date
+    print(df2.mean(axis=1).mean())
+
+    '''
     start = time.time()
     results = [process_data(i) for i in range(total_test_days)]
     end = time.time()
@@ -384,3 +408,4 @@ if __name__ == '__main__':
     df2.mean(axis=0) # stock
     df2.mean(axis=1) # date
     print(df2.mean(axis=1).mean())
+    '''
