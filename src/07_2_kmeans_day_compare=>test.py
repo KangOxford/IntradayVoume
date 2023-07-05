@@ -52,25 +52,15 @@ for index, dflst in enumerate(df_lst):
     # assert dflst.shape[0] == 3172, f"index, {index}"
     if dflst.shape[0] == 3146:
         new_dflst_lst.append(dflst)
+
+
 one_stock_shape = 3146
 bin_size = 26
-train_days = 10 
+train_days = 10
 train_size = train_days * 26
 test_size = 1 * 26
 total_num_stocks = len(new_dflst_lst)
 total_test_days = new_dflst_lst[0].shape[0]//bin_size - train_days
-feature_list = []
-for index, item in enumerate(new_dflst_lst):
-    pass
-    item.date = item.date.astype(np.int32)
-    item = item.set_index('date')
-    value = item.turnover
-    value.name = path06Files[index][:-4]
-    feature_list.append(value)
-features = pd.concat(feature_list,axis = 1)
-features
-
-
 
 # ================================
 index_max  = int((df.shape[0] -(train_size + test_size))/bin_size)
@@ -92,6 +82,49 @@ x_list = x_list + our_log_features
 y_list = ['log_turnover']
 original_space = ['turnover']
 # ================================
+
+def get_features(new_dflst_lst,type="volume"):
+    if type =="volume":
+        return get_volume_features(new_dflst_lst)
+    elif type =="features":
+        return get_features_features(new_dflst_lst)
+    else:
+        raise NotImplementedError
+
+def get_volume_features(new_dflst_lst):
+    feature_list = []
+    for index, item in enumerate(new_dflst_lst):
+        pass
+        item.date = item.date.astype(np.int32)
+        item = item.set_index('date')
+        value = item.turnover
+        value.name = path06Files[index][:-4]
+        feature_list.append(value)
+    features = pd.concat(feature_list,axis = 1)
+    return features
+
+def get_features_features(new_dflst_lst):
+    nfeatures = []
+    for col in x_list:
+        feature_list = []
+        for index, item in enumerate(new_dflst_lst):
+            pass
+            item.columns
+            item.date = item.date.astype(np.int32)
+            item = item.set_index('date')
+            value = item.loc[:,col]
+            assert item.shape[1] == 108
+            value.name = path06Files[index][:-4]
+            feature_list.append(value)
+        features = pd.concat(feature_list,axis = 1)
+        nfeatures.append(features)
+    nfeatures = np.stack(nfeatures)
+    len(nfeatures.shape)
+    nfeatures.shape
+    return nfeatures
+
+
+features = get_features(new_dflst_lst,type="features")
 
 
 def regularity_ols(X_train, y_train, X_test, regulator):
@@ -225,11 +258,28 @@ def process_data(date_index):
     # def classifyStocks(features):
     train_start_Index = (date_index * bin_size ) # for classification of stocks
     train_end_Index = (date_index * bin_size + train_size)  # for classification
-    f = features.iloc[train_start_Index:train_end_Index,:]
-    fv=f.values
-    corr_matrix = np.corrcoef(fv, rowvar=False)
-    # Print the shape of the correlation matrix
-    print("Shape of correlation matrix:", corr_matrix.shape)
+    def get_corr_matrix(train_start_Index, train_end_Index, features):
+        if len(features.shape) ==2:
+            f = features.iloc[train_start_Index:train_end_Index,:]
+            fv=f.values
+            corr_matrix = np.corrcoef(fv, rowvar=False)
+            # Print the shape of the correlation matrix
+            print("Shape of correlation matrix:", corr_matrix.shape)
+            return corr_matrix
+        elif len(features.shape) ==3:
+            nfeatures = features
+            f = np.array([nfeatures[i,train_start_Index:train_end_Index,:] for i in range(nfeatures.shape[0])])
+            f.shape
+            ncorr_matrix = np.array([np.corrcoef(fv, rowvar=False) for fv in f])
+            ncorr_matrix.shape
+            corr_matrix = np.mean(ncorr_matrix,axis=0)
+            # Print the shape of the correlation matrix
+            print("Shape of correlation matrix:", corr_matrix.shape)
+            return corr_matrix
+        else:
+            raise NotImplementedError
+
+    corr_matrix = get_corr_matrix(train_start_Index, train_end_Index, features)
     from sklearn.decomposition import PCA
     pca = PCA()
     # Fit PCA on the correlation matrix
@@ -242,8 +292,8 @@ def process_data(date_index):
     # pca=PCA(n_components=40)
     # pca=PCA(n_components=100)
     # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.9999))
-    pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.99))
-    # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.8))
+    # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.99))
+    pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.8))
     pca.fit(corr_matrix)
     scores_pca = pca.transform(corr_matrix)
 
