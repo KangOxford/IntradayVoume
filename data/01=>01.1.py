@@ -1,14 +1,25 @@
 import numpy as np
 
-path00 = "/Users/kang/CMEM/"
-path01 = "/Users/kang/CMEM/data/01_raw/"
-path01_1 = "/Users/kang/CMEM/data/01.1_raw/"
-path02 = "/Users/kang/CMEM/data/02_r_input/"
-path04 = "/Users/kang/CMEM/r_output/04_r_output_raw_data/"
-path04_1 = "/Users/kang/CMEM/r_output/04_1_rOuputFeatured/"
-path04_2 = "/Users/kang/Volume-Forecasting/02_raw_component/"
-path05 = "/Users/kang/CMEM/r_output/05_r_output_raw_pkl/"
-path06 = '/Users/kang/CMEM/r_output/06_r_output_raw_pkl/'
+import os; os.sys.path.append("/home/kanli/cmem/")
+
+path00 = "/home/kanli/cmem/"
+path01 = "/home/kanli/cmem/data/01_raw/"
+
+path01_1 = "/home/kanli/cmem/data/01.1_raw/"
+path02 = "/home/kanli/cmem/data/02_r_input/"
+path04 = "/home/kanli/cmem/r_output/04_r_output_raw_data/"
+path04_1 = "/home/kanli/cmem/r_output/04_1_rOuputFeatured/"
+path05 = "/home/kanli/cmem/r_output/05_r_output_raw_pkl/"
+path06 = '/home/kanli/cmem/r_output/06_r_output_raw_pkl/'
+
+# path00 = "/Users/kang/CMEM/"
+# path01 = "/Users/kang/CMEM/data/01_raw/"
+# path01_1 = "/Users/kang/CMEM/data/01.1_raw/"
+# path02 = "/Users/kang/CMEM/data/02_r_input/"
+# path04 = "/Users/kang/CMEM/r_output/04_r_output_raw_data/"
+# path04_1 = "/Users/kang/CMEM/r_output/04_1_rOuputFeatured/"
+# path05 = "/Users/kang/CMEM/r_output/05_r_output_raw_pkl/"
+# path06 = '/Users/kang/CMEM/r_output/06_r_output_raw_pkl/'
 
 
 from os import listdir;
@@ -43,8 +54,10 @@ def tryMkdir(path):
 _,_ = map(tryMkdir,[path01,path01_1])
 
 for i in range(len(path01Files)):
+    print(f">>> {i} th")
     item = pd.read_pickle(path01 + path01Files[i])
     new_item = item[item['date'].isin(common_dates)]
     name = path01Files[i]
     new_item.to_pickle(path01_1+name)
+
 

@@ -21,8 +21,9 @@
 
  rm(list = ls(all=TRUE))
 options(warn = 1)
-source("~/CMEM/vWAPMain_20081010.R")
-
+# source("/home/kanli/cmem/r_code/vWAPMain_20081010.R")
+source("~/CMEM/r_code/vWAPMain_20081010.R")
+# /home/kanli/cmem/r_code/vWAPMain_20081010.R
 
 .dummyBin <-
 function(binL, include)
@@ -118,19 +119,22 @@ function(model)
 
 
 
+# dir_path <- "/home/kanli/cmem/data/02_r_input/"
 dir_path <- "/Users/kang/CMEM/data/02_r_input/"
 # dir_path <- "/Users/kang/CMEM/data/02_r_input_10/"
 file_names <- list.files(dir_path)
 
 
-for (i in seq_along(file_names))
+for (i in seq_along(file_names)[200:length(file_names)])
+# for (i in seq_along(file_names))
 {
   cat("++++++++++++++++++++ i is :", i, "\n")
+  # filein1 <- paste0(dir_path, "CNC.txt")
   filein1 <- paste0(dir_path, file_names[i])
   rangeDate <- c(20170705, 20171228)
 
   #### Fileout
-  fileout1 <- "~/CMEM/SPY-residuals-LBstats-20091201.txt"
+  fileout1 <- "~/cmem/SPY-residuals-LBstats-20091201.txt"
 
   #### Parameters
   model <- c(
@@ -249,6 +253,7 @@ for (i in seq_along(file_names))
   # write the all_forecasts data frame to a single file
   # out_dir_path <- "/Users/kang/CMEM/r_output/r_output_raw_data/"
   # out_dir_path <- "/Users/kang/CMEM/r_output/r_output_raw_data_10/"
+  # out_dir_path <- "/home/kanli/cmem/r_output/04_r_output_raw_data/"
   out_dir_path <- "/Users/kang/CMEM/r_output/04_r_output_raw_data/"
   filename <- paste0(out_dir_path, "forecasts_", substr(file_names[i], 1,nchar(file_names[i])-4), ".csv")
   write.table(df, file = filename, sep = ",", col.names = FALSE, append = FALSE)

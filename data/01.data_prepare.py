@@ -3,6 +3,7 @@ import numpy as np
 from tqdm import tqdm
 import warnings;warnings.simplefilter("ignore", category=FutureWarning)
 from os import listdir;from os.path import isfile, join
+import os; os.sys.path.append("/home/kanli/cmem/")
 from data import Config
 
 pd.set_option('display.max_columns', None)
@@ -13,7 +14,7 @@ if platform.system() == 'Darwin':
     path = "/Users/kang/Volume-Forecasting/"
 elif platform.system() == 'Linux':
     print("Running on Linux")
-    raise NotImplementedError
+    path = "/home/kanli/cmem/"
 else:print("Unknown operating system")
 
 data_path = Config.raw_data_path
@@ -35,11 +36,12 @@ try:already_done = [f[:-4] for f in listdir(out_path) if isfile(join(out_path, f
 except:import os;os.mkdir(out_path);already_done = [f[:-4] for f in listdir(out_path) if isfile(join(out_path, f))]
 
 
-
+i = 492
+i = 493
 # for i in tqdm(range(len(syms))):
 # for i in tqdm(range(10)):
 # for i in tqdm(range(20)):
-for i in tqdm(range(100)):
+for i in tqdm(range(492,498)):
     sym = syms.iloc[i]
     print(f">>> stock {i} {sym}")
     df_list = []
@@ -77,9 +79,13 @@ for i in tqdm(range(100)):
     dflst = dflst.reset_index().iloc[:,1:]
     dflst = dflst.reset_index()
     # dflst.iloc[:,0] = dflst.iloc[:,0]//15
+    if  np.isnan(dflst['qty']).sum() / dflst.shape[0] > 0.90:
+        print(f"{sym} data is cracked")
+        continue
 
     dflst['groupper'] = dflst.timeHMs.apply(lambda x:str(x).zfill(4)).apply(lambda x: x[:2]+":"+x[2:])
     dflst['groupper'] = dflst.date.apply(lambda x:str(x[:4])+'-'+str(x[4:6])+'-'+str(x[6:])+ " ") + dflst['groupper']
+
     dflst['groupper'] = pd.to_datetime(dflst['groupper'])
 
     dflst.set_index('groupper', inplace=True)
