@@ -21,7 +21,7 @@
 
 rm(list = ls(all=TRUE))
 options(warn = 1)
-source("~/CMEM/vWAPMain_20081010.R")
+source("~/CMEM/r_code/vWAPMain_20081010.R")
 
 
 .dummyBin <- 
