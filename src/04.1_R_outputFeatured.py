@@ -1,4 +1,14 @@
+import os
+os.sys.path.append("/home/kanli/cmem/src/")
 from config import *
+
+def tryMkdir(path):
+    from os import listdir
+    try: listdir(path)
+    except:import os;os.mkdir(path)
+    return 0
+_,_ = map(tryMkdir,[path01,path05])
+
 
 from os import listdir;
 from os.path import isfile, join;
@@ -7,7 +17,8 @@ import numpy as np
 
 
 readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f)) and f != '.DS_Store'])
-path04Files, path04_1Files, path04_2Files, path05Files = map(readFromPath, [path04, path04_1, path04_2, path05])
+path04Files, path04_1Files, path05Files = map(readFromPath, [path04, path04_1, path05])
+# path04Files, path04_1Files, path04_2Files, path05Files = map(readFromPath, [path04, path04_1, path04_2, path05])
 
 common_dates = np.load(path00 + 'common_dates.npy')[1:] # only the r output parts is in need
 

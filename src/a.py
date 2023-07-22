@@ -41,3 +41,34 @@ data_path, onlyfiles = platform()
 
 for i in range(len(onlyfiles)):
     df = pd.read_csv(data_path + onlyfiles[i])
+
+
+
+
+a = "/Users/kang/CMEM/data/02_r_input"
+b = "/Users/kang/CMEM/r_output/04_r_output_raw_data"
+c = '/Users/kang/CMEM/data/02_r_input_remained'
+from os import listdir;from os.path import isfile, join
+onlyfiles = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f))])
+a1 = onlyfiles(a)
+a2 = [file[:-4] for file in a1]
+a2
+b1 = onlyfiles(b)
+b2 = [file[10:-4] for file in b1]
+b2
+c2 = [file  for file in a2 if file not in b2]
+c1 = [file+".txt" for file in c2]
+c1
+# for file name in list c1 copy the file in dir a into dir c
+
+import os
+import shutil
+for file_name in c1:
+    try:
+        src_file_path = os.path.join(a, file_name)
+        dest_file_path = os.path.join(c, file_name)
+        shutil.copy(src_file_path, dest_file_path)
+    except:
+        print(f"{file_name} not found")
+
+

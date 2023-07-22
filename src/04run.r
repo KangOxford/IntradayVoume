@@ -119,13 +119,29 @@ function(model)
 
 
 
+dir_path <- "/Users/kang/CMEM/data/02_r_input_remained/"
 # dir_path <- "/home/kanli/cmem/data/02_r_input/"
-dir_path <- "/Users/kang/CMEM/data/02_r_input/"
+# dir_path <- "/Users/kang/CMEM/data/02_r_input/"
 # dir_path <- "/Users/kang/CMEM/data/02_r_input_10/"
 file_names <- list.files(dir_path)
 
 
-for (i in seq_along(file_names)[200:length(file_names)])
+for (i in seq_along(file_names)[74:length(file_names)])
+# for (i in seq_along(file_names)[73:length(file_names)])
+# for (i in seq_along(file_names)[72:length(file_names)])
+# for (i in seq_along(file_names)[70:length(file_names)])
+# for (i in seq_along(file_names)[55:length(file_names)])
+# for (i in seq_along(file_names)[49:length(file_names)])
+# for (i in seq_along(file_names)[5:length(file_names)])
+# for (i in seq_along(file_names))
+# for (i in seq_along(file_names)[192:200])
+# for (i in seq_along(file_names)[170:200])
+# for (i in seq_along(file_names)[151:200])
+# for (i in seq_along(file_names)[477:length(file_names)])
+# for (i in seq_along(file_names)[450:length(file_names)])
+# for (i in seq_along(file_names)[0:200])
+# for (i in seq_along(file_names)[400:length(file_names)])
+# for (i in seq_along(file_names)[200:length(file_names)])
 # for (i in seq_along(file_names))
 {
   cat("++++++++++++++++++++ i is :", i, "\n")
