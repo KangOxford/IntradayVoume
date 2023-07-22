@@ -70,11 +70,14 @@ def regularity_ols(X_train, y_train, X_test, regulator):
 # ================================
 if __name__ == "__main__":
     df1_lst = []
+    df2_lst = []
     # for Index in tqdm(range(100)):
     # for Index in tqdm(range(0,1)):
-    for Index in tqdm(range(1,2)):
+    # for Index in tqdm(range(1,2)):
+    for Index in tqdm(range(111)):
         # num = 100
-        num = 1
+        # num = 1
+        num = len(path06Files)
         def get_universal_df():
             df_lst = []
             from tqdm import tqdm
@@ -109,6 +112,7 @@ if __name__ == "__main__":
         test_size = 1 # for update per bin
         index_max  = int((df.shape[0] -(train_size + test_size))/bin_size)
         r2_list = []
+        mse_list = []
         # index = 0 for index in range(0, index_max+1)
         # index = 0 for index in range(0, index_max+0) # not sure
 
@@ -205,13 +209,19 @@ if __name__ == "__main__":
             df0.reset_index(inplace=True)
             g = df0.groupby('index')
             lst = []
+            lst2 = []
             for index, item in g:
                 pass
                 r2value = r2_score(item['true'], item['pred'])
+                from sklearn.metrics import mean_squared_error
+                msevalue = mean_squared_error(original_images, y_pred_clipped)
                 lst.append(r2value)
+                lst2.append(msevalue)
             # stock r2 by all bins for one date, len(lst) = 100
             r2 = np.mean(lst)
+            mse = np.mean(lst2)
             r2_list.append([test_date,r2])
+            mse_list.append([test_date,mse])
             # y_list.append([test_date, y_test, y_pred_clipped])
 
 
