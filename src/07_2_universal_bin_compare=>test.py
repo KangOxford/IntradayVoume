@@ -230,14 +230,32 @@ if __name__ == "__main__":
         # r2arr[:,1].mean()
         df1.columns = ['test_date','r2']
         df1_lst.append(df1)
-        df2_lst = []
-        for df1 in df1_lst:
-            df2 = df1.set_index('test_date')
-            df2_lst.append(df2)
-        df3 = pd.concat(df2_lst,axis=1)
-        # df3.to_csv('universal_bin.csv')
-        df3.mean(axis=1).mean()
-        df3.mean(axis=0).mean()
+
+
+        msearr = np.array(mse_list)
+        df1 = pd.DataFrame(r2arr)
+        # r2arr[:,1].mean()
+        df1.columns = ['test_date','r2']
+        df1_lst.append(df1)
+
+
+
+
+
+
+
+
+
+
+        # df2_lst = []
+        # for df1 in df1_lst:
+        #     df2 = df1.set_index('test_date')
+        #     df2_lst.append(df2)
+        # df3 = pd.concat(df2_lst,axis=1)
+        # # df3.to_csv('universal_bin.csv')
+        # df3.mean(axis=1).mean()
+        # df3.mean(axis=0).mean()
+
         # print(df1)
         # df1.r2.mean()
 
