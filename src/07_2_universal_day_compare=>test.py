@@ -4,8 +4,46 @@ import pandas as pd
 from os import listdir;
 from os.path import isfile, join;
 from sklearn.metrics import r2_score
-import sys;sys.path.append("/homes/80/kang/cmem/");from src.config import *
+import os
+os.sys.path.append("/home/kanli/cmem/src/")
+from config import *
+# import sys;sys.path.append("/homes/80/kang/cmem/");from src.config import *
+'''
+I guess 
+for testing we should use 
+07compare=>test.py for single assets
+07_2_universal_day_compare=>test.py for universal models but more general
+but still not sure what is the difference between 07_2_universal_day_compare=>test.py and 07_2_universal_compare=>test.py
 
+for 07_2_universal_compare=>test.py
+should be used for universal
+but the 07_2_universal_day_compare=>test.py one is more general
+
+such as:
+df3lst = []
+# for start_index in tqdm(range(1)):
+# list(range(0, 100, 50))
+num_stock_per_group = 1
+# num_stock_per_group = 2
+# num_stock_per_group = 5
+# num_stock_per_group = 10
+# num_stock_per_group = 20
+# num_stock_per_group = 50
+# num_stock_per_group = 100
+# for start_index in tqdm(range(0, 100, num_stock_per_group)):
+# for start_index in tqdm(range(20, 100, num_stock_per_group)):
+# for start_index in tqdm(range(40, 60, num_stock_per_group)):
+# for start_index in tqdm(range(60, 80, num_stock_per_group)):
+# for start_index in tqdm(range(80, 100, num_stock_per_group)):
+# for start_index in tqdm(range(50, 60, num_stock_per_group)):
+# for start_index in tqdm(range(70, 80, num_stock_per_group)):
+# for start_index in tqdm(range(90, 100, num_stock_per_group)):
+# for start_index in tqdm(range(30, 40, num_stock_per_group)):
+for start_index in tqdm(range(10, 20, num_stock_per_group)):
+    df3 = get_universal(start_index,num_stock_per_group)
+    df3lst.append(df3)
+df3lst1 = df3lst[0:10]
+'''
 
 def tryMkdir(path):
     try: listdir(path)
@@ -102,16 +140,16 @@ def get_universal(start_index, num_of_stocks):
         return df
     df = get_universal_df()
     # symbol = path06Files[i][:-4]
-    # ================================
-    from sklearn.cluster import KMeans
-
-    km = KMeans(
-        n_clusters=3, init='random',
-        n_init=10, max_iter=300,
-        tol=1e-04, random_state=0
-    )
-    y_km = km.fit_predict(X)
-    # ================================
+    # # ================================
+    # from sklearn.cluster import KMeans
+    #
+    # km = KMeans(
+    #     n_clusters=3, init='random',
+    #     n_init=10, max_iter=300,
+    #     tol=1e-04, random_state=0
+    # )
+    # y_km = km.fit_predict(X)
+    # # ================================
 
 
 
@@ -280,7 +318,8 @@ print_mean(df4)
 # s,e=30,40
 # s,e=10,20
 
-df4.to_csv("/homes/80/kang/cmem/07_output_universal/"+f"100stocks_{num_stock_per_group}_stocksPerGroup_{s}_{e}"+".csv")
+df4.to_csv("/home/kanli/cmem/07_output_universal/"+f"100stocks_{num_stock_per_group}_stocksPerGroup_{s}_{e}"+".csv")
+# df4.to_csv("/homes/80/kang/cmem/07_output_universal/"+f"100stocks_{num_stock_per_group}_stocksPerGroup_{s}_{e}"+".csv")
 
 # df4.to_csv("100stocks_5stocksPerGroup"+".csv")
 # df4.to_csv("100stocks_10stocksPerGroup"+".csv")
@@ -288,7 +327,8 @@ df4.to_csv("/homes/80/kang/cmem/07_output_universal/"+f"100stocks_{num_stock_per
 # df4.to_csv("100stocks_20stocksPerGroup"+".csv")
 
 
-path100 = "/homes/80/kang/cmem/07_output_universal/"
+path100 = "/home/kanli/cmem/07_output_universal/"
+# path100 = "/homes/80/kang/cmem/07_output_universal/"
 readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f)) and f != '.DS_Store'])
 path01Files, path100Files =\
     map(readFromPath, [path01, path100])

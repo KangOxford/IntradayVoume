@@ -12,7 +12,20 @@ path04 = path00 + "r_output/04_r_output_raw_data/"
 path05 = path00 + "r_output/05_r_output_raw_pkl/"
 path06 = path00 + "r_output/06_r_output_raw_pkl/"
 
+import os
+os.sys.path.append("/home/kanli/cmem/src/")
+from config import *
 
+'''
+I guess this file is wrong
+due to 
+        x_train = df.loc[train_start_index: train_end_index, x_list]
+        y_train = df.loc[train_start_index: train_end_index, y_list]
+        
+        not using iloc here
+
+
+'''
 def tryMkdir(path):
     try: listdir(path)
     except:import os;os.mkdir(path)
@@ -74,6 +87,7 @@ def regularity_ols(X_train, y_train, X_test, regulator):
     else:
         raise NotImplementedError
 # ================================
+num = len(path06Files) # CAUTION do not forget to make the right number of stocks
 # num = 100
 # num = 90
 # num = 80
@@ -86,7 +100,7 @@ def regularity_ols(X_train, y_train, X_test, regulator):
 # num = 10
 # num = 3
 # num = 2
-num = 1
+# num = 1
 def get_universal_df():
     df_lst = []
     from tqdm import tqdm
@@ -179,8 +193,8 @@ for index in tqdm(range(111)):
         assert y_test.index[0] > y_train.index[-1]
     no_overlap_assert(y_test, y_train)
 
-    regulator = "OLS"
-    # regulator = "Lasso"
+    # regulator = "OLS"
+    regulator = "Lasso"
     # regulator = "Ridge"
     # regulator = "None"
     y_pred = regularity_ols(X_train, y_train, X_test, regulator)
