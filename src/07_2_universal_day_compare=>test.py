@@ -280,10 +280,8 @@ def print_mean(df3):
     print(f">>>> date mean: \n",df3.mean(axis=1))   # date
     print(f">>>> aggregate mean: \n",df3.mean(axis=1).mean())
 
-df3lst = []
 # for start_index in tqdm(range(1)):
 # list(range(0, 100, 50))
-num_stock_per_group = 1
 # num_stock_per_group = 2
 # num_stock_per_group = 5
 # num_stock_per_group = 10
@@ -299,6 +297,14 @@ num_stock_per_group = 1
 # for start_index in tqdm(range(70, 80, num_stock_per_group)):
 # for start_index in tqdm(range(90, 100, num_stock_per_group)):
 # for start_index in tqdm(range(30, 40, num_stock_per_group)):
+
+# def get_universal(start_index, num_of_stocks):
+
+df3 = get_universal(start_index=0,num_of_stocks=len(path06Files))
+
+
+'''
+df3lst = []
 for start_index in tqdm(range(10, 20, num_stock_per_group)):
     df3 = get_universal(start_index,num_stock_per_group)
     df3lst.append(df3)
@@ -306,6 +312,7 @@ df3lst1 = df3lst[0:10]
 df4 = pd.concat(df3lst1, axis=1)
 # df4 = pd.concat(df3lst, axis=1)
 print_mean(df4)
+'''
 # df4.to_csv("100stocks_2stocksPerGroup"+".csv")
 # s,e=0,10
 # s,e=20,30
