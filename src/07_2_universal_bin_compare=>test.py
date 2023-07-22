@@ -4,7 +4,9 @@ from os import listdir;
 from os.path import isfile, join;
 from sklearn.metrics import r2_score
 from tqdm import tqdm
-import sys;sys.path.append("/homes/80/kang/cmem/");from src.config import *
+import os
+os.sys.path.append("/home/kanli/cmem/src/")
+from config import *
 
 
 def tryMkdir(path):
@@ -233,10 +235,9 @@ if __name__ == "__main__":
 
 
         msearr = np.array(mse_list)
-        df1 = pd.DataFrame(r2arr)
-        # r2arr[:,1].mean()
-        df1.columns = ['test_date','r2']
-        df1_lst.append(df1)
+        df2 = pd.DataFrame(msearr)
+        df2.columns = ['test_date','mse']
+        df2_lst.append(df2)
 
 
 
