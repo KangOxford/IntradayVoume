@@ -29,7 +29,7 @@ common_dates = [str(date) for date in common_dates0]
 # len(common_dates)
 
 from tqdm import tqdm
-for i in tqdm(range(len(path04Files))):
+for i in tqdm(range(480,len(path04Files))):
     df = pd.read_csv(path04 + path04Files[i],header=None, index_col=0).dropna(axis=1).reset_index(drop=True)
     df = df.apply(abs)
     df.columns = ['eta','seas','mu','x']
