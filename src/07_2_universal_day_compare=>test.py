@@ -326,10 +326,12 @@ b = m.values
 c = (m+s).values
 mean = b.mean()
 
+
 import matplotlib.pyplot as plt
 # Plotting
-plt.figure(figsize=(8, 6))
-# plt.figure(figsize=(12, 8))
+# plt.figure(figsize=(6, 4))
+# plt.figure(figsize=(8, 6))
+plt.figure(figsize=(12, 8))
 
 dates = m.index
 x_axis = pd.to_datetime(dates, format='%Y%m%d')
@@ -344,7 +346,8 @@ plt.fill_between(x_axis, a, c, color='blue', alpha=0.1)
 # plt.fill_between(range(len(a)), a, c, color='blue', alpha=0.1)
 plt.axhline(mean, color='red', linestyle='-', label='Mean across all dates')
 from datetime import timedelta
-plt.text(x_axis[-1]+timedelta(days=7), mean + 0.01, f"Mean: {mean:.2f}", verticalalignment='bottom', horizontalalignment='right', color='red')
+plt.text(x_axis[-1]+timedelta(days=5), mean + 0.01, f"{mean:.2f}", verticalalignment='bottom', horizontalalignment='right', color='red')
+# plt.text(x_axis[-1]-timedelta(days=7), mean - 0.17, f"Mean: {mean:.2f}", verticalalignment='bottom', horizontalalignment='right', color='red')
 # plt.text(x_axis, mean, f"Mean: {mean:.2f}", verticalalignment='bottom', horizontalalignment='right', color='red')
 # plt.text(len(b)+4.5, mean, f"Mean: {mean:.2f}", verticalalignment='bottom', horizontalalignment='right', color='red')
 plt.xlabel("Date")
@@ -355,8 +358,8 @@ plt.grid(True)
 from datetime import datetime
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")# Get current timestamp and format it
 filename = f"plot_{timestamp}.png"
-plt.savefig(path00+filename, bbox_inches='tight')
-# plt.savefig(path00+filename, dpi=1200, bbox_inches='tight')
+# plt.savefig(path00+filename, bbox_inches='tight')
+plt.savefig(path00+filename, dpi=1200, bbox_inches='tight')
 plt.show()
 
 
