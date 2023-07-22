@@ -72,3 +72,14 @@ for file_name in c1:
         print(f"{file_name} not found")
 
 
+
+
+import pandas as pd
+a = "/home/kanli/cmem/r_output/04_1_rOuputFeatured_100/forecasts_A.csv"
+a1 = pd.read_csv(a)
+a1
+b="/home/kanli/cmem/data/01.1_raw/A.pkl"
+b1 = pd.read_pickle(b)
+c = "/home/kanli/volume/02_raw_component/A.pkl"
+c1 = pd.read_pickle(c)
+c1
