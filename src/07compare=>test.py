@@ -69,7 +69,8 @@ def regularity_ols(X_train, y_train, X_test, regulator):
 
 
 dflst = []
-for i in range(100):
+from tqdm import tqdm
+for i in tqdm(range(len(path06Files))):
     print(f">>> i: {i}")
     df = pd.read_pickle(path06+path06Files[i])
     symbol = path06Files[i][:-4]

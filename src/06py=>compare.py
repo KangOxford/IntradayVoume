@@ -14,9 +14,10 @@ _,_ = map(tryMkdir,[path05,path06])
 readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f)) and f != '.DS_Store'])
 path01Files, path01_1Files, path02Files, path04Files, path05Files = map(readFromPath, [path01, path01_1, path02, path04, path05])
 
-
-for i in range(100):
-    df = pd.read_csv(path02 + path02Files[i], delimiter='\t')
+from tqdm import tqdm
+for i in tqdm(range(len(path05Files))):
+    name = path05Files[i][10:-4]
+    df = pd.read_csv(path02 + name+".txt", delimiter='\t')
     raw = df.iloc[26:,:].loc[:,['date','turnover']].reset_index(drop=True)
     # ==========
     raw['log_turnover'] = raw['turnover'].apply(np.log)
