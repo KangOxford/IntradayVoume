@@ -359,8 +359,8 @@ plt.grid(True)
 
 # Save the figure with the generated filename
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-filename = f"plot_{timestamp}.png"
-plt.savefig(path00+filename, dpi=1200, bbox_inches='tight', format='eps')
+filename = f"plot_{timestamp}.pdf"
+plt.savefig(path00+filename, dpi=1200, bbox_inches='tight', format='pdf')
 plt.show()
 
 

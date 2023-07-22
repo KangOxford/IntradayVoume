@@ -69,6 +69,7 @@ def regularity_ols(X_train, y_train, X_test, regulator):
 
 
 dflst = []
+dflst2 =[]
 from tqdm import tqdm
 for i in tqdm(range(len(path06Files))):
     print(f">>> i: {i}")
@@ -79,6 +80,7 @@ for i in tqdm(range(len(path06Files))):
     test_size = 1 * 26
     index_max  = int((df.shape[0] -(train_size + test_size))/bin_size)
     r2_list = []
+    mse_list = []
     # index = 0 for index in range(0, index_max+1)
     # index = 0 for index in range(0, index_max+0) # not sure
 
@@ -144,9 +146,12 @@ for i in tqdm(range(len(path06Files))):
         original_images = df.loc[train_end_index:train_end_index+test_size,original_space]
         # r2 = r2_score(y_test, y_pred_clipped)
         r2 = r2_score(original_images, y_pred_clipped)
+        from sklearn.metrics import mean_squared_error
+        mse = mean_squared_error(original_images, y_pred_clipped)
 
 
         r2_list.append([test_date,r2])
+        mse_list.append([test_date,mse])
         # y_list.append([test_date, y_test, y_pred_clipped])
     r2arr = np.array(r2_list)
     df = pd.DataFrame(r2arr)
@@ -157,5 +162,84 @@ for i in tqdm(range(len(path06Files))):
     df.test_date = df.test_date.astype(int)
     pivot_df = df.pivot(index='test_date', columns='symbol', values='r2')
     dflst.append(pivot_df)
+
+    msearr = np.array(mse_list)
+    df2 = pd.DataFrame(msearr)
+    df2.columns = ['test_date','mse']
+    df2['symbol'] = symbol
+    df2 = df2[['symbol','test_date','mse']]
+    df2.test_date = df2.test_date.astype(int)
+    pivot_df2 = df2.pivot(index='test_date', columns='symbol', values='mse')
+    dflst2.append(pivot_df2)
 r2df = pd.concat(dflst,axis =1)
-r2df.to_csv(path00 + "07_r2df_"+regulator+"_.csv", mode = 'w')
+msedf = pd.concat(dflst2,axis =1)
+
+
+import datetime
+# Get the current date and time
+current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+# Construct the filename with the timestamp
+filename = path00 + "07_r2df_" + regulator + "_" + current_time + ".csv"
+# Save the DataFrame to the CSV file with the specified filename
+r2df.to_csv(filename, mode='w')
+
+
+r2df.mean(axis=1)
+r2df.mean(axis=1).mean()
+
+
+
+
+
+
+'''
+df3 = r2df
+df3.index = df3.index.astype(int).astype(str)
+m = df3.mean(axis=1) # by date
+s = df3.std(axis=1) # by date
+df3.mean(axis=1).mean() # all mean
+# df3.to_csv(path00 + "07_r2df_universal_day_483_"+"lasso"+"_.csv", mode = 'w')
+# start plotting
+
+a = (m-s).values
+b = m.values
+c = (m+s).values
+mean = b.mean()
+
+
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+from datetime import timedelta, datetime
+
+# Font size variable
+font = 20
+
+# Plotting
+plt.figure(figsize=(16, 12))
+# plt.figure(figsize=(12, 8))
+
+dates = m.index
+x_axis = pd.to_datetime(dates, format='%Y%m%d')
+plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%Y'))
+
+# plot first group with shadow
+plt.plot(x_axis, b, label='Mean of R Squared', color='blue')
+plt.fill_between(x_axis, a, c, color='blue', alpha=0.1)
+plt.axhline(mean, color='red', linestyle='-', label='Mean across all dates')
+plt.text(x_axis[-1]+timedelta(days=5), mean + 0.01, f"{mean:.2f}", verticalalignment='bottom', horizontalalignment='right', color='red', fontsize=font*1.2)
+
+# Adjusting font sizes with the font variable
+plt.xlabel("Date", fontsize=font*1.2)
+plt.ylabel("Out of sample R squared", fontsize=font*1.2)
+plt.xticks(fontsize=font*1.2)
+plt.yticks(fontsize=font*1.2)
+plt.legend(fontsize=font*1.2)
+
+plt.grid(True)
+
+# Save the figure with the generated filename
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+filename = f"plot_{timestamp}.pdf"
+plt.savefig(path00+filename, dpi=1200, bbox_inches='tight', format='pdf')
+plt.show()
+'''
