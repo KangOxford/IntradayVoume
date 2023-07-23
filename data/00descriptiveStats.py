@@ -16,20 +16,32 @@ for i in range(len(files)):
     # pd.concat(lst1,axis=0)
     dff = df[['timeHMs','date','qty']].reset_index(drop=True).pivot(index='timeHMs',columns='date')
     dff.index
-    try:
-        dff =dff.drop(1346.0)
-    except:
-        pass
-    f = dff.fillna(method ="ffill")
-    b = dff.fillna(method ="bfill")
-    m = (f+b)/2
 
-    m_normalized = m.div(m.mean())
-    # df_normalized = dff.div(dff.mean())
-    lst.append(m_normalized)
+
+    try:
+        assert (dff.index == [ 930.0,  945.0, 1000.0, 1015.0, 1030.0, 1045.0, 1100.0, 1115.0,
+                  1130.0, 1145.0, 1200.0, 1215.0, 1230.0, 1245.0, 1300.0, 1315.0,
+                  1330.0, 1345.0, 1400.0, 1415.0, 1430.0, 1445.0, 1500.0, 1515.0,
+                  1530.0, 1545.0]).all()
+        f = dff.fillna(method="ffill")
+        b = dff.fillna(method="bfill")
+        m = (f + b) / 2
+
+        m_normalized = m.div(m.mean())
+        # df_normalized = dff.div(dff.mean())
+        lst.append(m_normalized)
+    except:
+        print(f"{files[i]} not found")
+        continue
+
 len(lst)
 
 df1 = pd.concat(lst,axis=1)
+
+# Convert the index
+df1.index = df1.index.map(lambda x: f"{int(x)//100:02d}:{int(x)%100:02d}")
+df1
+
 
 df_normalized = df1.div(df1.mean())
 df_normalized
@@ -42,14 +54,26 @@ df1 = m_normalized
 df2 = m_normalized.iloc[:-1,:]
 # df1 = df_rescaled
 
-df1 = df2
+df1 = df_normalized.iloc[:-1,:]
 
 # %%%%%%%%
-m=df1.mean(axis=1)
-s=df1.std(axis=1)
+m = df1.mean(axis=1)
+s = df1.std(axis=1)
 
 import matplotlib.pyplot as plt
-plt.plot(m)
+
+# Plotting the mean
+plt.plot(m, label='Mean')
+
+# Plotting one standard deviation above and below the mean
+plt.fill_between(m.index, m-s, m+s, color='blue', alpha=0.1, label='One Std Deviation')
+
+plt.grid(True)
+plt.xticks(rotation=45)  # Rotating the x-axis labels
+plt.xlabel("Start Time of Each Bin")
+plt.ylabel("Normalized Trading Volume")
+plt.legend()  # Displaying the legend
+plt.tight_layout()
 plt.show()
 # %%%%%%%%
 
