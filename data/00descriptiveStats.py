@@ -67,13 +67,18 @@ plt.plot(m, label='Mean')
 
 # Plotting one standard deviation above and below the mean
 plt.fill_between(m.index, m-s, m+s, color='blue', alpha=0.1, label='One Std Deviation')
-
-plt.grid(True)
+plt.grid(True, alpha=0.3)
 plt.xticks(rotation=45)  # Rotating the x-axis labels
 plt.xlabel("Start Time of Each Bin")
 plt.ylabel("Normalized Trading Volume")
 plt.legend()  # Displaying the legend
 plt.tight_layout()
+# Save the figure with the generated filename
+from datetime import timedelta, datetime
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+filename = f"plot_{timestamp}.pdf"
+path00 = "/home/kanli/cmem/"
+plt.savefig(path00+filename, dpi=1200, bbox_inches='tight', format='pdf')
 plt.show()
 # %%%%%%%%
 
