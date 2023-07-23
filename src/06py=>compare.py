@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from os import listdir;
 from os.path import isfile, join;
+import os
+os.sys.path.append("/home/kanli/cmem/src/")
 from config import *
 
 
