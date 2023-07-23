@@ -77,6 +77,9 @@ if __name__ == "__main__":
     # for Index in tqdm(range(0,1)):
     # for Index in tqdm(range(1,2)):
     for Index in tqdm(range(111)):
+        '''
+        @TODO what is the Index Used for?
+        '''
         # num = 100
         # num = 1
         num = len(path06Files)
@@ -179,8 +182,8 @@ if __name__ == "__main__":
                 X_train, y_train = get_trainData(df)
                 X_test, y_test = get_testData(df)
 
-                regulator = "OLS"
-                # regulator = "Lasso"
+                # regulator = "OLS"
+                regulator = "Lasso"
                 # regulator = "Ridge"
                 # regulator = "None"
                 y_pred = regularity_ols(X_train, y_train, X_test, regulator)
