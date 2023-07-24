@@ -34,7 +34,7 @@ ratio_cumsum = 0.80
 
 # def get_universal(start_index, num_of_stocks, end_index):
     # assert (end_index - start_index) % num_of_stocks == 0
-start_index, num_of_stocks = 0, 100
+start_index, num_of_stocks = 0, len(path06Files)
 array1 = np.concatenate( [np.arange(1,10,0.01), np.arange(10,50,0.1) ])
 array2 = np.arange(1,0.001,-0.001)
 combined_array = np.array(list(zip(array1, array2))).flatten()
@@ -94,6 +94,8 @@ def get_features(new_dflst_lst,type="volume"):
         return get_volume_features(new_dflst_lst)
     elif type =="features":
         return get_features_features(new_dflst_lst)
+    elif type =="economic":
+        return get_economic_features(new_dflst_lst)
     else:
         raise NotImplementedError
 
@@ -129,8 +131,12 @@ def get_features_features(new_dflst_lst):
     nfeatures.shape
     return nfeatures
 
+def get_economic_features(new_dflst_lst):
+    len(new_dflst_lst)
+    return 0
 
-features = get_features(new_dflst_lst,type="features")
+
+features = get_features(new_dflst_lst,type="economic")
 features.shape
 
 

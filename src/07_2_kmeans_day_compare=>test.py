@@ -22,9 +22,9 @@ path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =
 
 # n_clusters = 2
 # n_clusters = 5
-# n_clusters = 10
+n_clusters = 10
 # n_clusters = 20
-n_clusters = 50
+# n_clusters = 50
 
 
 ratio_cumsum = 0.80
@@ -34,7 +34,7 @@ ratio_cumsum = 0.80
 
 # def get_universal(start_index, num_of_stocks, end_index):
     # assert (end_index - start_index) % num_of_stocks == 0
-start_index, num_of_stocks = 0, 100
+start_index, num_of_stocks = 0, len(path06Files)
 array1 = np.concatenate( [np.arange(1,10,0.01), np.arange(10,50,0.1) ])
 array2 = np.arange(1,0.001,-0.001)
 combined_array = np.array(list(zip(array1, array2))).flatten()
@@ -303,7 +303,7 @@ def process_data(date_index):
     # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.9999))
     # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.99))
     if ratio_cumsum == 1.00:
-        pca = PCA(n_components=100)
+        pca = PCA(n_components=len(path06Files))
         print("n_components 100")
     else:
         pca = PCA(n_components=np.argmax(ratio.cumsum() >= ratio_cumsum))
@@ -315,10 +315,10 @@ def process_data(date_index):
     kmeans_pca = KMeans(n_clusters=n_clusters, init="k-means++",random_state=42)
     kmeans_pca.fit(scores_pca)
     labels = kmeans_pca.labels_
-    assert kmeans_pca.labels_.shape == (100,)
+    assert kmeans_pca.labels_.shape == (len(path06Files),)
 
 
-    v = pd.DataFrame({"a":labels,"b": np.arange(100)})
+    v = pd.DataFrame({"a":labels,"b": np.arange(len(path06Files))})
     g =v.groupby("a")
     lst2 = []
     for i1,item in g:
@@ -378,7 +378,7 @@ if __name__ == '__main__':
     r2arr = np.array(results).reshape(-1,3)
     df1 = pd.DataFrame(r2arr)
     df1.columns = ['test_date','stock_index','r2']
-    assert np.unique(df1.stock_index).shape == (100,)
+    assert np.unique(df1.stock_index).shape == (len(path06Files),)
     df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
 
     print(df2)
