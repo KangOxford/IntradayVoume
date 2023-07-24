@@ -20,8 +20,8 @@ path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =
 
 
 
-n_clusters = 2
-# n_clusters = 5
+# n_clusters = 2
+n_clusters = 5
 # n_clusters = 10
 # n_clusters = 20
 # n_clusters = 50
@@ -181,6 +181,13 @@ def regularity_ols(X_train, y_train, X_test, regulator):
         y_pred = reg.predict(X_test)
         y_pred = y_pred.flatten()
         return y_pred
+    elif regulator == "XGB":
+        import xgboost as xgb
+        model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160)
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+        y_pred = y_pred.flatten()
+        return y_pred
     else:
         raise NotImplementedError
 
@@ -223,8 +230,10 @@ def return_lst(list_, index):
     X_test, y_test = get_testData(df)
     original_images = df.loc[:, original_space].iloc[train_end_index:test_end_index, :]
 
+    regulator = "XGB"
+    # regulator = "Lasso"
+
     # regulator = "OLS"
-    regulator = "Lasso"
     # regulator = "Ridge"
     # regulator = "None"
     y_pred = regularity_ols(X_train, y_train, X_test, regulator)
@@ -371,7 +380,8 @@ if __name__ == '__main__':
 
     start = time.time()
     with multiprocessing.Pool(processes=num_processes) as pool:
-         results = pool.map(process_data,range(total_test_days))
+         results = pool.map(process_data,range(total_test_days)[:3])
+         # results = pool.map(process_data,range(total_test_days))
     end = time.time()
     print(f"time {(end-start)/60}")
 
