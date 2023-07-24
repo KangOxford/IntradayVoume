@@ -23,8 +23,8 @@ path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =
 # n_clusters = 2
 # n_clusters = 5
 # n_clusters = 10
-n_clusters = 20
-# n_clusters = 50
+# n_clusters = 20
+n_clusters = 50
 
 
 ratio_cumsum = 0.80
@@ -257,8 +257,6 @@ def return_lst(list_, index):
         r2value = r2_score(item['true'], item['pred'])
         lst.append([int(test_date), stock, r2value])
     return lst
-
-
 date_index =0
 def process_data(date_index):
     print(f"index, {date_index}")
@@ -344,8 +342,6 @@ if __name__ == '__main__':
         num_processes = 80
     from tqdm import tqdm
     results = []
-
-
     start = time.time()
     with multiprocessing.Pool(processes=num_processes) as pool:
          results = pool.map(process_data,range(total_test_days))
