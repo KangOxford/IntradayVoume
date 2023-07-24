@@ -1,4 +1,5 @@
 path06 = '/home/kanli/cmem/r_output/06_r_output_raw_pkl/'
+path00 = '/home/kanli/cmem/'
 path = path06
 import pandas as pd
 import numpy as np
@@ -32,4 +33,85 @@ for i in tqdm(range(len(files))):
 r2dfs = pd.concat(r2df_lst,axis=1)
 msedfs = pd.concat(msedf_lst,axis=1)
 
-r2dfs
+m = r2dfs.astype(np.float64).mean(axis=0)
+# First, let's sort the series in descending order
+m_sorted = m.sort_values(ascending=False)
+# Then we can calculate the index that gives the top 80%
+index_80_percent = int(len(m_sorted) * 0.8)
+# Now we can select the top 80% of values
+top_80_percent = m_sorted[:index_80_percent]
+# Get the index values as a list
+index_list = top_80_percent.index.tolist()
+index_list
+len(index_list)
+
+r2dfs2=r2dfs[index_list].astype(np.float64)
+r2dfs2.mean(axis=1).mean()
+
+
+
+m = msedfs.astype(np.float64).mean(axis=0)
+# First, let's sort the series in descending order
+m_sorted = m.sort_values(ascending=True)
+# Then we can calculate the index that gives the top 80%
+# index_80_percent = int(len(m_sorted) * 0.92)
+index_80_percent = int(len(m_sorted) * 0.8)
+# Now we can select the top 80% of values
+top_80_percent = m_sorted[:index_80_percent]
+# Get the index values as a list
+index_list = top_80_percent.index.tolist()
+index_list
+len(index_list)
+msedfs2=msedfs[index_list].astype(np.float64)
+number = msedfs2.mean(axis=1).mean()
+formatted_number = "{:.4e}".format(number)
+formatted_number
+
+
+
+
+df=msedfs2
+# =================
+# start   plotting
+# =================
+m = df.mean(axis=1)
+s = df.std(axis=1)
+a = (m-s).values
+b = m.values
+c = (m+s).values
+mean = b.mean()
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+from datetime import timedelta, datetime
+# Font size variable
+font = 20
+# Plotting
+plt.figure(figsize=(16, 12))
+# plt.figure(figsize=(12, 8))
+dates = m.index
+x_axis = pd.to_datetime(dates, format='%Y%m%d')
+plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%Y'))
+# plot first group with shadow
+plt.plot(x_axis, b, label='Mean of MSE(Mean Squared Error)', color='blue')
+# plt.plot(x_axis, b, label='Mean of R Squared', color='blue')
+plt.fill_between(x_axis, a, c, color='blue', alpha=0.1)
+plt.axhline(mean, color='red', linestyle='-', label='Mean across all dates')
+plt.text(x_axis[-1]+timedelta(days=5), mean + 0.25*int(1e9), f"{mean:,.2f}", verticalalignment='bottom', horizontalalignment='right', color='red', fontsize=font*1.2)
+# plt.text(x_axis[-1]+timedelta(days=5), mean + 0.01, f"{mean:,.2f}", verticalalignment='bottom', horizontalalignment='right', color='red', fontsize=font*1.2)
+# Adjusting font sizes with the font variable
+plt.xlabel("Date", fontsize=font*1.2)
+plt.ylabel("Out of sample  Mean Squared Error", fontsize=font*1.2)
+# plt.ylabel("Out of sample R squared", fontsize=font*1.2)
+plt.xticks(fontsize=font*1.2)
+plt.yticks(fontsize=font*1.2)
+plt.legend(fontsize=font*1.2)
+plt.grid(True)
+# Save the figure with the generated filename
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+filename = f"plot_{timestamp}.pdf"
+plt.savefig(path00+filename, dpi=1200, bbox_inches='tight', format='pdf')
+plt.show()
+# =================
+#   end   plotting
+# =================
+

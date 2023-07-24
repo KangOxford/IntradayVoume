@@ -1,4 +1,7 @@
 path = "/home/kanli/cmem/data/01.1_raw/"
+# /home/kanli/seventh/02_raw_component/A.pkl
+path = "/home/kanli/seventh/02_raw_component/"
+path = "/home/kanli/seventh/01_raw/"
 import pandas as pd
 import numpy as np
 from os import listdir;from os.path import isfile,join
@@ -9,6 +12,9 @@ for i in range(len(files)):
 
     file = path + files[i]
     df = pd.read_pickle(file)
+    df
+    df['sumOfBuyAndSell'] = df['volBuyQty']+df['volSellQty']
+
     # g = df.groupby("timeHMs")[['qty']]
     # lst1 = []
     # for index,item in g:
