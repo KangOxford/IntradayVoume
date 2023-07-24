@@ -21,8 +21,8 @@ path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =
 
 
 # n_clusters = 2
-# n_clusters = 5
-n_clusters = 10
+n_clusters = 5
+# n_clusters = 10
 # n_clusters = 20
 # n_clusters = 50
 
@@ -388,7 +388,8 @@ if __name__ == '__main__':
     df2.mean(axis=1) # date
     print(df2.mean(axis=1).mean())
 
-
+    filename = "07_2_kmeans_day_compare=>test.py_"+str(int(time.time()))+"_.csv"
+    df2.to_csv(filename,'w')
     '''
     start = time.time()
     results = [process_data(i) for i in range(total_test_days)]
