@@ -67,6 +67,13 @@ def regularity_ols(X_train, y_train, X_test, regulator):
         y_pred = reg.predict(X_test)
         y_pred = y_pred.flatten()
         return y_pred
+    elif regulator == "XGB":
+        import xgboost as xgb
+        model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160)
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+        y_pred = y_pred.flatten()
+        return y_pred
     else:
         raise NotImplementedError
 # ================================
