@@ -223,10 +223,11 @@ def regularity_ols(X_train, y_train, X_test, regulator):
             # Get the best parameters
             best_params = grid_search.best_params_
             best_reg_alpha = best_params['reg_alpha']
+            print(f"best_reg_alpha {best_reg_alpha}")
             return best_reg_alpha
 
         best_reg_alpha = gridSearchAplha()
-        model = xgb.XGBRegressor(max_depth=3, learning_rate=0.1, n_estimators=50, reg_alpha = best_reg_alpha)
+        model = xgb.XGBRegressor(max_depth=3, n_estimators=50, reg_alpha = best_reg_alpha)
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
         y_pred = y_pred.flatten()
