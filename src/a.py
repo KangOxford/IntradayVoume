@@ -97,16 +97,47 @@ a1 = pd.read_csv(a)
 import pandas as pd
 a ="/Users/kang/CMEM/07_2_kmeans_day_compare=>test.py_1690267558_.csv"
 a ="/Users/kang/CMEM/xgb_07_2_kmeans_day_compare_test.py_10_20170721_20170803_1690272692_.csv"
-a1 = pd.read_csv(a)
+a1 = pd.read_csv(a,index_col=0)
 a1
+a1.mean(axis=1)
+
+
+b ="/Users/kang/CMEM/xgb_07_2_kmeans_day_compare_test.py_10_20170804_20170817_1690272801_.csv"
+b1 = pd.read_csv(b,index_col=0)
+a1
+a1.mean(axis=1)
+
+
+c ="/Users/kang/CMEM/xgb_07_2_kmeans_day_compare_test.py_10_20170818_20170831_1690272793_.csv"
+c1 = pd.read_csv(c,index_col=0)
+a1
+a1.mean(axis=1)
+
+
+
+df = pd.concat([a1,b1,c1])
+df
+df3 = df
+df3
+mean_per_stock = df3.mean(axis=0)
+num_top_stocks = int(len(mean_per_stock) * 0.5)
+top_performing_stocks = mean_per_stock.nlargest(num_top_stocks)
+top_performing_stocks.mean()
 
 
 
 
+# Assuming you have already calculated the mean_per_stock using df3.mean(axis=0)
+mean_per_stock = df3.mean(axis=0)
 
+# Calculate the number of bottom-performing stocks you want (e.g., bottom 50%)
+num_bottom_stocks = int(len(mean_per_stock) * 0.5)
 
+# Get the bottom-performing stocks based on the mean values
+bottom_performing_stocks = mean_per_stock.nsmallest(num_bottom_stocks)
 
+# Calculate the mean of the bottom-performing stocks
+bottom_performing_stocks_mean = bottom_performing_stocks.mean()
 
-
-
+print(bottom_performing_stocks_mean)
 
