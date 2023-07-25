@@ -83,3 +83,30 @@ b1 = pd.read_pickle(b)
 c = "/home/kanli/volume/02_raw_component/A.pkl"
 c1 = pd.read_pickle(c)
 c1
+
+import pandas as pd
+a ="/homes/80/kang/cmem/07_2_kmeans_day_compare=>test.py_1690267558_.csv"
+a1 = pd.read_csv(a)
+
+
+
+
+
+
+
+import pandas as pd
+a ="/Users/kang/CMEM/07_2_kmeans_day_compare=>test.py_1690267558_.csv"
+a ="/Users/kang/CMEM/xgb_07_2_kmeans_day_compare_test.py_10_20170721_20170803_1690272692_.csv"
+a1 = pd.read_csv(a)
+a1
+
+
+
+
+
+
+
+
+
+
+

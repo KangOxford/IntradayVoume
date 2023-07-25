@@ -389,8 +389,8 @@ if __name__ == '__main__':
     df2.mean(axis=1) # date
     print(df2.mean(axis=1).mean())
 
-    filename = "07_2_kmeans_day_compare=>test.py_"+str(int(time.time()))+"_.csv"
-    df2.to_csv(filename,'w')
+    filename = "07_2_kmeans_day_compare_test.py_"+str(len(df2.index))+'_'+str(int(df2.index[0]))+"_"+str(int(df2.index[-1]))+"_"+str(int(time.time()))+"_.csv"
+    df2.to_csv(filename)
     '''
     start = time.time()
     results = [process_data(i) for i in range(total_test_days)]

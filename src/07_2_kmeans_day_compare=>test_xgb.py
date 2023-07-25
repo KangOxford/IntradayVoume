@@ -21,10 +21,10 @@ path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =
 
 
 # n_clusters = 2
-n_clusters = 5
+# n_clusters = 5
 # n_clusters = 10
 # n_clusters = 20
-# n_clusters = 50
+n_clusters = 50
 
 
 ratio_cumsum = 0.80
@@ -338,6 +338,7 @@ def process_data(date_index):
     # index2, list_ =  lst2[0]
     for i2, list_ in lst2:
         lst = return_lst(list_, date_index)
+
         sub_r2_list+=lst
 
     return sub_r2_list
@@ -349,7 +350,7 @@ if __name__ == '__main__':
     num_processes = multiprocessing.cpu_count()  # Get the number of available CPU cores
     import os; home = os.path.expanduser("~")
     if home == '/homes/80/kang':
-        num_processes = 100
+        num_processes = 121
     from tqdm import tqdm
     results = []
 
@@ -380,7 +381,14 @@ if __name__ == '__main__':
 
     start = time.time()
     with multiprocessing.Pool(processes=num_processes) as pool:
-         results = pool.map(process_data,range(total_test_days)[:3])
+         # results = pool.map(process_data,range(total_test_days)[:1])
+         results = pool.map(process_data,range(total_test_days)[35:37])
+         # results = pool.map(process_data,range(total_test_days)[33:35])
+         # results = pool.map(process_data,range(total_test_days)[31:33])
+         # results = pool.map(process_data,range(total_test_days)[30:31])
+         # results = pool.map(process_data,range(total_test_days)[20:30])
+         # results = pool.map(process_data,range(total_test_days)[10:20])
+         # results = pool.map(process_data,range(total_test_days)[:10])
          # results = pool.map(process_data,range(total_test_days))
     end = time.time()
     print(f"time {(end-start)/60}")
@@ -399,8 +407,11 @@ if __name__ == '__main__':
     df2.mean(axis=1) # date
     print(df2.mean(axis=1).mean())
 
-    filename = "07_2_kmeans_day_compare=>test.py_"+str(int(time.time()))+"_.csv"
-    df2.to_csv(filename,'w')
+    filename = "xgb_07_2_kmeans_day_compare_test.py_"+str(len(df2.index))+'_'+str(int(df2.index[0]))+"_"+str(int(df2.index[-1]))+"_"+str(int(time.time()))+"_.csv"
+    df2.to_csv(filename)
+    # df2.to_csv(filename,'x')
+
+
     '''
     start = time.time()
     results = [process_data(i) for i in range(total_test_days)]
