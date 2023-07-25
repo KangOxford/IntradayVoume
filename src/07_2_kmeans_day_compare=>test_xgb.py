@@ -183,7 +183,14 @@ def regularity_ols(X_train, y_train, X_test, regulator):
         return y_pred
     elif regulator == "XGB":
         import xgboost as xgb
-        model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160)
+        from sklearn.model_selection import GridSearchCV
+        param_grid = {'reg_alpha': [0.01, 0.1, 1, 10]}
+        xgb_model = xgb.XGBRegressor()
+        grid_search = GridSearchCV(estimator=xgb_model, param_grid=param_grid, cv=5)
+        grid_search.fit(X_train, y_train)
+        best_reg_alpha = grid_search.best_params_['reg_alpha']
+        print("Best reg_alpha:", best_reg_alpha)
+        model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160, reg_alpha = best_reg_alpha)
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
         y_pred = y_pred.flatten()
@@ -381,8 +388,8 @@ if __name__ == '__main__':
 
     start = time.time()
     with multiprocessing.Pool(processes=num_processes) as pool:
-         # results = pool.map(process_data,range(total_test_days)[:1])
-         results = pool.map(process_data,range(total_test_days)[35:37])
+         results = pool.map(process_data,range(total_test_days)[:1])
+         # results = pool.map(process_data,range(total_test_days)[35:37])
          # results = pool.map(process_data,range(total_test_days)[33:35])
          # results = pool.map(process_data,range(total_test_days)[31:33])
          # results = pool.map(process_data,range(total_test_days)[30:31])
