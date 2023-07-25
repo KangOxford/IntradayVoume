@@ -183,14 +183,32 @@ def regularity_ols(X_train, y_train, X_test, regulator):
         return y_pred
     elif regulator == "XGB":
         import xgboost as xgb
-        from sklearn.model_selection import GridSearchCV
-        param_grid = {'reg_alpha': [0.01, 0.1, 1, 10]}
+
+        # Define parameter grid
+        param_grid = {
+            'max_depth': [3, 5, 7],  # Try different values for max_depth
+            'n_estimators': [50, 100, 150, 200],  # Try different values for n_estimators
+            'reg_alpha': [0.01, 0.1, 1, 10]  # Try different values for reg_alpha
+        }
+        # Create model
         xgb_model = xgb.XGBRegressor()
+        from sklearn.model_selection import GridSearchCV
+        # Set up GridSearchCV
         grid_search = GridSearchCV(estimator=xgb_model, param_grid=param_grid, cv=5)
+        # Perform grid search
         grid_search.fit(X_train, y_train)
-        best_reg_alpha = grid_search.best_params_['reg_alpha']
-        print("Best reg_alpha:", best_reg_alpha)
-        model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160, reg_alpha = best_reg_alpha)
+        # Get the best parameters
+        best_params = grid_search.best_params_
+        best_max_depth = best_params['max_depth']
+        best_n_estimators = best_params['n_estimators']
+        best_reg_alpha = best_params['reg_alpha']
+        print("--------")
+        print(f"best_max_depth {best_max_depth}")
+        print(f"best_n_estimators {best_n_estimators}")
+        print(f"best_reg_alpha {best_reg_alpha}")
+        print("\n")
+
+        model = xgb.XGBRegressor(max_depth=best_max_depth, learning_rate=0.1, n_estimators=best_n_estimators, reg_alpha = best_reg_alpha)
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
         y_pred = y_pred.flatten()
