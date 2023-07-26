@@ -226,8 +226,8 @@ def regularity_ols(X_train, y_train, X_test, regulator):
             print(f"best_reg_alpha {best_reg_alpha}")
             return best_reg_alpha
 
-        best_reg_alpha = gridSearchAplha()
-        model = xgb.XGBRegressor(max_depth=3, n_estimators=50, reg_alpha = best_reg_alpha)
+        # best_reg_alpha = gridSearchAplha()
+        model = xgb.XGBRegressor(max_depth=3, n_estimators=50, reg_alpha = 10)
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
         y_pred = y_pred.flatten()
@@ -425,7 +425,8 @@ if __name__ == '__main__':
 
     start = time.time()
     with multiprocessing.Pool(processes=num_processes) as pool:
-         results = pool.map(process_data,range(total_test_days)[:1])
+         results = pool.map(process_data,range(total_test_days)[:5])
+         # results = pool.map(process_data,range(total_test_days)[:1])
          # results = pool.map(process_data,range(total_test_days)[35:37])
          # results = pool.map(process_data,range(total_test_days)[33:35])
          # results = pool.map(process_data,range(total_test_days)[31:33])

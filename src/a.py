@@ -141,3 +141,10 @@ bottom_performing_stocks_mean = bottom_performing_stocks.mean()
 
 print(bottom_performing_stocks_mean)
 
+
+
+
+
+
+
+
