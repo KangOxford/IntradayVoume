@@ -143,8 +143,50 @@ print(bottom_performing_stocks_mean)
 
 
 
+path00 = '/home/kanli/cmem/'
+import pandas as pd
+import numpy as np
+from os import listdir;from os.path import isfile,join
+files = lambda path: sorted([f for f in listdir(path) if isfile(join(path,f)) and f != '.DS_Store'])
+path21='/home/kanli/cmem/r_output/0400_r_kl_output_raw_data/'
+files21 = files(path21)
+i=0
+print(len(files21))
+r2lst = []
+for i in range(len(files21)):
+    df = pd.read_csv(path21+files21[i])
+    r2=df.r2.mean()
+    r2lst.append(r2)
+r2arr= np.array(r2lst)
+r2arr.mean()
 
 
 
 
+path00 = '/home/kanli/cmem/'
+import pandas as pd; import numpy as np
+from os import listdir;from os.path import isfile,join
+files = lambda path: sorted([f for f in listdir(path) if isfile(join(path,f)) and f != '.DS_Store'])
+path21='/home/kanli/cmem/r_output/0400_r_kl_output_raw_data/'
+files21 = files(path21)
+path22='/home/kanli/cmem/data/02.2_data_r_input_kf/'
+files22 = files(path22)
+files23 = [file for file in files22 if file not in files21]
+len(files23)
+assert len(files23)+len(files21)==len(files22)
 
+path23=path22[:-2]+"_remained/"
+path23
+import os
+os.system(f'mkdir {path23}')
+
+
+import shutil
+for file in files23:
+    source_file = os.path.join(path22,file)
+    destination_file = os.path.join(path23, file)
+    shutil.copy(source_file, destination_file)
+
+
+
+# len(files(path23))
