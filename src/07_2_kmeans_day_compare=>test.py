@@ -11,11 +11,11 @@ def tryMkdir(path):
     try: listdir(path)
     except:import os;os.mkdir(path)
     return 0
-_,_ = map(tryMkdir,[path05,path06])
+_,_ = map(tryMkdir,[path05,path0600])
 
 readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f)) and f != '.DS_Store'])
-path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =\
-    map(readFromPath, [path01, path01_1, path02, path04, path05, path06])
+path01Files, path01_1Files, path02Files, path04Files, path05Files, path0600Files =\
+    map(readFromPath, [path01, path01_1, path02, path04, path05, path0600])
 
 
 
@@ -34,7 +34,7 @@ ratio_cumsum = 1.00
 
 # def get_universal(start_index, num_of_stocks, end_index):
     # assert (end_index - start_index) % num_of_stocks == 0
-start_index, num_of_stocks = 0, len(path06Files)
+start_index, num_of_stocks = 0, len(path0600Files)
 array1 = np.concatenate( [np.arange(1,10,0.01), np.arange(10,50,0.1) ])
 array2 = np.arange(1,0.001,-0.001)
 combined_array = np.array(list(zip(array1, array2))).flatten()
@@ -50,17 +50,19 @@ num = num_of_stocks
 df_lst = []
 from tqdm import tqdm
 for i in tqdm(range(start_index,start_index+num)): # on mac4
-    df = pd.read_pickle(path06+path06Files[i])
+    df = pd.read_pickle(path0600+path0600Files[i])
     df_lst.append(df)
 
 new_dflst_lst = []
 for index, dflst in enumerate(df_lst):
     # assert dflst.shape[0] == 3172, f"index, {index}"
-    if dflst.shape[0] == 3146:
+    # if dflst.shape[0] == 3146:
+    if dflst.shape[0] == 109*26:
         new_dflst_lst.append(dflst)
 
 
-one_stock_shape = 3146
+# one_stock_shape = 3146
+one_stock_shape = 109*26
 bin_size = 26
 train_days = 10
 train_size = train_days * 26
@@ -104,7 +106,7 @@ def get_volume_features(new_dflst_lst):
         item.date = item.date.astype(np.int32)
         item = item.set_index('date')
         value = item.turnover
-        value.name = path06Files[index][:-4]
+        value.name = path0600Files[index][:-4]
         feature_list.append(value)
     features = pd.concat(feature_list,axis = 1)
     return features
@@ -120,7 +122,7 @@ def get_features_features(new_dflst_lst):
             item = item.set_index('date')
             value = item.loc[:,col]
             assert item.shape[1] == 108
-            value.name = path06Files[index][:-4]
+            value.name = path0600Files[index][:-4]
             feature_list.append(value)
         features = pd.concat(feature_list,axis = 1)
         nfeatures.append(features)
@@ -304,7 +306,7 @@ def process_data(date_index):
     # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.9999))
     # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.99))
     if ratio_cumsum == 1.00:
-        pca = PCA(n_components=len(path06Files))
+        pca = PCA(n_components=len(path0600Files))
         print("n_components 100")
     else:
         pca = PCA(n_components=np.argmax(ratio.cumsum() >= ratio_cumsum))
@@ -316,10 +318,10 @@ def process_data(date_index):
     kmeans_pca = KMeans(n_clusters=n_clusters, init="k-means++",random_state=42)
     kmeans_pca.fit(scores_pca)
     labels = kmeans_pca.labels_
-    assert kmeans_pca.labels_.shape == (len(path06Files),)
+    assert kmeans_pca.labels_.shape == (len(path0600Files),)
 
 
-    v = pd.DataFrame({"a":labels,"b": np.arange(len(path06Files))})
+    v = pd.DataFrame({"a":labels,"b": np.arange(len(path0600Files))})
     g =v.groupby("a")
     lst2 = []
     for i1,item in g:
@@ -379,7 +381,7 @@ if __name__ == '__main__':
     r2arr = np.array(results).reshape(-1,3)
     df1 = pd.DataFrame(r2arr)
     df1.columns = ['test_date','stock_index','r2']
-    assert np.unique(df1.stock_index).shape == (len(path06Files),)
+    assert np.unique(df1.stock_index).shape == (len(path0600Files),)
     df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
 
     print(df2)

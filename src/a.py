@@ -190,3 +190,10 @@ for file in files23:
 
 
 # len(files(path23))
+
+
+
+import pandas as pd
+b ="/home/kanli/cmem/r_output/06_r_output_raw_pkl/A.pkl"
+b1 = pd.read_pickle(b)
+b1
