@@ -11,11 +11,11 @@ def tryMkdir(path):
     try: listdir(path)
     except:import os;os.mkdir(path)
     return 0
-_,_ = map(tryMkdir,[path05,path06])
+_,_ = map(tryMkdir,[path05,path0600])
 
 readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f)) and f != '.DS_Store'])
-path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =\
-    map(readFromPath, [path01, path01_1, path02, path04, path05, path06])
+path01Files, path01_1Files, path02Files, path04Files, path05Files, path0600Files =\
+    map(readFromPath, [path01, path01_1, path02, path04, path05, path0600])
 
 array1 = np.concatenate( [np.arange(1,10,0.01), np.arange(10,50,0.1) ])
 array2 = np.arange(1,0.001,-0.001)
@@ -72,10 +72,10 @@ def regularity_ols(X_train, y_train, X_test, regulator):
 dflst = []
 dflst2 =[]
 from tqdm import tqdm
-for i in tqdm(range(len(path06Files))):
+for i in tqdm(range(len(path0600Files))):
     print(f">>> i: {i}")
-    df = pd.read_pickle(path06+path06Files[i])
-    symbol = path06Files[i][:-4]
+    df = pd.read_pickle(path0600+path0600Files[i])
+    symbol = path0600Files[i][:-4]
     bin_size = 26
     train_size = 10 * 26
     test_size = 1 * 26

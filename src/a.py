@@ -197,3 +197,13 @@ import pandas as pd
 b ="/home/kanli/cmem/r_output/06_r_output_raw_pkl/A.pkl"
 b1 = pd.read_pickle(b)
 b1
+
+
+
+
+df3 = df2
+df3
+mean_per_stock = df3.mean(axis=0)
+num_top_stocks = int(len(mean_per_stock) * 0.5)
+top_performing_stocks = mean_per_stock.nlargest(num_top_stocks)
+top_performing_stocks.mean()

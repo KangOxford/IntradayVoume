@@ -189,6 +189,7 @@ current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 # Construct the filename with the timestamp
 filename = path00 + "07_msedf_" + regulator + "_" + current_time + ".csv"
 # Save the DataFrame to the CSV file with the specified filename
+r2df = r2df.astype(float)
 r2df.to_csv(filename, mode='w')
 
 
