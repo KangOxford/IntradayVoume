@@ -20,17 +20,24 @@ readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile
 # path04Files, path04_1Files, path05Files = map(readFromPath, [path04, path04_1, path05])
 path0400Files, path0400_1Files, path04_2Files = map(readFromPath, [path0400, path0400_1, path04_2])
 
+'''
 # common_dates = np.load(path00 + 'common_dates.npy')[1:] # only the r output parts is in need
 sample=pd.read_csv("/home/kanli/cmem/data/02_r_input/A.txt",sep="\t")
 sample1=sorted(list(set(sample.date)))
 common_dates0 = sample1[1:]
 common_dates = [str(date) for date in common_dates0]
 # len(common_dates)
+'''
 
 from tqdm import tqdm
-for i in tqdm(range(480,len(path0400Files))):
-    df = pd.read_csv(path04 + path0400Files[i],header=None, index_col=0).dropna(axis=1).reset_index(drop=True)
-    df = df.apply(abs)
+for i in tqdm(range(0,len(path0400Files))):
+    df = pd.read_csv(path0400 + path0400Files[i]).dropna(axis=1).reset_index(drop=True)
+    print(f"days {df.shape[0]/26}")
+    # df = df.apply(abs)
+    df
+    df['date'] = df['date'].str.replace('X', '').str.replace('.', '')
+    common_dates = sorted(list(set(df.date)))
+    df = df[['daily','seasonal','dynamic','forecast_signal']]
     df.columns = ['eta','seas','mu','x']
     df['eta*seas'] = df['eta'] * df['seas']
     # ============= milestone here ============
@@ -42,7 +49,7 @@ for i in tqdm(range(480,len(path0400Files))):
     new_df = df[['log_x','log_eta*seas','log_eta','log_seas','x','eta*seas','log_mu', 'eta','seas','mu']]
     # ============= milestone here ============
     try:
-        name = path0400Files[i][10:-4] +".pkl"
+        name = path0400Files[i][:-4] +".pkl"
         ft = pd.read_pickle(path04_2 + name).reset_index(drop=True)
         # Select rows from the DataFrame based on common dates
         selected_rows = ft[ft['date'].isin(common_dates)].reset_index(drop=True)
@@ -51,7 +58,7 @@ for i in tqdm(range(480,len(path0400Files))):
         continue
     try:
         assert len(list(set(selected_rows.date))) == len(common_dates)
-        assert selected_rows.shape[0] == 122 * 26 # 3172
+        assert selected_rows.shape[0] == 110 * 26 # 3172
     except:
         print(f"{path0400Files[i]} exist error, continue")
         continue
@@ -65,4 +72,4 @@ for i in tqdm(range(480,len(path0400Files))):
     df_with_newFeatures = selected_rows[new_features]
     merged_df = pd.concat([new_df, df_with_newFeatures],axis = 1)
     # ============= milestone here ============
-    merged_df.to_csv(path04_1 + path0400Files[i], mode = 'w+')
+    merged_df.to_csv(path0400_1 + path0400Files[i], mode = 'w+')

@@ -12,7 +12,8 @@
 
 
 # load("/Users/kang/intradayModel/data/volume_aapl.rda")
-dir_path <- '/home/kanli/cmem/data/02.2_data_r_input_k_remained/'
+home_path <- path.expand("~")
+dir_path <- paste0(home_path,'/cmem/data/02.2_data_r_input_k_remained/')
 # dir_path <- '/home/kanli/cmem/data/02.2_data_r_input_kf/'
 # dir_path <- '/Users/kang/CMEM/data/02.2_data_r_input_kf/'
 # dir_path <- "/home/kanli/cmem/data/02_r_input/"
@@ -21,10 +22,10 @@ dir_path <- '/home/kanli/cmem/data/02.2_data_r_input_k_remained/'
 file_names <- list.files(dir_path)
 
 
-source("/home/kanli/intradayModel/R/use_model.R")
-source("/home/kanli/intradayModel/R/fit.R")
-source("/home/kanli/intradayModel/R/auxiliary_kalman.R")
-source("/home/kanli/intradayModel/R/auxiliary_tools.R")
+source(paste0(home_path,"/intradayModel/R/use_model.R"))
+source(paste0(home_path,"/intradayModel/R/fit.R"))
+source(paste0(home_path,"/intradayModel/R/auxiliary_kalman.R"))
+source(paste0(home_path,"/intradayModel/R/auxiliary_tools.R"))
 
 # source("/Users/kang/intradayModel/R/use_model.R")
 # source("/Users/kang/intradayModel/R/fit.R")
@@ -189,7 +190,7 @@ process_and_write_data <- function(i)
 
   }
   dff <- do.call(rbind, lst)
-  out_dir_path <- '/home/kanli/cmem/r_output/0400_r_kl_output_raw_data/'
+  out_dir_path <- paste0(home_path,'/cmem/r_output/0400_r_kl_output_raw_data/')
   # out_dir_path <- '/Users/kang/CMEM/r_output/0400_r_kl_output_raw_data/'
   filename <- paste0(out_dir_path,file_names[i])
   write.csv(dff, file = filename, row.names = FALSE)
@@ -206,7 +207,7 @@ library(parallel)
 
 
 # Get the number of available CPU cores
-num_cores <- detectCores()
+num_cores <- detectCores() - 10
 
 # Output the number of cores
 cat("Number of CPU cores:", num_cores, "\n")
