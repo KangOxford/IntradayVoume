@@ -3,7 +3,10 @@ import pandas as pd
 from os import listdir;
 from os.path import isfile, join;
 
+import os
+os.sys.path.append("/home/kanli/cmem/src/")
 from config import *
+
 
 
 def tryMkdir(path):
@@ -112,6 +115,7 @@ for i in tqdm(range(len(path06Files))):
 
     # x_list = ['log_x']
     # y_list = ['log_turnover']
+    breakpoint()
 
 
     original_space = ['turnover']
