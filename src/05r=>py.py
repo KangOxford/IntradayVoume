@@ -1,6 +1,7 @@
 import os
 os.sys.path.append("/home/kanli/cmem/src/")
-from config import *
+try: from config import *
+except: from src.config import *
 
 def tryMkdir(path):
     from os import listdir
@@ -22,6 +23,27 @@ for i in tqdm(range(len(path0400_1Files))):
     item.to_pickle(path0500 + path0400_1Files[i][:-3] +"pkl")
     assert item.shape[0] == 110*26
 
+# r2 check
+lst = []
+for i in tqdm(range(len(path0500Files))):
+    item = pd.read_pickle(path0500 + path0400_1Files[i][:-3] +"pkl")
+    item['log_qty_shift1']=item.log_qty.shift(-1)
+    import numpy as np
+    item['date'] = np.array([[i]*26 for i in range(item.shape[0]//26)]).reshape(-1)
+    itm = item[:-26]
+    g = itm.groupby("date")
+    for index, it in g:
+        pass
+        true = it.log_qty_shift1.apply(np.exp)
+        pred = it.log_x.apply(np.exp)
+        from sklearn.metrics import r2_score
+        r2 = r2_score(true, pred)
+        lst.append([index, path0400_1Files[i][:-4],r2])
+
+df = pd.DataFrame(lst,columns=['date','stock','r2'])
+dff=df.pivot(index = 'date',columns='stock')
+r2 = dff.mean(axis=1).mean()
+assert r2 >= 0.45, f"the kf-cmem should have a oos r2:{r2} over 0.45"
 
 
 
