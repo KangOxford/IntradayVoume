@@ -5,6 +5,8 @@ from os.path import isfile, join;
 
 import os
 os.sys.path.append("/home/kanli/cmem/src/")
+os.sys.path.append("/Users/kang/CMEM/src/")
+os.sys.path.append("/homes/80/kang/cmem/src/")
 from config import *
 
 
@@ -74,7 +76,8 @@ if __name__=="__main__":
     dflst = []
     dflst2 =[]
     from tqdm import tqdm
-    for i in tqdm(range(len(path06Files))):
+    # for i in tqdm(range(len(path06Files))):
+    def process_file(i):
         print(f">>> i: {i}")
         df = pd.read_pickle(path06+path06Files[i])
         symbol = path06Files[i][:-4]
@@ -200,7 +203,7 @@ if __name__=="__main__":
 
             r2_list.append([test_date,r2])
             mse_list.append([test_date,mse])
-            # y_list.append([test_date, y_test, y_pred_clipped])
+
         r2arr = np.array(r2_list)
         df = pd.DataFrame(r2arr)
         # r2arr[:,1].mean()
@@ -219,32 +222,93 @@ if __name__=="__main__":
         df2.test_date = df2.test_date.astype(int)
         pivot_df2 = df2.pivot(index='test_date', columns='symbol', values='mse')
         dflst2.append(pivot_df2)
-    r2df = pd.concat(dflst,axis =1)
-    msedf = pd.concat(dflst2,axis =1)
 
 
-    import datetime
-    # Get the current date and time
-    current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    # Construct the filename with the timestamp
-    filename = path00 + "07_r2df_" + regulator + "_" + current_time + ".csv"
-    # Save the DataFrame to the CSV file with the specified filename
-    r2df.to_csv(filename, mode='w')
-
-    import datetime
-    # Get the current date and time
-    current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    # Construct the filename with the timestamp
-    filename = path00 + "07_msedf_" + regulator + "_" + current_time + ".csv"
-    # Save the DataFrame to the CSV file with the specified filename
-    r2df = r2df.astype(float)
-    r2df.to_csv(filename, mode='w')
+    process_file(0)
 
 
-    r2df.mean(axis=1)
-    r2df.mean(axis=1).mean()
+
+    # import time
+    # import multiprocessing
+    # # 2. Map the function to the data
+    # start = time.time()
+    # num_processes = multiprocessing.cpu_count()  # Get the number of available CPU cores
+    # import os; home = os.path.expanduser("~")
+    # if home == '/homes/80/kang':
+    #     num_processes = 112
+    # with multiprocessing.Pool(processes=num_processes) as pool:
+    #     results = pool.map(process_file, range(len(path06Files)))
+    # end = time.time()
+    #
+    # # Post-process the results
+    # r2_list_combined = []
+    # mse_list_combined = []
+    # for r2, mse in results:
+    #     r2_list_combined.extend(r2)
+    #     mse_list_combined.extend(mse)
+    #
+    # r2arr = np.array(r2_list_combined)
+    # msearr = np.array(mse_list_combined)
+    #
+    # print(f"time {(end - start) / 60}")
+    #
+    #
+    #
+    # # r2arr = np.array(r2_list)
+    # df = pd.DataFrame(r2arr)
+    # # r2arr[:,1].mean()
+    # df.columns = ['test_date','r2']
+    # df['symbol'] = symbol
+    # df = df[['symbol','test_date','r2']]
+    # df.test_date = df.test_date.astype(int)
+    # pivot_df = df.pivot(index='test_date', columns='symbol', values='r2')
+    # dflst.append(pivot_df)
 
 
+
+
+
+
+
+
+
+    #     msearr = np.array(mse_list)
+    #     df2 = pd.DataFrame(msearr)
+    #     df2.columns = ['test_date','mse']
+    #     df2['symbol'] = symbol
+    #     df2 = df2[['symbol','test_date','mse']]
+    #     df2.test_date = df2.test_date.astype(int)
+    #     pivot_df2 = df2.pivot(index='test_date', columns='symbol', values='mse')
+    #     dflst2.append(pivot_df2)
+    #
+    #
+    #
+    # r2df = pd.concat(dflst,axis =1)
+    # msedf = pd.concat(dflst2,axis =1)
+    #
+    #
+    # import datetime
+    # # Get the current date and time
+    # current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    # # Construct the filename with the timestamp
+    # filename = path00 + "07_r2df_" + regulator + "_" + current_time + ".csv"
+    # # Save the DataFrame to the CSV file with the specified filename
+    # r2df.to_csv(filename, mode='w')
+    #
+    # import datetime
+    # # Get the current date and time
+    # current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    # # Construct the filename with the timestamp
+    # filename = path00 + "07_msedf_" + regulator + "_" + current_time + ".csv"
+    # # Save the DataFrame to the CSV file with the specified filename
+    # r2df = r2df.astype(float)
+    # r2df.to_csv(filename, mode='w')
+    #
+    #
+    # r2df.mean(axis=1)
+    # r2df.mean(axis=1).mean()
+    #
+    #
 
 
 
