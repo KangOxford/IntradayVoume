@@ -9,6 +9,7 @@ os.sys.path.append("/Users/kang/CMEM/src/")
 os.sys.path.append("/homes/80/kang/cmem/src/")
 from config import *
 
+import time
 
 
 def tryMkdir(path):
@@ -44,6 +45,9 @@ def regularity_ols(X_train, y_train, X_test, regulator):
         # assert type(y_pred) == np.float64
         return y_pred
     elif regulator in ["Lasso", "Ridge"]:
+        import warnings
+        from sklearn.exceptions import DataConversionWarning
+        warnings.filterwarnings("ignore", category=DataConversionWarning)
         # print("LASSO / RIDGE")
         def find_best_regularity_alpha(X_train, y_train):
             if regulator == "Lasso":
@@ -78,7 +82,7 @@ if __name__=="__main__":
     from tqdm import tqdm
     # for i in tqdm(range(len(path06Files))):
     def process_file(i):
-        print(f">>> i: {i}")
+        start = time.time()
         df = pd.read_pickle(path06+path06Files[i])
         symbol = path06Files[i][:-4]
         bin_size = 26
@@ -121,16 +125,18 @@ if __name__=="__main__":
             # y_list = ['log_turnover']
             # breakpoint()
         else:
-            x_list =   ["x", "eta*seas", "eta", "seas", "mu", "ntn", "volBuyNotional", "volSellNotional", "nrTrades",
-                          "ntr", "volBuyNrTrades_lit", "volSellNrTrades_lit", "volBuyQty", "volSellQty", "daily_ntn",
-                          "daily_volBuyNotional", "daily_volSellNotional", "daily_nrTrades", "daily_ntr",
-                          "daily_volBuyNrTrades_lit", "daily_volSellNrTrades_lit", "daily_volBuyQty", "daily_volSellQty",
-                          "daily_qty", "intraday_ntn", "intraday_volBuyNotional", "intraday_volSellNotional",
-                          "intraday_nrTrades", "intraday_ntr", "intraday_volBuyNrTrades_lit", "intraday_volSellNrTrades_lit",
-                          "intraday_volBuyQty", "intraday_volSellQty", "intraday_qty", "ntn_2", "volBuyNotional_2",
-                          "volSellNotional_2", "nrTrades_2", "ntr_2", "volBuyNrTrades_lit_2", "volSellNrTrades_lit_2",
-                          "volBuyQty_2", "volSellQty_2", "ntn_8", "volBuyNotional_8", "volSellNotional_8", "nrTrades_8",
-                          "ntr_8", "volBuyNrTrades_lit_8", "volSellNrTrades_lit_8", "volBuyQty_8", "volSellQty_8", "qty"]
+            # x_list =   ["x", "eta*seas", "eta", "seas", "mu", "ntn", "volBuyNotional", "volSellNotional", "nrTrades",
+            #               "ntr", "volBuyNrTrades_lit", "volSellNrTrades_lit", "volBuyQty", "volSellQty", "daily_ntn",
+            #               "daily_volBuyNotional", "daily_volSellNotional", "daily_nrTrades", "daily_ntr",
+            #               "daily_volBuyNrTrades_lit", "daily_volSellNrTrades_lit", "daily_volBuyQty", "daily_volSellQty",
+            #               "daily_qty", "intraday_ntn", "intraday_volBuyNotional", "intraday_volSellNotional",
+            #               "intraday_nrTrades", "intraday_ntr", "intraday_volBuyNrTrades_lit", "intraday_volSellNrTrades_lit",
+            #               "intraday_volBuyQty", "intraday_volSellQty", "intraday_qty", "ntn_2", "volBuyNotional_2",
+            #               "volSellNotional_2", "nrTrades_2", "ntr_2", "volBuyNrTrades_lit_2", "volSellNrTrades_lit_2",
+            #               "volBuyQty_2", "volSellQty_2", "ntn_8", "volBuyNotional_8", "volSellNotional_8", "nrTrades_8",
+            #               "ntr_8", "volBuyNrTrades_lit_8", "volSellNrTrades_lit_8", "volBuyQty_8", "volSellQty_8", "qty"]
+
+            x_list = ["x", "eta*seas", "eta", "seas", "mu"]
             y_list = ['turnover']
 
 
@@ -212,7 +218,7 @@ if __name__=="__main__":
         df = df[['symbol','test_date','r2']]
         df.test_date = df.test_date.astype(int)
         pivot_df = df.pivot(index='test_date', columns='symbol', values='r2')
-        dflst.append(pivot_df)
+        # dflst.append(pivot_df)
 
         msearr = np.array(mse_list)
         df2 = pd.DataFrame(msearr)
@@ -221,36 +227,67 @@ if __name__=="__main__":
         df2 = df2[['symbol','test_date','mse']]
         df2.test_date = df2.test_date.astype(int)
         pivot_df2 = df2.pivot(index='test_date', columns='symbol', values='mse')
-        dflst2.append(pivot_df2)
+        # dflst2.append(pivot_df2)
+        print(f">>> i: {i} finished, takes {(time.time()-start)/60:.2f} min")
+        return pivot_df, pivot_df2
+
+    # process_file(0)
 
 
-    process_file(0)
+
+    import time
+    import multiprocessing
+    # 2. Map the function to the data
+    start_ = time.time()
+    num_processes = multiprocessing.cpu_count()  # Get the number of available CPU cores
+    import os; home = os.path.expanduser("~")
+    if home == '/homes/80/kang':
+        num_processes = 112
+
+    # import socket
+    # time_i = int(socket.gethostname()[-1])
+    # time_i = 1
+
+    # if time_i==1:
+    #     with multiprocessing.Pool(processes=num_processes) as pool:
+    #         results = pool.map(process_file, range(len(path06Files))[:100])
+    # elif time_i==2:
+    #     with multiprocessing.Pool(processes=num_processes) as pool:
+    #         results = pool.map(process_file, range(len(path06Files))[100:200])
+    # elif time_i==3:
+    #     with multiprocessing.Pool(processes=num_processes) as pool:
+    #         results = pool.map(process_file, range(len(path06Files))[200:300])
+    # elif time_i==4:
+    #     with multiprocessing.Pool(processes=num_processes) as pool:
+    #         results = pool.map(process_file, range(len(path06Files))[300:400])
+    # elif time_i==5:
+    #     with multiprocessing.Pool(processes=num_processes) as pool:
+    #         results = pool.map(process_file, range(len(path06Files))[400:])
 
 
+    with multiprocessing.Pool(processes=num_processes) as pool:
+        results = pool.map(process_file, range(len(path06Files))[400:416])
 
-    # import time
-    # import multiprocessing
-    # # 2. Map the function to the data
-    # start = time.time()
-    # num_processes = multiprocessing.cpu_count()  # Get the number of available CPU cores
-    # import os; home = os.path.expanduser("~")
-    # if home == '/homes/80/kang':
-    #     num_processes = 112
-    # with multiprocessing.Pool(processes=num_processes) as pool:
-    #     results = pool.map(process_file, range(len(path06Files)))
-    # end = time.time()
+    end_ = time.time()
     #
-    # # Post-process the results
-    # r2_list_combined = []
-    # mse_list_combined = []
-    # for r2, mse in results:
-    #     r2_list_combined.extend(r2)
-    #     mse_list_combined.extend(mse)
+    # Post-process the results
+
+
+    r2_list_combined = []
+    mse_list_combined = []
+    for r2, mse in results:
+        r2_list_combined.append(r2)
+        mse_list_combined.append(mse)
+    r2df = pd.concat(r2_list_combined,axis=1)
+    msedf = pd.concat(mse_list_combined,axis=1)
+
+    r2df.mean(axis=1).mean()
+
+    # r2df.to_csv(f"r2df_"+str(time.time())+"_{time_i}.csv")
+
+
     #
-    # r2arr = np.array(r2_list_combined)
-    # msearr = np.array(mse_list_combined)
-    #
-    # print(f"time {(end - start) / 60}")
+    print(f"time {(end_ - start_) / 60}")
     #
     #
     #
