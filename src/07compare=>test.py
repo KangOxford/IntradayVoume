@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from os import listdir;
+import time
 from os.path import isfile, join;
 
 import os
@@ -9,7 +10,6 @@ os.sys.path.append("/Users/kang/CMEM/src/")
 os.sys.path.append("/homes/80/kang/cmem/src/")
 from config import *
 
-import time
 
 
 def tryMkdir(path):
@@ -125,6 +125,7 @@ if __name__=="__main__":
             # y_list = ['log_turnover']
             # breakpoint()
         else:
+
             # x_list =   ["x", "eta*seas", "eta", "seas", "mu", "ntn", "volBuyNotional", "volSellNotional", "nrTrades",
             #               "ntr", "volBuyNrTrades_lit", "volSellNrTrades_lit", "volBuyQty", "volSellQty", "daily_ntn",
             #               "daily_volBuyNotional", "daily_volSellNotional", "daily_nrTrades", "daily_ntr",
@@ -136,7 +137,8 @@ if __name__=="__main__":
             #               "volBuyQty_2", "volSellQty_2", "ntn_8", "volBuyNotional_8", "volSellNotional_8", "nrTrades_8",
             #               "ntr_8", "volBuyNrTrades_lit_8", "volSellNrTrades_lit_8", "volBuyQty_8", "volSellQty_8", "qty"]
 
-            x_list = ["x", "eta*seas", "eta", "seas", "mu"]
+            # x_list = ["x", "eta*seas", "eta", "seas", "mu"]
+            x_list = ["x"]
             y_list = ['turnover']
 
 
@@ -186,16 +188,19 @@ if __name__=="__main__":
 
 
             # regulator = "OLS"
-            regulator = "Lasso"
+            # regulator = "Lasso"
             # regulator = "Ridge"
-            # regulator = "None"
+            regulator = "None"
 
             y_pred = regularity_ols(X_train, y_train, X_test, regulator)
-            min_limit, max_limit = y_train.min(), y_train.max()
-            broadcast = lambda x:np.full(y_pred.shape[0], x.to_numpy())
-            min_limit, max_limit= map(broadcast, [min_limit, max_limit])
-            y_pred_clipped = np.clip(y_pred, min_limit, max_limit)
-            if any('log' in x for x in x_list):
+            # 1st
+            # min_limit, max_limit = y_train.min(), y_train.max()
+            # broadcast = lambda x:np.full(y_pred.shape[0], x.to_numpy())
+            # min_limit, max_limit= map(broadcast, [min_limit, max_limit])
+            # y_pred_clipped = np.clip(y_pred, min_limit, max_limit)
+            # 2nd
+            y_pred_clipped = y_pred
+            if if_log:
                 y_pred_clipped = np.exp(y_pred_clipped)
             test_date = df.date[train_end_index]
 
@@ -231,7 +236,7 @@ if __name__=="__main__":
         print(f">>> i: {i} finished, takes {(time.time()-start)/60:.2f} min")
         return pivot_df, pivot_df2
 
-    # process_file(0)
+    process_file(0)
 
 
 
@@ -266,7 +271,9 @@ if __name__=="__main__":
 
 
     with multiprocessing.Pool(processes=num_processes) as pool:
-        results = pool.map(process_file, range(len(path06Files))[400:416])
+        # results = pool.map(process_file, range(len(path06Files))[400:410])
+        # results = pool.map(process_file, range(len(path06Files))[380:402])
+        results = pool.map(process_file, range(len(path06Files)))
 
     end_ = time.time()
     #
@@ -281,7 +288,7 @@ if __name__=="__main__":
     r2df = pd.concat(r2_list_combined,axis=1)
     msedf = pd.concat(mse_list_combined,axis=1)
 
-    r2df.mean(axis=1).mean()
+    print(r2df.mean(axis=1).mean())
 
     # r2df.to_csv(f"r2df_"+str(time.time())+"_{time_i}.csv")
 

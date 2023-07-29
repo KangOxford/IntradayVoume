@@ -4,7 +4,8 @@ from os import listdir;
 from os.path import isfile, join;
 import os
 os.sys.path.append("/home/kanli/cmem/src/")
-from config import *
+try: from config import *
+except: from src.config import *
 
 
 def tryMkdir(path):
@@ -41,7 +42,7 @@ for i in tqdm(range(len(path0500Files))):
     newResult = newResult.reset_index(drop=True)
     newResult.to_pickle(path0600+path0400Files[i][:-3]+'pkl')
     newResult.columns
-    [print(col) for col in newResult.columns]
+    # [print(col) for col in newResult.columns]
     def shift_check(newResult):
         columns = list(newResult.columns)
         columns.remove('log_qty')
@@ -52,3 +53,14 @@ for i in tqdm(range(len(path0500Files))):
         newCol = ['date','turnover','qty','log_turnover','log_qty']+columns
         NewResult = newResult[newCol]
         return NewResult
+
+    lst = []
+    g=newResult.groupby("date")
+    for index, item in g:
+        pass
+        itm = item[['turnover','x']]
+        from sklearn.metrics import r2_score
+        r2 = r2_score(itm.turnover,itm.x)
+        lst.append([index,r2])
+    newDf=pd.DataFrame(lst)
+    assert newDf.mean()[1] >= 0.45, "the kf-cmem should have a oos r2 over 0.45"
