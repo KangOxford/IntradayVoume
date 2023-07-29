@@ -40,6 +40,8 @@ for i in tqdm(range(len(path0500Files))):
     newResult = new_result[new_result['date'].isin(unique_dates)]
     newResult = newResult.reset_index(drop=True)
     newResult.to_pickle(path0600+path0400Files[i][:-3]+'pkl')
+    newResult.columns
+    [print(col) for col in newResult.columns]
     def shift_check(newResult):
         columns = list(newResult.columns)
         columns.remove('log_qty')

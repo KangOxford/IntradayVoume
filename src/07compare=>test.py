@@ -92,73 +92,95 @@ if __name__=="__main__":
 
         # x_list = ['eta','seas','mu']
         # y_list = ['turnover']
+        if_log = False
+        if if_log:
+            # our_log_features = ['log_ntn', 'log_volBuyNotional', 'log_volSellNotional', 'log_nrTrades', 'log_ntr',
+            #                     'log_volBuyNrTrades_lit', 'log_volSellNrTrades_lit', 'log_volBuyQty', 'log_volSellQty',
+            #                     'log_daily_ntn', 'log_daily_volBuyNotional', 'log_daily_volSellNotional', 'log_daily_nrTrades',
+            #                     'log_daily_ntr', 'log_daily_volBuyNrTrades_lit', 'log_daily_volSellNrTrades_lit',
+            #                     'log_daily_volBuyQty', 'log_daily_volSellQty', 'log_daily_qty', 'log_intraday_ntn',
+            #                     'log_intraday_volBuyNotional', 'log_intraday_volSellNotional', 'log_intraday_nrTrades',
+            #                     'log_intraday_ntr', 'log_intraday_volBuyNrTrades_lit', 'log_intraday_volSellNrTrades_lit',
+            #                     'log_intraday_volBuyQty', 'log_intraday_volSellQty', 'log_intraday_qty', 'log_ntn_2',
+            #                     'log_volBuyNotional_2', 'log_volSellNotional_2', 'log_nrTrades_2', 'log_ntr_2',
+            #                     'log_volBuyNrTrades_lit_2', 'log_volSellNrTrades_lit_2', 'log_volBuyQty_2', 'log_volSellQty_2',
+            #                     'log_ntn_8', 'log_volBuyNotional_8', 'log_volSellNotional_8', 'log_nrTrades_8', 'log_ntr_8',
+            #                     'log_volBuyNrTrades_lit_8', 'log_volSellNrTrades_lit_8', 'log_volBuyQty_8', 'log_volSellQty_8']
+            x_list = ['log_x', 'log_eta*seas', 'log_eta', 'log_seas', 'log_mu']
+            # x_list = x_list +  our_log_features
+            y_list = ['log_turnover']
+            # x_list = ['log_eta', 'log_seas', 'log_mu']
+            # y_list = ['log_turnover']
+            # x_list = ['x']
+            # y_list = ['turnover']
 
-        # our_log_features = ['log_ntn', 'log_volBuyNotional', 'log_volSellNotional', 'log_nrTrades', 'log_ntr',
-        #                     'log_volBuyNrTrades_lit', 'log_volSellNrTrades_lit', 'log_volBuyQty', 'log_volSellQty',
-        #                     'log_daily_ntn', 'log_daily_volBuyNotional', 'log_daily_volSellNotional', 'log_daily_nrTrades',
-        #                     'log_daily_ntr', 'log_daily_volBuyNrTrades_lit', 'log_daily_volSellNrTrades_lit',
-        #                     'log_daily_volBuyQty', 'log_daily_volSellQty', 'log_daily_qty', 'log_intraday_ntn',
-        #                     'log_intraday_volBuyNotional', 'log_intraday_volSellNotional', 'log_intraday_nrTrades',
-        #                     'log_intraday_ntr', 'log_intraday_volBuyNrTrades_lit', 'log_intraday_volSellNrTrades_lit',
-        #                     'log_intraday_volBuyQty', 'log_intraday_volSellQty', 'log_intraday_qty', 'log_ntn_2',
-        #                     'log_volBuyNotional_2', 'log_volSellNotional_2', 'log_nrTrades_2', 'log_ntr_2',
-        #                     'log_volBuyNrTrades_lit_2', 'log_volSellNrTrades_lit_2', 'log_volBuyQty_2', 'log_volSellQty_2',
-        #                     'log_ntn_8', 'log_volBuyNotional_8', 'log_volSellNotional_8', 'log_nrTrades_8', 'log_ntr_8',
-        #                     'log_volBuyNrTrades_lit_8', 'log_volSellNrTrades_lit_8', 'log_volBuyQty_8', 'log_volSellQty_8']
-        x_list = ['log_x', 'log_eta*seas', 'log_eta', 'log_seas', 'log_mu']
-        # x_list = x_list +  our_log_features
-        y_list = ['log_turnover']
-        # x_list = ['log_eta', 'log_seas', 'log_mu']
-        # y_list = ['log_turnover']
-        # x_list = ['x']
-        # y_list = ['turnover']
-
-        # x_list = ['log_x']
-        # y_list = ['log_turnover']
-        # breakpoint()
+            # x_list = ['log_x']
+            # y_list = ['log_turnover']
+            # breakpoint()
+        else:
+            x_list =   ["x", "eta*seas", "eta", "seas", "mu", "ntn", "volBuyNotional", "volSellNotional", "nrTrades",
+                          "ntr", "volBuyNrTrades_lit", "volSellNrTrades_lit", "volBuyQty", "volSellQty", "daily_ntn",
+                          "daily_volBuyNotional", "daily_volSellNotional", "daily_nrTrades", "daily_ntr",
+                          "daily_volBuyNrTrades_lit", "daily_volSellNrTrades_lit", "daily_volBuyQty", "daily_volSellQty",
+                          "daily_qty", "intraday_ntn", "intraday_volBuyNotional", "intraday_volSellNotional",
+                          "intraday_nrTrades", "intraday_ntr", "intraday_volBuyNrTrades_lit", "intraday_volSellNrTrades_lit",
+                          "intraday_volBuyQty", "intraday_volSellQty", "intraday_qty", "ntn_2", "volBuyNotional_2",
+                          "volSellNotional_2", "nrTrades_2", "ntr_2", "volBuyNrTrades_lit_2", "volSellNrTrades_lit_2",
+                          "volBuyQty_2", "volSellQty_2", "ntn_8", "volBuyNotional_8", "volSellNotional_8", "nrTrades_8",
+                          "ntr_8", "volBuyNrTrades_lit_8", "volSellNrTrades_lit_8", "volBuyQty_8", "volSellQty_8", "qty"]
+            y_list = ['turnover']
 
 
         original_space = ['turnover']
 
 
 
-        # ---------- test -----------
-
-        dff = df[['date','turnover','x']]
-        g =dff.groupby('date')
-        lst = []
-        for index, item in g:
-            pass
-            from sklearn.metrics import r2_score
-            lst.append((int(index),r2_score(item.turnover, item.x)))
-        df0 = pd.DataFrame(lst)
-        df0.mean()
-
-        # df['x']
-        # df['eta']
-        # df['seas']
-        # df['mu']
-        # df['eta']*df['seas']*df['mu']
-
-        # ---------- test -----------
+        # # ---------- test -----------
+        #
+        # dff = df[['date','turnover','x']]
+        # g =dff.groupby('date')
+        # lst = []
+        # for index, item in g:
+        #     pass
+        #     from sklearn.metrics import r2_score
+        #     lst.append((int(index),r2_score(item.turnover, item.x)))
+        # df0 = pd.DataFrame(lst)
+        # df0.mean()
+        # # df['x']
+        # # df['eta']
+        # # df['seas']
+        # # df['mu']
+        # # df['eta']*df['seas']*df['mu']
+        # # ---------- test -----------
 
         for index in range(0, index_max + 1):
-            train_end_index = index * bin_size + train_size
+
+            # train_end_index = index * bin_size + train_size
+            num_of_universal_stocks = 1
+            train_start_index = (index * bin_size) * num_of_universal_stocks
+            train_end_index = (index * bin_size + train_size) * num_of_universal_stocks
+            test_start_index = train_end_index
+            test_end_index = train_end_index + test_size * num_of_universal_stocks
+
             def get_trainData(df):
-                x_train = df.loc[index * bin_size : index * bin_size + train_size,x_list]
-                y_train = df.loc[index * bin_size : index * bin_size + train_size,y_list]
+                x_train = df.loc[:, x_list].iloc[train_start_index: train_end_index, :]
+                y_train = df.loc[:, y_list].iloc[train_start_index: train_end_index, :]
                 return x_train, y_train
             def get_testData(df):
-                x_test = df.loc[train_end_index:train_end_index+test_size,x_list]
-                y_test = df.loc[train_end_index:train_end_index+test_size,y_list]
+                x_test = df.loc[:, x_list].iloc[train_end_index:  test_end_index, :]
+                y_test = df.loc[:, y_list].iloc[train_end_index:  test_end_index, :]
                 return x_test, y_test
             X_train, y_train = get_trainData(df)
             X_test, y_test = get_testData(df)
+            # original_images = df.loc[train_end_index:train_end_index+test_size,original_space]
+            original_images = df.loc[:, original_space].iloc[train_end_index:test_end_index, :]
+
 
             # regulator = "OLS"
             regulator = "Lasso"
             # regulator = "Ridge"
             # regulator = "None"
+
             y_pred = regularity_ols(X_train, y_train, X_test, regulator)
             min_limit, max_limit = y_train.min(), y_train.max()
             broadcast = lambda x:np.full(y_pred.shape[0], x.to_numpy())
@@ -170,7 +192,6 @@ if __name__=="__main__":
 
 
             from sklearn.metrics import r2_score
-            original_images = df.loc[train_end_index:train_end_index+test_size,original_space]
             # r2 = r2_score(y_test, y_pred_clipped)
             r2 = r2_score(original_images, y_pred_clipped)
             from sklearn.metrics import mean_squared_error
@@ -228,7 +249,8 @@ if __name__=="__main__":
 
 
 
-    # '''
+
+    '''
     type='r2'
     df3 = msedf if type =='mse' else r2df
     df3.index = df3.index.astype(int).astype(str)
@@ -269,4 +291,4 @@ if __name__=="__main__":
     filename = f"plot_{timestamp}.pdf"
     plt.savefig(path00+filename, dpi=1200, bbox_inches='tight', format='pdf')
     plt.show()
-    # '''
+    '''
