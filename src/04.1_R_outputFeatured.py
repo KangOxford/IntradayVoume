@@ -1,6 +1,7 @@
 import os
 os.sys.path.append("/home/kanli/cmem/src/")
-from config import *
+try: from config import *
+except: from src.config import *
 
 def tryMkdir(path):
     from os import listdir
