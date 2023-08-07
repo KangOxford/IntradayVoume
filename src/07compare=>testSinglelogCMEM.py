@@ -217,6 +217,11 @@ select_quantile(r2df,0.20).mean(axis=1).mean()
 
 r2df = select_quantile(r2df,0.20)
 
+
+
+
+# r2df = r2dff1
+
 # '''
 type='r2'
 df3 = msedf if type =='mse' else r2df

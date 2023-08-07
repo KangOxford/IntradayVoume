@@ -19,8 +19,8 @@ def tryMkdir(path):
 _,_ = map(tryMkdir,[path05,path06])
 
 readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f)) and f != '.DS_Store'])
-path01Files, path01_1Files, path02Files, path04Files, path0500Files, path0600Files =\
-    map(readFromPath, [path01, path01_1, path02, path04, path0500, path0600])
+path01Files, path01_1Files, path02Files, path04Files, path05Files, path06Files =\
+    map(readFromPath, [path01, path01_1, path02, path04, path05, path06])
 
 array1 = np.concatenate( [np.arange(1,10,0.01), np.arange(10,50,0.1) ])
 array2 = np.arange(1,0.001,-0.001)
@@ -83,8 +83,8 @@ if __name__=="__main__":
     # for i in tqdm(range(len(path06Files))):
     def process_file(i):
         start = time.time()
-        df = pd.read_pickle(path0600+path0600Files[i])
-        symbol = path0600Files[i][:-4]
+        df = pd.read_pickle(path06+path06Files[i])
+        symbol = path06Files[i][:-4]
         bin_size = 26
         train_size = 10 * 26
         test_size = 1 * 26
@@ -273,7 +273,7 @@ if __name__=="__main__":
     with multiprocessing.Pool(processes=num_processes) as pool:
         # results = pool.map(process_file, range(len(path06Files))[400:410])
         # results = pool.map(process_file, range(len(path06Files))[380:402])
-        results = pool.map(process_file, range(len(path0600Files)))
+        results = pool.map(process_file, range(len(path06Files)))
 
     end_ = time.time()
     #
@@ -308,21 +308,8 @@ if __name__=="__main__":
     # pivot_df = df.pivot(index='test_date', columns='symbol', values='r2')
     # dflst.append(pivot_df)
 
-    r2dff = r2df.copy()
-    def select_quantile(r2df, quantile):
-        '''
-        r2df rows are date, cols are stock
-        r2df.mean(axis=0) get the mean of each stock,
-        '''
-        mean_values = r2df.mean(axis=0)
-        threshold = mean_values.quantile(quantile)
-        selected_r2df = r2df.loc[:, mean_values >= threshold]
-        print(quantile, selected_r2df.shape[1] / r2df.shape[1])
-        return selected_r2df
 
 
-    r2dff1 = select_quantile(r2dff,0.20)
-    r2dff1.mean(axis=1).mean()
 
 
 
