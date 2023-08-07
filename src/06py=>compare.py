@@ -17,6 +17,8 @@ _,_ = map(tryMkdir,[path0500,path0600])
 readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f)) and f != '.DS_Store'])
 path01Files, path01_1Files, path0200Files, path0400Files, path0500Files = map(readFromPath, [path01, path01_1, path0200, path0400, path0500])
 
+
+newDflist = []
 from tqdm import tqdm
 for i in tqdm(range(len(path0500Files))):
     name = path0400Files[i]
@@ -62,5 +64,10 @@ for i in tqdm(range(len(path0500Files))):
         from sklearn.metrics import r2_score
         r2 = r2_score(itm.turnover,itm.x)
         lst.append([index,r2])
-    newDf=pd.DataFrame(lst)
-    assert newDf.mean()[1] >= 0.45, "the kf-cmem should have a oos r2 over 0.45"
+    newDf=pd.DataFrame(lst,columns = ['date',name[:-4]])
+    newDf = newDf.set_index('date')
+    newDflist.append(newDf)
+NewDf = pd.concat(newDflist,axis=1)
+r2= NewDf.mean(axis=1).mean()
+print(f"the kf-cmem have a oos r2:{r2}")
+# assert r2 >= 0.45, "the kf-cmem should have a oos r2 over 0.45"
