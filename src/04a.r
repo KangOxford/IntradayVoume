@@ -70,6 +70,8 @@ library(xts)
 # for (i in seq_along(file_names)[125:150])
 # for (i in seq_along(file_names)[25:50])
 # for (i in seq_along(file_names))
+
+
 process_and_write_data <- function(i)
 {
 
@@ -183,14 +185,15 @@ process_and_write_data <- function(i)
     # Adding a column for the bins from 1 to 26
     df$bins <- 1:26
     df$date <- date
-    df$r2 <-cor(original_signal, forecast_signal)^2
+    df$r2 <- cor(original_signal, forecast_signal)^2
     # Printing the data frame
     # print(df)
     lst[[date_index]] <- df
 
   }
+
   dff <- do.call(rbind, lst)
-  out_dir_path <- paste0(home_path,'/cmem/r_output/0400_r_kl_output_raw_data/')
+  out_dir_path <- paste0(home_path,'/cmem/r_output/0400_r_kl_output_raw_data_test/')
   # out_dir_path <- '/Users/kang/CMEM/r_output/0400_r_kl_output_raw_data/'
   filename <- paste0(out_dir_path,file_names[i])
   write.csv(dff, file = filename, row.names = FALSE)
@@ -207,7 +210,7 @@ library(parallel)
 
 
 # Get the number of available CPU cores
-num_cores <- detectCores() - 10
+num_cores <- detectCores()
 
 # Output the number of cores
 cat("Number of CPU cores:", num_cores, "\n")
@@ -216,7 +219,9 @@ cat("Number of CPU cores:", num_cores, "\n")
 indices <- seq_along(file_names)
 
 # Perform the processing in parallel using mclapply
-results <- mclapply(indices, process_and_write_data, mc.cores = num_cores)
+results <-process_and_write_data(1)
+
+# results <- mclapply(indices, process_and_write_data, mc.cores = num_cores)
 
 # 'results' will contain the return value of the function (which is NULL in this case)
 # Since the function doesn't have an explicit return statement, it returns NULL by default
