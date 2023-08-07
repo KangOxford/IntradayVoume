@@ -5,7 +5,11 @@ from os.path import isfile, join;
 import os
 os.sys.path.append("/home/kanli/cmem/src/")
 from config import *
+'''
+this file should be wrong
+as the loc in the xtrain ytrian is wrong
 
+'''
 
 def tryMkdir(path):
     try: listdir(path)
@@ -105,11 +109,12 @@ for i in tqdm(range(len(path0600Files))):
     #                     'log_volBuyNrTrades_lit_8', 'log_volSellNrTrades_lit_8', 'log_volBuyQty_8', 'log_volSellQty_8']
     # x_list = ['log_x', 'log_eta*seas', 'log_eta', 'log_seas', 'log_mu']
     # x_list = x_list +  our_log_features
-    y_list = ['log_turnover']
     x_list = ['log_eta', 'log_seas', 'log_mu']
-    # y_list = ['log_turnover']
-    # x_list = ['x']
-    # y_list = ['turnover']
+    y_list = ['log_turnover']
+
+
+    x_list = ['x']
+    y_list = ['turnover']
 
     # x_list = ['log_x']
     # y_list = ['log_turnover']
@@ -130,9 +135,9 @@ for i in tqdm(range(len(path0600Files))):
         X_test, y_test = get_testData(df)
 
         # regulator = "OLS"
-        regulator = "Lasso"
+        # regulator = "Lasso"
         # regulator = "Ridge"
-        # regulator = "None"
+        regulator = "None"
         y_pred = regularity_ols(X_train, y_train, X_test, regulator)
         min_limit, max_limit = y_train.min(), y_train.max()
         broadcast = lambda x:np.full(y_pred.shape[0], x.to_numpy())
@@ -191,15 +196,26 @@ current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 filename = path00 + "07_msedf_" + regulator + "_" + current_time + ".csv"
 # Save the DataFrame to the CSV file with the specified filename
 r2df.to_csv(filename, mode='w')
-
+r2df_copy = r2df.copy()
 
 r2df.mean(axis=1)
 r2df.mean(axis=1).mean()
 
+# r2df = r2df_copy.copy()
+def select_quantile(r2df,quantile):
+    '''
+    r2df rows are date, cols are stock
+    r2df.mean(axis=0) get the mean of each stock,
+    '''
+    mean_values = r2df.mean(axis=0)
+    threshold = mean_values.quantile(quantile)
+    selected_r2df = r2df.loc[:, mean_values >= threshold]
+    print(quantile, selected_r2df.shape[1]/r2df.shape[1])
+    return selected_r2df
 
+select_quantile(r2df,0.20).mean(axis=1).mean()
 
-
-
+r2df = select_quantile(r2df,0.20)
 
 # '''
 type='r2'
