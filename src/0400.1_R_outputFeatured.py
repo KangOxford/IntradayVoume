@@ -130,58 +130,58 @@ pd.set_option('display.max_columns', None)
 
 
 
-R2LST=[]
-R2LST2=[]
-i=0
-for i in tqdm(range(0,len(path0400Files))):
-    df = pd.read_csv(path0400 + path0400Files[i]).dropna(axis=1).reset_index(drop=True)
-    print(f"days {df.shape[0]/26}")
-    # df = df.apply(abs)
-    df
-    # r2_score(df.iloc[:26,0],df.iloc[:26,1])
-    # R2LST2.append(r2_score(df.original,df.forecast_signal))
-    '''caution the r2 in the df is actually corr^2 and all positive
-    we should not use the r2 in the df from path0400'''
-    # df.r2.mean()
-    df['date'] = df['date'].str.replace('X', '').str.replace('.', '')
-    common_dates = sorted(list(set(df.date)))[1:-1] #the last/first one is for the shift -1
-    df = df[['date','daily','seasonal','dynamic','forecast_signal','original']]
-    d1=df[['date','original']]
-    d2=df[['daily','seasonal','dynamic','forecast_signal']]
-    d2 = d2.shift(-1)
-    df=pd.concat([d1,d2],axis=1)
-    df.columns = ['date','qty','eta','seas','mu','x',]
-    df['eta*seas'] = df['eta'] * df['seas']
-    df
-    # ============= milestone here ============
-    df['log_eta'] = df['eta'].apply(np.log)
-    df['log_seas'] = df['seas'].apply(np.log)
-    df['log_mu'] = df['mu'].apply(np.log)
-    df['log_x'] = df['x'].apply(np.log)
-    df['log_eta*seas'] = df['eta*seas'].apply(np.log)
-    df['log_qty'] = df['qty'].apply(np.log)
-    new_df = df[['date','log_qty','log_x','log_eta*seas','log_eta','log_seas','qty','x','eta*seas','log_mu', 'eta','seas','mu']]
-    new_df0 = new_df.copy()
-    # new_df0.qty = new_df0.qty.shift(-1)
-    g = new_df0.groupby('date')
-    r2lst=[]
-    for a,b in g:
-        # print(a)
-        pass
-        has_na = b.isna().any().any()
-        if has_na:
-            continue
-        r2 = r2_score(b.qty,b.x)
-        r2lst.append(r2)
-    R2LST.append(pd.Series(r2lst,name=path0400Files[i][:-4]))
-r2df = pd.DataFrame(R2LST)
-r2df.mean(axis=0).mean()
-r2df.mean(axis=0)
-r2df.mean(axis=1).mean()
-r2df.mean(axis=1)
-
-np.array(R2LST2).mean()
-
+# R2LST=[]
+# R2LST2=[]
+# i=0
+# for i in tqdm(range(0,len(path0400Files))):
+#     df = pd.read_csv(path0400 + path0400Files[i]).dropna(axis=1).reset_index(drop=True)
+#     print(f"days {df.shape[0]/26}")
+#     # df = df.apply(abs)
+#     df
+#     # r2_score(df.iloc[:26,0],df.iloc[:26,1])
+#     # R2LST2.append(r2_score(df.original,df.forecast_signal))
+#     '''caution the r2 in the df is actually corr^2 and all positive
+#     we should not use the r2 in the df from path0400'''
+#     # df.r2.mean()
+#     df['date'] = df['date'].str.replace('X', '').str.replace('.', '')
+#     common_dates = sorted(list(set(df.date)))[1:-1] #the last/first one is for the shift -1
+#     df = df[['date','daily','seasonal','dynamic','forecast_signal','original']]
+#     d1=df[['date','original']]
+#     d2=df[['daily','seasonal','dynamic','forecast_signal']]
+#     d2 = d2.shift(-1)
+#     df=pd.concat([d1,d2],axis=1)
+#     df.columns = ['date','qty','eta','seas','mu','x',]
+#     df['eta*seas'] = df['eta'] * df['seas']
+#     df
+#     # ============= milestone here ============
+#     df['log_eta'] = df['eta'].apply(np.log)
+#     df['log_seas'] = df['seas'].apply(np.log)
+#     df['log_mu'] = df['mu'].apply(np.log)
+#     df['log_x'] = df['x'].apply(np.log)
+#     df['log_eta*seas'] = df['eta*seas'].apply(np.log)
+#     df['log_qty'] = df['qty'].apply(np.log)
+#     new_df = df[['date','log_qty','log_x','log_eta*seas','log_eta','log_seas','qty','x','eta*seas','log_mu', 'eta','seas','mu']]
+#     new_df0 = new_df.copy()
+#     # new_df0.qty = new_df0.qty.shift(-1)
+#     g = new_df0.groupby('date')
+#     r2lst=[]
+#     for a,b in g:
+#         # print(a)
+#         pass
+#         has_na = b.isna().any().any()
+#         if has_na:
+#             continue
+#         r2 = r2_score(b.qty,b.x)
+#         r2lst.append(r2)
+#     R2LST.append(pd.Series(r2lst,name=path0400Files[i][:-4]))
+# r2df = pd.DataFrame(R2LST)
+# r2df.mean(axis=0).mean()
+# r2df.mean(axis=0)
+# r2df.mean(axis=1).mean()
+# r2df.mean(axis=1)
+#
+# np.array(R2LST2).mean()
+#
 
 
 
