@@ -20,41 +20,39 @@ path01Files, path01_1Files, path0200Files, path0400Files, path0500Files = map(re
 
 newDflist = []
 from tqdm import tqdm
+i=0
 for i in tqdm(range(len(path0500Files))):
-    name = path0400Files[i]
-    df = pd.read_csv(path0400 + name)[['date','original']]
-    df['date'] = df['date'].str.replace('X', '').str.replace('.', '')
-    df.columns = ['date','turnover']
-    raw =df
-    # raw = df.iloc[26:,:].loc[:,['date','turnover']].reset_index(drop=True)?
-    # ==========
-    raw['log_turnover'] = raw['turnover'].apply(np.log)
-    # ==========
+    # name = path0500Files[i]
+    # raw['log_turnover'] = raw['turnover'].apply(np.log)
+    # # ==========
+    # fore = pd.read_pickle(path0500 + path0500Files[i]).reset_index(drop=True)
+    # forecast = fore.loc[:,['log_x', 'log_eta*seas', 'log_eta', 'log_seas', 'log_mu', 'x', 'eta*seas','eta', 'seas', 'mu']]
+    # assert forecast.shape[1] == 10
+    # feature = fore.iloc[:,10:]
+    # result = pd.concat([raw, forecast], axis = 1)
+    # shift_result = result.shift(-1)
+    # new_result = pd.concat([shift_result, feature],axis=1)
+    # new_result = new_result.dropna()
+    # frequency_counts = new_result.date.value_counts()
+    # unique_dates = sorted(frequency_counts[frequency_counts == 26].index.tolist())
+    # newResult = new_result[new_result['date'].isin(unique_dates)]
+
+    name = path0500Files[i]
     fore = pd.read_pickle(path0500 + path0500Files[i]).reset_index(drop=True)
-    forecast = fore.loc[:,['log_x', 'log_eta*seas', 'log_eta', 'log_seas', 'log_mu', 'x', 'eta*seas','eta', 'seas', 'mu']]
-    assert forecast.shape[1] == 10
-    feature = fore.iloc[:,10:]
-    result = pd.concat([raw, forecast], axis = 1)
-    shift_result = result.shift(-1)
-    new_result = pd.concat([shift_result, feature],axis=1)
-    new_result = new_result.dropna()
+    fore['turnover'] = fore.qty.shift(-1)
+    fore['log_turnover'] = fore['turnover'].apply(np.log)
+    new_result = fore.dropna()
     frequency_counts = new_result.date.value_counts()
     unique_dates = sorted(frequency_counts[frequency_counts == 26].index.tolist())
     newResult = new_result[new_result['date'].isin(unique_dates)]
+    '''
+    after the dropna here, the days shrinked from 109 to 108
+    there should be no 110 => 109 shrink. it is of no need
+    '''
+
     newResult = newResult.reset_index(drop=True)
     newResult.to_pickle(path0600+path0400Files[i][:-3]+'pkl')
     newResult.columns
-    # [print(col) for col in newResult.columns]
-    def shift_check(newResult):
-        columns = list(newResult.columns)
-        columns.remove('log_qty')
-        columns.remove('qty')
-        columns.remove('date')
-        columns.remove('turnover')
-        columns.remove('log_turnover')
-        newCol = ['date','turnover','qty','log_turnover','log_qty']+columns
-        NewResult = newResult[newCol]
-        return NewResult
 
     lst = []
     g=newResult.groupby("date")
