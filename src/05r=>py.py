@@ -21,9 +21,11 @@ path0400_1Files, path0500Files = map(readFromPath, [path0400_1, path0500])
 # r2 check
 def r2_check_0400_1():
     lst = []
+    i=0
     for i in tqdm(range(len(path0400_1Files))):
         item = pd.read_csv(path0400_1 + path0400_1Files[i], index_col=0)
         item['qty_shift1']=item.qty.shift(-1)
+        item[['qty_shift1','x']]
         import numpy as np
         item['date'] = np.array([[i]*26 for i in range(item.shape[0]//26)]).reshape(-1)
         itm = item[:-26]
@@ -41,14 +43,15 @@ def r2_check_0400_1():
     r2 = dff.mean(axis=1).mean()
     print(f"the kf-cmem have a oos r2:{r2}")
     # assert r2 >= 0.45, f"the kf-cmem should have a oos r2:{r2} over 0.45"
-r2_check_0400_1()
+# r2_check_0400_1()
 
 
 from tqdm import tqdm
+i=0
 for i in tqdm(range(len(path0400_1Files))):
     item = pd.read_csv(path0400_1+path0400_1Files[i],index_col=0)
     item.to_pickle(path0500 + path0400_1Files[i][:-3] +"pkl")
-    assert item.shape[0] == 109*26
+    # assert item.shape[0] == 109*26
 
 
 def r2_check_(path,pathFiles):

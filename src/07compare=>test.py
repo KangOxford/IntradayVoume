@@ -81,9 +81,21 @@ if __name__=="__main__":
     dflst2 =[]
     from tqdm import tqdm
     # for i in tqdm(range(len(path06Files))):
+    i=0
     def process_file(i):
         start = time.time()
         df = pd.read_pickle(path0600+path0600Files[i])
+
+        # cut_file
+
+        df.turnover = df.turnover.shift(-1)
+        # df = df.iloc[:,:-26]
+        df = df.iloc[:-26,:]
+        df = df.iloc[:-26,:]
+        df
+        # cut_file
+
+
         symbol = path0600Files[i][:-4]
         bin_size = 26
         train_size = 10 * 26
@@ -309,6 +321,8 @@ if __name__=="__main__":
     # dflst.append(pivot_df)
 
     r2dff = r2df.copy()
+
+    r2dff = r2dff.dropna(axis=0)
     def select_quantile(r2df, quantile):
         '''
         r2df rows are date, cols are stock
@@ -322,11 +336,56 @@ if __name__=="__main__":
 
 
     r2dff1 = select_quantile(r2dff,0.20)
-    r2dff1.mean(axis=1).mean()
+    print(r2dff1.mean(axis=1).mean())
+
+    def plot(r2df):
+        # '''
+        type = 'r2'
+        df3 = msedf if type == 'mse' else r2df
+        df3.index = df3.index.astype(int).astype(str)
+        m = df3.mean(axis=1)  # by date
+        s = df3.std(axis=1)  # by date
+        df3.mean(axis=1).mean()  # all mean
+        # df3.to_csv(path00 + "07_r2df_universal_day_483_"+"lasso"+"_.csv", mode = 'w')
+        # start plotting
+        a = (m - s).values
+        b = m.values
+        c = (m + s).values
+        mean = b.mean()
+        import matplotlib.pyplot as plt
+        import matplotlib.dates as mdates
+        from datetime import timedelta, datetime
+
+        font = 20  # Font size variable
+        plt.figure(figsize=(16, 12))  # Plotting
+        # plt.figure(figsize=(12, 8))
+        dates = m.index
+        x_axis = pd.to_datetime(dates, format='%Y%m%d')
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%Y'))
+        # plot first group with shadow
+        plot_label = 'Mean of R Squared' if type == 'r2' else 'Mean of Mean Sqaured Error'
+        plt.plot(x_axis, b, label=plot_label, color='blue')
+        plt.fill_between(x_axis, a, c, color='blue', alpha=0.1)
+        plt.axhline(mean, color='red', linestyle='-', label='Mean across all dates')
+        plt.text(x_axis[-1] + timedelta(days=5), mean + 0.01, f"{mean:,.2f}", verticalalignment='bottom',
+                 horizontalalignment='right', color='red', fontsize=font * 1.2)
+        # Adjusting font sizes with the font variable
+        plt.xlabel("Date", fontsize=font * 1.2)
+        ylabel = "Out of sample R squared" if type == 'r2' else "Out of sample Mean Squared Error"
+        plt.ylabel(ylabel, fontsize=font * 1.2)
+        plt.xticks(fontsize=font * 1.2)
+        plt.yticks(fontsize=font * 1.2)
+        plt.legend(fontsize=font * 1.2)
+        plt.grid(True)
+        # Save the figure with the generated filename
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"plot_{timestamp}.pdf"
+        plt.savefig(path00 + filename, dpi=1200, bbox_inches='tight', format='pdf')
+        plt.show()
+        # '''
 
 
-
-
+    plot(r2dff1)
     #     msearr = np.array(mse_list)
     #     df2 = pd.DataFrame(msearr)
     #     df2.columns = ['test_date','mse']
