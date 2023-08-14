@@ -8,7 +8,17 @@ from utils import *
 path0400_1files = readFromPath(path0400_1)
 path0400Files = readFromPath(path0400)
 
-tryMkdir(path0600_1)
+# tryMkdir(path0600_1)
+
+# def selectMidDay(i):
+#     # i=0
+#     file = pd.read_csv(path0400_1+path0400_1files[i],index_col=0)
+#     intraday_interval = np.array([0]*2+[1]*22+[2]*2)
+#     intradayInterval = np.tile(intraday_interval,(file.shape[0]//26,))
+#     file['intradayInterval']=intradayInterval
+#     df=file[file['intradayInterval']==1]
+#     df = df.reset_index(drop=True)
+#     return df
 
 def selectMidDay(i):
     # i=0
@@ -16,11 +26,12 @@ def selectMidDay(i):
     intraday_interval = np.array([0]*2+[1]*22+[2]*2)
     intradayInterval = np.tile(intraday_interval,(file.shape[0]//26,))
     file['intradayInterval']=intradayInterval
-    df=file[file['intradayInterval']==1]
+    df=file
     df = df.reset_index(drop=True)
     return df
 
-def compare2test(i,frequency_counts=22):
+def compare2test(i,frequency_counts=26):
+# def compare2test(i,frequency_counts=22):
     name = path0400_1files[i]
     fore = selectMidDay(i)
 

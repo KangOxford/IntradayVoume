@@ -102,7 +102,9 @@ process_and_write_data <- function(i)
   volume_aapl <- data_matrix
 
 
-  traing_len <- 10
+  # traing_len <- 26
+  traing_len <- 10*26
+  # traing_len <- 10
   test_len_with_one_dummy <- 2
 
 
@@ -193,7 +195,7 @@ process_and_write_data <- function(i)
   }
 
   dff <- do.call(rbind, lst)
-  out_dir_path <- paste0(home_path,'/cmem/r_output/0400_r_kl_output_raw_data_test/')
+  out_dir_path <- paste0(home_path,'/cmem/output/0400_r_kl_output_raw_data_test/')
   # out_dir_path <- '/Users/kang/CMEM/r_output/0400_r_kl_output_raw_data/'
   filename <- paste0(out_dir_path,file_names[i])
   write.csv(dff, file = filename, row.names = FALSE)
