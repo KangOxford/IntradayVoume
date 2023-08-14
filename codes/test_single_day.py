@@ -15,6 +15,7 @@ from utils import *
 from model import *
 
 path0600_1Files = readFromPath(path0600_1)
+print(len(path0600_1Files))
 
 
 def get_universal(start_index, num_of_stocks):
@@ -37,8 +38,9 @@ def get_universal(start_index, num_of_stocks):
         for index, dflst in enumerate(df_lst):
             # assert dflst.shape[0] == 3172, f"index, {index}"
             # if dflst.shape[0] == 3146:
-            assert  dflst.shape[0] == 2833, f"shape, {dflst.shape}"
-            new_dflst_lst.append(dflst)
+            # assert  dflst.shape[0] == 2834, f"shape, {dflst.shape}"
+            if dflst.shape[0] == 2834:
+                new_dflst_lst.append(dflst)
 
         gs = [dflst.iterrows() for dflst in new_dflst_lst]
         dff = []
@@ -111,61 +113,67 @@ def get_universal(start_index, num_of_stocks):
     from tqdm import tqdm
     r2_list = []
     index = 0
-    for index in tqdm(range(111)):
+    # for index in tqdm(range(111)):
+    # for index in tqdm(range(111)):
+    while True:
+        try:
+            train_start_index = (index * bin_size ) * num
+            train_end_index = (index * bin_size + train_size ) * num
+            test_start_index = train_end_index
+            test_end_index = train_end_index + test_size * num
+            def get_trainData(df):
+                x_train = df.loc[:, x_list].iloc[train_start_index: train_end_index, :]
+                y_train = df.loc[:, y_list].iloc[train_start_index: train_end_index, :]
+                # x_train = df.iloc[train_start_index : train_end_index, x_list]
+                # y_train = df.loc[train_start_index : train_end_index, y_list]
+                return x_train, y_train
+            def get_testData(df):
+                x_test = df.loc[:, x_list].iloc[train_end_index:  test_end_index, :]
+                y_test = df.loc[:, y_list].iloc[train_end_index: test_end_index, :]
+                return x_test, y_test
+            X_train, y_train = get_trainData(df)
+            X_test, y_test = get_testData(df)
+            original_images = df.loc[:, original_space].iloc[train_end_index:test_end_index,:]
 
-        train_start_index = (index * bin_size ) * num
-        train_end_index = (index * bin_size + train_size ) * num
-        test_start_index = train_end_index
-        test_end_index = train_end_index + test_size * num
-        def get_trainData(df):
-            x_train = df.loc[:, x_list].iloc[train_start_index: train_end_index, :]
-            y_train = df.loc[:, y_list].iloc[train_start_index: train_end_index, :]
-            # x_train = df.iloc[train_start_index : train_end_index, x_list]
-            # y_train = df.loc[train_start_index : train_end_index, y_list]
-            return x_train, y_train
-        def get_testData(df):
-            x_test = df.loc[:, x_list].iloc[train_end_index:  test_end_index, :]
-            y_test = df.loc[:, y_list].iloc[train_end_index: test_end_index, :]
-            return x_test, y_test
-        X_train, y_train = get_trainData(df)
-        X_test, y_test = get_testData(df)
-        original_images = df.loc[:, original_space].iloc[train_end_index:test_end_index,:]
-
-        # regulator = "Lasso"
-        # regulator = "XGB"
-
-
-        # regulator = "OLS"
-        # regulator = "Ridge"
-        regulator = "None"
-        y_pred = regularity_ols(X_train, y_train, X_test, regulator)
-        min_limit, max_limit = y_train.min(), y_train.max()
-        broadcast = lambda x:np.full(y_pred.shape[0], x.to_numpy())
-        min_limit, max_limit= map(broadcast, [min_limit, max_limit])
-        y_pred_clipped = np.clip(y_pred, min_limit, max_limit)
-        if any('log' in x for x in x_list):
-            y_pred_clipped = np.exp(y_pred_clipped)
-        test_date = df.date[train_end_index]
+            # regulator = "Lasso"
+            # regulator = "XGB"
 
 
-        # r2 = r2_score(y_test, y_pred_clipped)
-        y_pred_clipped = pd.DataFrame(y_pred_clipped)
-        y_pred_clipped.columns = ['pred']
-        original_images.reset_index(inplace=True,drop=True)
-        original_images.columns = ['true']
+            regulator = "OLS"
+            # regulator = "Ridge"
+            # regulator = "None"
+            y_pred = regularity_ols(X_train, y_train, X_test, regulator)
+            min_limit, max_limit = y_train.min(), y_train.max()
+            broadcast = lambda x:np.full(y_pred.shape[0], x.to_numpy())
+            min_limit, max_limit= map(broadcast, [min_limit, max_limit])
+            y_pred_clipped = np.clip(y_pred, min_limit, max_limit)
+            if any('log' in x for x in x_list):
+                y_pred_clipped = np.exp(y_pred_clipped)
+            test_date = df.date[train_end_index]
+            '''prob in the y_pred shapes'''
+
+            # r2 = r2_score(y_test, y_pred_clipped)
+            y_pred_clipped = pd.DataFrame(y_pred_clipped)
+            y_pred_clipped.columns = ['pred']
+            original_images.reset_index(inplace=True,drop=True)
+            original_images.columns = ['true']
 
 
-        original_images['date'] = test_date
-        stock_index = np.tile(np.arange(num),26)
-        original_images['stock_index']= stock_index
-        oneday_df = pd.concat([original_images,y_pred_clipped],axis=1)
-        lst = []
-        g = oneday_df.groupby(stock_index)
-        for stock, item in g:
-            pass
-            r2value = r2_score(item['true'], item['pred'])
-            lst.append([test_date, stock, r2value])
-        r2_list.extend(lst)
+            original_images['date'] = test_date
+            stock_index = np.tile(np.arange(num),26)
+            original_images['stock_index']= stock_index
+            oneday_df = pd.concat([original_images,y_pred_clipped],axis=1)
+            lst = []
+            g = oneday_df.groupby(stock_index)
+            for stock, item in g:
+                pass
+                r2value = r2_score(item['true'], item['pred'])
+                lst.append([test_date, stock, r2value])
+            r2_list.extend(lst)
+            print(index)
+            index += 1
+        except:
+            break
 
 
     r2arr = np.array(r2_list)
@@ -199,6 +207,7 @@ def print_mean(df3):
 if __name__=="__main__":
 
     df3 = get_universal(start_index=0,num_of_stocks=len(path0600_1Files))
+    # start_index = 0; num_of_stocks = len(path0600_1Files)
 
 
     # import pandas as pd

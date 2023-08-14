@@ -8,17 +8,18 @@ from utils import *
 path0400_1files = readFromPath(path0400_1)
 path0400Files = readFromPath(path0400)
 
-# tryMkdir(path0600_1)
+tryMkdir(path0600_1_22)
 
-# def selectMidDay(i):
-#     # i=0
-#     file = pd.read_csv(path0400_1+path0400_1files[i],index_col=0)
-#     intraday_interval = np.array([0]*2+[1]*22+[2]*2)
-#     intradayInterval = np.tile(intraday_interval,(file.shape[0]//26,))
-#     file['intradayInterval']=intradayInterval
-#     df=file[file['intradayInterval']==1]
-#     df = df.reset_index(drop=True)
-#     return df
+def selectMidDay(i):
+    '''22'''
+    # i=0
+    file = pd.read_csv(path0400_1+path0400_1files[i],index_col=0)
+    intraday_interval = np.array([0]*2+[1]*22+[2]*2)
+    intradayInterval = np.tile(intraday_interval,(file.shape[0]//26,))
+    file['intradayInterval']=intradayInterval
+    df=file[file['intradayInterval']==1]
+    df = df.reset_index(drop=True)
+    return df
 
 def selectMidDay(i):
     # i=0
@@ -30,7 +31,7 @@ def selectMidDay(i):
     df = df.reset_index(drop=True)
     return df
 
-def compare2test(i,frequency_counts=26):
+def compare2test(i,frequencyCounts=26):
 # def compare2test(i,frequency_counts=22):
     name = path0400_1files[i]
     fore = selectMidDay(i)
@@ -39,7 +40,7 @@ def compare2test(i,frequency_counts=26):
     fore['log_turnover'] = fore['turnover'].apply(np.log)
     new_result = fore.dropna()
     frequency_counts = new_result.date.value_counts()
-    unique_dates = sorted(frequency_counts[frequency_counts==frequency_counts].index.tolist())
+    unique_dates = sorted(frequency_counts[frequency_counts==frequencyCounts].index.tolist())
     newResult = new_result[new_result['date'].isin(unique_dates)]
     '''
     after the dropna here, the days shrinked from 109 to 108
@@ -49,6 +50,9 @@ def compare2test(i,frequency_counts=26):
     newResult = newResult.reset_index(drop=True)
     newResult.to_csv(path0600_1+path0400_1files[i][:-3]+'csv')
     newResult.columns
+    print(newResult.shape)
+
+
 
     lst = []
     g=newResult.groupby("date")
@@ -64,6 +68,7 @@ def compare2test(i,frequency_counts=26):
         lst.append([index,r2])
     newDf=pd.DataFrame(lst,columns = ['date',name[:-4]])
     newDf = newDf.set_index('date')
+    # print(newDf.shape)
     return newDf
 
 
@@ -85,3 +90,6 @@ if __name__ == "__main__":
     NewDf = pd.concat(newDflist,axis=1)
 
     check_NewDf(NewDf)
+
+    # path0600_1_22files = readFromPath(path0600_1_22)
+    # print(len(path0600_1_22files))

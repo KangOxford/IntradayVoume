@@ -14,10 +14,9 @@ class CNN_LSTM_Model(nn.Module):
         self.cnn = nn.Sequential(
             nn.Conv1d(40, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.MaxPool1d(kernel_size=2, stride=2)
         )
 
-        self.lstm = nn.LSTM(input_size=64, hidden_size=50, num_layers=2, batch_first=True)
+        self.lstm1 = nn.LSTM(input_size=64, hidden_size=50, num_layers=1, batch_first=True)
 
         self.fc = nn.Linear(50, 1)
 
@@ -25,9 +24,14 @@ class CNN_LSTM_Model(nn.Module):
         x = x.permute(0, 2, 1)  # Permute to match Conv1d input shape
         x = self.cnn(x)
         x = x.permute(0, 2, 1)  # Permute back to match LSTM input shape
-        x, _ = self.lstm(x)
+        x, _ = self.lstm1(x)
+        x = x.permute(0, 2, 1)  # Permute for pooling
+        x = self.pool(x)
+        x = x.permute(0, 2, 1)  # Permute back for LSTM
+        x, _ = self.lstm2(x)
         x = self.fc(x)
         return x
+
 
 def train():
     # Model, loss function, and optimizer
