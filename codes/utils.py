@@ -16,6 +16,7 @@ path05 = path00 + "r_output/05_r_output_raw_pkl/"
 path0500 = path00 + "r_output/0500_r_output_raw_pkl/"
 path06 = path00 + "r_output/06_r_output_raw_pkl/"
 path0600 = path00 + "r_output/0600_r_output_raw_pkl/"
+path0600_1 = path00+'output/0600_1_r_output_raw_csv/'
 
 
 import numpy as np

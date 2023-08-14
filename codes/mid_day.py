@@ -1,13 +1,14 @@
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-import os;os.sys.path.append(os.path.expanduser('~') + "/cmem/code")
+import os;os.sys.path.append(os.path.expanduser('~') + "/cmem/codes/")
 import os;os.sys.path.append(os.path.expanduser('~') + "/cmem/")
 from utils import *
 
 path0400_1files = readFromPath(path0400_1)
 path0400Files = readFromPath(path0400)
 
+tryMkdir(path0600_1)
 
 def selectMidDay(i):
     # i=0
@@ -35,7 +36,7 @@ def compare2test(i,frequency_counts=22):
     '''
 
     newResult = newResult.reset_index(drop=True)
-    newResult.to_csv(path0600+path0400Files[i][:-3]+'csv')
+    newResult.to_csv(path0600_1+path0400_1files[i][:-3]+'csv')
     newResult.columns
 
     lst = []
@@ -44,19 +45,32 @@ def compare2test(i,frequency_counts=22):
         pass
         itm = item[['turnover','x']]
         from sklearn.metrics import r2_score
+        # if index == 20170822 and name[:-4] == "ADP":
+        #     breakpoint()
+        # if index == 20170913 and name[:-4] == "AFL":
+        #     breakpoint()
         r2 = r2_score(itm.turnover,itm.x)
         lst.append([index,r2])
     newDf=pd.DataFrame(lst,columns = ['date',name[:-4]])
     newDf = newDf.set_index('date')
     return newDf
 
-newDflist = []
-from tqdm import tqdm
-for i in tqdm(range(len(path0400_1files))):
-    newDf = compare2test(i)
-    newDflist.append(newDf)
+
+
+
 def check_NewDf(NewDf):
-    NewDf = pd.concat(newDflist,axis=1)
     r2= NewDf.mean(axis=1).mean()
     print(f"the kf-cmem have a oos r2:{r2}")
     # assert r2 >= 0.45, "the kf-cmem should have a oos r2 over 0.45"
+
+
+if __name__ == "__main__":
+    newDflist = []
+    from tqdm import tqdm
+
+    for i in tqdm(range(len(path0400_1files))):
+        newDf = compare2test(i)
+        newDflist.append(newDf)
+    NewDf = pd.concat(newDflist,axis=1)
+
+    check_NewDf(NewDf)
