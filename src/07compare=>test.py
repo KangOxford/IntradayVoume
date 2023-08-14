@@ -87,11 +87,10 @@ if __name__=="__main__":
         df = pd.read_pickle(path0600+path0600Files[i])
 
         # cut_file
-
-        df.turnover = df.turnover.shift(-1)
+        df.turnover = df.turnover.shift(1)
         # df = df.iloc[:,:-26]
-        df = df.iloc[:-26,:]
-        df = df.iloc[:-26,:]
+        # df = df.iloc[:-26,:]
+        df = df.iloc[26:,:]
         df
         # cut_file
 
@@ -470,3 +469,7 @@ if __name__=="__main__":
     plt.savefig(path00+filename, dpi=1200, bbox_inches='tight', format='pdf')
     plt.show()
     '''
+
+
+
+df = pd.read_pickle("/home/kanli/cmem/02_raw_component/A.pkl")
