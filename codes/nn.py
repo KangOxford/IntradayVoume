@@ -3,13 +3,16 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
+# numStock = 1
+numStock = 100
+# numStock = 492
+numFeature = 40
 
-numStock = 492
 
 # Sample data
-X_train = torch.randn(260*numStock, 40)
+X_train = torch.randn(260*numStock, numFeature)
 y_train = torch.randn(26*numStock, 1)
-X_test = torch.randn(260*numStock, 40)  # Test data
+X_test = torch.randn(260*numStock, numFeature)  # Test data
 y_test = torch.randn(26*numStock, 1)
 
 
