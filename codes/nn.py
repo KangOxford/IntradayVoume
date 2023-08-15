@@ -3,11 +3,14 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
+
+numStock = 492
+
 # Sample data
-X_train = torch.randn(100, 260, 40)
-y_train = torch.randn(100, 26, 1)
-X_test = torch.randn(100, 260, 40)  # Test data
-y_test = torch.randn(100, 26, 1)
+X_train = torch.randn(100, 260*numStock, 40)
+y_train = torch.randn(100, 26*numStock, 1)
+X_test = torch.randn(100, 260*numStock, 40)  # Test data
+y_test = torch.randn(100, 26*numStock, 1)
 
 
 class CNN_LSTM_Model(nn.Module):
