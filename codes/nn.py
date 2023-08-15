@@ -1,10 +1,13 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch.nn.functional as F
 
-# Sample data (replace with your actual data)
-X_train = torch.randn(100, 260, 40)  # 100 samples, 260 time steps, 40 features
-y_train = torch.randn(100, 26, 1)  # 100 samples, 26 time steps, 1 feature
+# Sample data
+X_train = torch.randn(100, 260, 40)
+y_train = torch.randn(100, 26, 1)
+X_test = torch.randn(100, 260, 40)  # Test data
+y_test = torch.randn(100, 26, 1)
 
 
 class CNN_LSTM_Model(nn.Module):
@@ -18,6 +21,9 @@ class CNN_LSTM_Model(nn.Module):
 
         self.lstm1 = nn.LSTM(input_size=64, hidden_size=50, num_layers=1, batch_first=True)
 
+        # Adding a max pooling layer to reduce the sequence length
+        self.pool = nn.MaxPool1d(10)  # Pooling with a factor of 10
+
         self.fc = nn.Linear(50, 1)
 
     def forward(self, x):
@@ -27,10 +33,16 @@ class CNN_LSTM_Model(nn.Module):
         x, _ = self.lstm1(x)
         x = x.permute(0, 2, 1)  # Permute for pooling
         x = self.pool(x)
-        x = x.permute(0, 2, 1)  # Permute back for LSTM
-        x, _ = self.lstm2(x)
+        x = x.permute(0, 2, 1)  # Permute back for fully connected layer
         x = self.fc(x)
         return x
+
+
+def test(model, X_test, y_test):
+    with torch.no_grad():
+        outputs = model(X_test)
+        loss = F.mse_loss(outputs, y_test)
+        return loss.item()
 
 
 def train():
@@ -48,7 +60,10 @@ def train():
         loss.backward()
         optimizer.step()
         print(f'Epoch {epoch + 1}/{epochs}, Loss: {loss.item()}')
+    return model
 
     # You can now use the trained model for prediction
 if __name__=="__main__":
-    train()
+    trained_model = train()
+    test_loss = test(trained_model, X_test, y_test)
+    print(f'Test Loss (MSE): {test_loss}')
