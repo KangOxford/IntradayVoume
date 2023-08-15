@@ -45,37 +45,38 @@ class CNN_LSTM_Model(nn.Module):
         return x.squeeze(0)
 
 
+class StockPredictionModel:
+    def __init__(self, numFeature, numStock):
+        self.numFeature = numFeature
+        self.numStock = numStock
+        self.model = CNN_LSTM_Model()
 
-def train():
-    # Model, loss function, and optimizer
-    model = CNN_LSTM_Model()  # No need to pass numStock
-    criterion = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    def train(self, X_train, y_train, epochs=50, lr=0.001):
+        criterion = nn.MSELoss()
+        optimizer = optim.Adam(self.model.parameters(), lr=lr)
 
-    # Training loop
-    epochs = 50
-    for epoch in range(epochs):
-        optimizer.zero_grad()
-        outputs = model(X_train)
-        loss = criterion(outputs, y_train)
-        loss.backward()
-        optimizer.step()
-        print(f'Epoch {epoch + 1}/{epochs}, Loss: {loss.item()}')
-    return model
-def test(model, X_test, y_test):
-    with torch.no_grad():
-        outputs = model(X_test)
-        loss = F.mse_loss(outputs, y_test)
-        return loss.item()
+        for epoch in range(epochs):
+            optimizer.zero_grad()
+            outputs = self.model(X_train)
+            loss = criterion(outputs, y_train)
+            loss.backward()
+            optimizer.step()
+            print(f'Epoch {epoch + 1}/{epochs}, Loss: {loss.item()}')
 
+    def test(self, X_test, y_test):
+        with torch.no_grad():
+            outputs = self.model(X_test)
+            loss = F.mse_loss(outputs, y_test)
+            return loss.item()
+
+    def predict(self, X):
+        with torch.no_grad():
+            y_pred = self.model(X)
+            return y_pred
 
 if __name__=="__main__":
-    trained_model = train()
-    test_loss = test(trained_model, X_test, y_test)
+    stock_prediction_model = StockPredictionModel(numFeature, numStock)
+    stock_prediction_model.train(X_train, y_train)
+    test_loss = stock_prediction_model.test(X_test, y_test)
+    y_pred = stock_prediction_model.predict(X_test)  # y_pred as the output
     print(f'Test Loss (MSE): {test_loss}')
-
-
-refactor the class of nn
-
-and build another bigger class to
-take X_train, y_train, X_test as input and y_pred as output
