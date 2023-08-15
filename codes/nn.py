@@ -21,28 +21,28 @@ class CNN_LSTM_Model(nn.Module):
         super(CNN_LSTM_Model, self).__init__()
 
         self.cnn = nn.Sequential(
-            nn.Conv1d(numFeature, 64, kernel_size=3, stride=1, padding=1), # Use numFeature here
+            nn.Conv1d(numFeature, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
         )
 
         self.lstm1 = nn.LSTM(input_size=64, hidden_size=50, num_layers=1, batch_first=True)
 
-        # Adding a max pooling layer to reduce the sequence length by a factor of 10
-        self.pool = nn.MaxPool1d(10)  # Pooling with a kernel size of 10
+        # Replace max pooling with adaptive avg pooling
+        self.pool = nn.AdaptiveAvgPool1d(1)  # Pooling to reduce sequence length to 1
 
         self.fc = nn.Linear(50, 1)
 
     def forward(self, x):
-        x = x.view(260 * numStock, numFeature).unsqueeze(0) # Use numFeature here
         x = x.permute(0, 2, 1)
         x = self.cnn(x)
         x = x.permute(0, 2, 1)
         x, _ = self.lstm1(x)
         x = x.permute(0, 2, 1)
-        x = self.pool(x)
-        x = x.permute(0, 2, 1)
+        x = self.pool(x).squeeze(-1)
         x = self.fc(x)
-        return x.squeeze(0)
+        return x.squeeze(-1)
+
+
 
 
 class NNPredictionModel:
