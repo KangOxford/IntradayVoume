@@ -21,7 +21,7 @@ class CNN_LSTM_Model(nn.Module):
         super(CNN_LSTM_Model, self).__init__()
 
         self.cnn = nn.Sequential(
-            nn.Conv1d(numFeature, 64, kernel_size=3, stride=1, padding=1),
+            nn.Conv1d(1, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
         )
 
@@ -33,7 +33,7 @@ class CNN_LSTM_Model(nn.Module):
         self.fc = nn.Linear(50, 1)
 
     def forward(self, x):
-        x = x.permute(0, 2, 1)
+        x = x.unsqueeze(1)  # Add a channel dimension
         x = self.cnn(x)
         x = x.permute(0, 2, 1)
         x, _ = self.lstm1(x)
@@ -41,6 +41,8 @@ class CNN_LSTM_Model(nn.Module):
         x = self.pool(x).squeeze(-1)
         x = self.fc(x)
         return x.squeeze(-1)
+
+
 
 
 
@@ -55,6 +57,8 @@ class NNPredictionModel:
         criterion = nn.MSELoss()
         optimizer = optim.Adam(self.model.parameters(), lr=lr)
 
+        y_train = y_train.squeeze(-1)  # Ensuring the target shape matches the output shape
+
         for epoch in range(epochs):
             optimizer.zero_grad()
             outputs = self.model(X_train)
@@ -65,6 +69,7 @@ class NNPredictionModel:
 
     def test(self, X_test, y_test):
         with torch.no_grad():
+            y_test = y_test.squeeze(-1)  # Ensuring the target shape matches the output shape
             outputs = self.model(X_test)
             loss = F.mse_loss(outputs, y_test)
             return loss.item()
