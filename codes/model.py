@@ -1,4 +1,4 @@
-
+import torch
 import numpy as np
 array1 = np.concatenate([np.arange(1, 10, 0.01), np.arange(10, 50, 0.1)])
 array2 = np.arange(1, 0.001, -0.001)
@@ -59,17 +59,18 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         return y_pred
     elif regulator == "cnnLstm":
         from codes.nn import NNPredictionModel
-        type(X_train)
-        type(y_train)
-        type(X_test)
-        breakpoint()
-        X_train = X_train.to_numpy()
-        y_train = y_train.to_numpy()
-        X_test = X_test.to_numpy()
-        X_train.shape
-        y_train.shape
-        X_test.shape
+        # Convert Pandas DataFrame to PyTorch tensor (Double)
+        X_train = torch.tensor(X_train.to_numpy(), dtype=torch.float64)
+        y_train = torch.tensor(y_train.to_numpy(), dtype=torch.float64)
+        X_test = torch.tensor(X_test.to_numpy(), dtype=torch.float64)
+
+        # Initialize the model
         stock_prediction_model = NNPredictionModel(numFeature=X_train.shape[1], numStock=num)
+
+        # Convert the model's parameters to Double
+        stock_prediction_model.model.double()
+
+        # Train and predict
         stock_prediction_model.train(X_train, y_train)
         y_pred = stock_prediction_model.predict(X_test)  # y_pred as the output
         return y_pred
