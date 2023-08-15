@@ -41,6 +41,7 @@ def get_universal_df(start_index, num):
             dff.append(elem)
     df = pd.concat(dff, axis=1).T
     df.reset_index(inplace=True, drop=True)
+    print(">>> finish preparing the universal df")
     return df
 
 
@@ -108,10 +109,12 @@ def process_df(index, df, bin_size, num, train_size, test_size, x_list, y_list, 
     # regulator = "Lasso"
     # regulator = "XGB"
 
-    regulator = "OLS"
+    regulator = "cnnLstm"
+    # regulator = "OLS"
     # regulator = "Ridge"
     # regulator = "None"
-    y_pred = regularity_ols(X_train, y_train, X_test, regulator)
+    # breakpoint()
+    y_pred = regularity_ols(X_train, y_train, X_test, regulator,num)
     min_limit, max_limit = y_train.min(), y_train.max()
     broadcast = lambda x: np.full(y_pred.shape[0], x.to_numpy())
     min_limit, max_limit = map(broadcast, [min_limit, max_limit])
@@ -141,38 +144,13 @@ def process_df(index, df, bin_size, num, train_size, test_size, x_list, y_list, 
     return lst
 
 def get_universal(start_index, num_of_stocks):
-# def get_universal(start_index, num_of_stocks, end_index):
-    # assert (end_index - start_index) % num_of_stocks == 0
-
-    # ================================
     num = num_of_stocks
-    # num = 100
-    # num = 2 # for 2 stocks
-    # num = 1 # for single stock
-
-    # symbol = path06Files[i][:-4]
-    # # ================================
-    # from sklearn.cluster import KMeans
-    #
-    # km = KMeans(
-    #     n_clusters=3, init='random',
-    #     n_init=10, max_iter=300,
-    #     tol=1e-04, random_state=0
-    # )
-    # y_km = km.fit_predict(X)
-    # # ================================
     df = get_universal_df(start_index,num)
 
 
 
 
     bin_size, train_size, test_size, x_list, y_list, original_space = param_define()
-
-
-    # for index in tqdm(range(0, index_max + 1)):
-    #     print(index)
-
-    from tqdm import tqdm
     r2_list = []
     index = 0
     # for index in tqdm(range(111)):

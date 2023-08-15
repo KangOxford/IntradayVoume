@@ -7,7 +7,7 @@ combined_array = np.array(list(zip(array1, array2))).flatten()
 
 
 # used for alphas
-def regularity_ols(X_train, y_train, X_test, regulator):
+def regularity_ols(X_train, y_train, X_test, regulator,num):
     if regulator == "None":
         y_pred = X_test.to_numpy().flatten()
         return y_pred
@@ -56,6 +56,22 @@ def regularity_ols(X_train, y_train, X_test, regulator):
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
         y_pred = y_pred.flatten()
+        return y_pred
+    elif regulator == "cnnLstm":
+        from codes.nn import NNPredictionModel
+        type(X_train)
+        type(y_train)
+        type(X_test)
+        breakpoint()
+        X_train = X_train.to_numpy()
+        y_train = y_train.to_numpy()
+        X_test = X_test.to_numpy()
+        X_train.shape
+        y_train.shape
+        X_test.shape
+        stock_prediction_model = NNPredictionModel(numFeature=X_train.shape[1], numStock=num)
+        stock_prediction_model.train(X_train, y_train)
+        y_pred = stock_prediction_model.predict(X_test)  # y_pred as the output
         return y_pred
     else:
         raise NotImplementedError

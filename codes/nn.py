@@ -11,8 +11,8 @@ numFeature = 40
 
 # Sample data
 X_train = torch.randn(260*numStock, numFeature)
-y_train = torch.randn(26*numStock, 1)
-X_test = torch.randn(260*numStock, numFeature)  # Test data
+y_train = torch.randn(260*numStock, 1)
+X_test = torch.randn(26*numStock, numFeature)  # Test data
 y_test = torch.randn(26*numStock, 1)
 
 
@@ -45,7 +45,7 @@ class CNN_LSTM_Model(nn.Module):
         return x.squeeze(0)
 
 
-class StockPredictionModel:
+class NNPredictionModel:
     def __init__(self, numFeature, numStock):
         self.numFeature = numFeature
         self.numStock = numStock
@@ -75,7 +75,7 @@ class StockPredictionModel:
             return y_pred
 
 if __name__=="__main__":
-    stock_prediction_model = StockPredictionModel(numFeature, numStock)
+    stock_prediction_model = NNPredictionModel(numFeature, numStock)
     stock_prediction_model.train(X_train, y_train)
     test_loss = stock_prediction_model.test(X_test, y_test)
     y_pred = stock_prediction_model.predict(X_test)  # y_pred as the output
