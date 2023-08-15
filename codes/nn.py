@@ -21,7 +21,7 @@ class CNN_LSTM_Model(nn.Module):
         super(CNN_LSTM_Model, self).__init__()
 
         self.cnn = nn.Sequential(
-            nn.Conv1d(40, 64, kernel_size=3, stride=1, padding=1),
+            nn.Conv1d(numFeature, 64, kernel_size=3, stride=1, padding=1), # Use numFeature here
             nn.ReLU(),
         )
 
@@ -33,7 +33,7 @@ class CNN_LSTM_Model(nn.Module):
         self.fc = nn.Linear(50, 1)
 
     def forward(self, x):
-        x = x.view(260 * numStock, 40).unsqueeze(0)  # Reshape to (batch_size, sequence_length, features)
+        x = x.view(260 * numStock, numFeature).unsqueeze(0) # Use numFeature here
         x = x.permute(0, 2, 1)
         x = self.cnn(x)
         x = x.permute(0, 2, 1)
@@ -44,7 +44,7 @@ class CNN_LSTM_Model(nn.Module):
         x = self.fc(x)
         return x.squeeze(0)
 
-# ...
+
 
 def train():
     # Model, loss function, and optimizer
@@ -73,3 +73,9 @@ if __name__=="__main__":
     trained_model = train()
     test_loss = test(trained_model, X_test, y_test)
     print(f'Test Loss (MSE): {test_loss}')
+
+
+refactor the class of nn
+
+and build another bigger class to
+take X_train, y_train, X_test as input and y_pred as output
