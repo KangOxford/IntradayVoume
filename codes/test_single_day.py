@@ -89,8 +89,6 @@ def param_define():
     return bin_size, train_size, test_size, x_list, y_list, original_space
 
 
-def process_df(index):
-    print("+ ",index)
 
 def process_df(index):
     print("+ ",index)
@@ -133,7 +131,6 @@ def process_df(index):
     if any('log' in x for x in x_list):
         y_pred_clipped = np.exp(y_pred_clipped)
     test_date = df.date[train_end_index]
-    test_date = df.date[train_end_index]
     '''prob in the y_pred shapes'''
 
     # r2 = r2_score(y_test, y_pred_clipped)
@@ -161,7 +158,6 @@ def process_df(index):
 
 def get_universal(start_index, num_of_stocks):
     global num, df, bin_size, train_size, test_size, x_list, y_list, original_space, total_test_days, num_processes
-    global num, df, bin_size, train_size, test_size, x_list, y_list, original_space, total_test_days, num_processes
     num = num_of_stocks
     df = get_universal_df(start_index, num)
     bin_size, train_size, test_size, x_list, y_list, original_space = param_define()
@@ -178,7 +174,6 @@ def get_universal(start_index, num_of_stocks):
 
     start = time.time()
     with multiprocessing.Pool(processes=num_processes) as pool:
-        results = pool.map(process_df, range(total_test_days))
         results = pool.map(process_df, range(total_test_days))
     end = time.time()
 
