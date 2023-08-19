@@ -149,6 +149,7 @@ def process_df(index):
         r2value = r2_score(item['true'], item['pred'])
         lst.append([test_date, stock, r2value])
     test_df = pd.DataFrame(lst,columns=["test_date", "stock", "r2value"])
+    print(test_df)
     print(index,test_date,test_df.r2value.mean())
     return lst
 
