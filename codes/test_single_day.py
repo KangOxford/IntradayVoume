@@ -170,8 +170,10 @@ def get_universal(start_index, num_of_stocks):
 
 
     start = time.time()
-    with multiprocessing.Pool(processes=num_processes) as pool:
-        results = pool.map(process_df, range(total_test_days))
+    # with multiprocessing.Pool(processes=num_processes) as pool:
+    results = []
+    for i in range(total_test_days):
+        results.append(process_df(i))
     end = time.time()
 
     r2arr = np.array(results).reshape(-1, 3)

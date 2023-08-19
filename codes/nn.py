@@ -57,7 +57,8 @@ class NNPredictionModel:
         self.model = CNN_LSTM_Model()
         # self.model = CNN_LSTM_Model().to(device) 
 
-    def train(self, X_train, y_train, epochs=50, lr=0.001):
+    def train(self, X_train, y_train, epochs=5, lr=0.001):
+    # def train(self, X_train, y_train, epochs=50, lr=0.001):
         criterion = nn.MSELoss()
         optimizer = optim.Adam(self.model.parameters(), lr=lr)
 
