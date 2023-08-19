@@ -89,6 +89,9 @@ def param_define():
 
 def process_df(index):
     print("+ ",index)
+
+def process_df(index):
+    print("+ ",index)
     train_start_index = (index * bin_size) * num
     train_end_index = (index * bin_size + train_size) * num
     test_start_index = train_end_index
@@ -115,16 +118,21 @@ def process_df(index):
 
     regulator = "cnnLstm"
     # regulator = "OLS"
+    regulator = "cnnLstm"
+    # regulator = "OLS"
     # regulator = "Ridge"
     # regulator = "None"
     # breakpoint()
+    print(regulator)
     y_pred = regularity_ols(X_train, y_train, X_test, regulator,num)
+    print(regulator+"_finished")
     min_limit, max_limit = y_train.min(), y_train.max()
     broadcast = lambda x: np.full(y_pred.shape[0], x.to_numpy())
     min_limit, max_limit = map(broadcast, [min_limit, max_limit])
     y_pred_clipped = np.clip(y_pred, min_limit, max_limit)
     if any('log' in x for x in x_list):
         y_pred_clipped = np.exp(y_pred_clipped)
+    test_date = df.date[train_end_index]
     test_date = df.date[train_end_index]
     '''prob in the y_pred shapes'''
 
@@ -153,19 +161,24 @@ def process_df(index):
 
 def get_universal(start_index, num_of_stocks):
     global num, df, bin_size, train_size, test_size, x_list, y_list, original_space, total_test_days, num_processes
+    global num, df, bin_size, train_size, test_size, x_list, y_list, original_space, total_test_days, num_processes
     num = num_of_stocks
     df = get_universal_df(start_index, num)
     bin_size, train_size, test_size, x_list, y_list, original_space = param_define()
 
     total_test_days = (df.shape[0]//num - train_size)//bin_size # reached
-    num_processes = multiprocessing.cpu_count() -10 # Number of available CPU cores
-    # num_processes = 2 # Number of available CPU cores
+
+    # num_processes = multiprocessing.cpu_count()  # on local machine
+    # num_processes = multiprocessing.cpu_count() -10 # on flair-node-03
+    num_processes = 1 # Number of available CPU cores
+
     
     
 
 
     start = time.time()
     with multiprocessing.Pool(processes=num_processes) as pool:
+        results = pool.map(process_df, range(total_test_days))
         results = pool.map(process_df, range(total_test_days))
     end = time.time()
 
@@ -197,6 +210,7 @@ def print_mean(df3):
 
 if __name__=="__main__":
     
+    
     df3 = get_universal(start_index=0,num_of_stocks=len(path0600_1Files))
 
 
@@ -204,6 +218,7 @@ if __name__=="__main__":
 
 
     print('total r2: ',df3.mean(axis=1).mean()) # all mean
+    print('total r2: ',df3.mean(axis=1).mean()) # all mean
     # df3.to_csv(path00 + "07_r2df_universal_day_483_"+"lasso"+"_.csv", mode = 'w')
-
-
+    
+    

@@ -60,15 +60,16 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
     elif regulator == "cnnLstm":
         from codes.nn import NNPredictionModel
         # Convert Pandas DataFrame to PyTorch tensor (Double)
-        X_train = torch.tensor(X_train.to_numpy(), dtype=torch.float64)
-        y_train = torch.tensor(y_train.to_numpy(), dtype=torch.float64)
-        X_test = torch.tensor(X_test.to_numpy(), dtype=torch.float64)
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        X_train = torch.tensor(X_train.to_numpy(), dtype=torch.float64).to(device)
+        y_train = torch.tensor(y_train.to_numpy(), dtype=torch.float64).to(device)
+        X_test = torch.tensor(X_test.to_numpy(), dtype=torch.float64).to(device)
 
         # Initialize the model
         stock_prediction_model = NNPredictionModel(numFeature=X_train.shape[1], numStock=num)
 
         # Convert the model's parameters to Double
-        stock_prediction_model.model.double()
+        stock_prediction_model.model.double().to(device)
 
         # Train and predict
         stock_prediction_model.train(X_train, y_train)
