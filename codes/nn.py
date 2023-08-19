@@ -3,6 +3,9 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
+# Define the device
+# device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 # numStock = 1
 numStock = 100
 # numStock = 492
@@ -52,6 +55,7 @@ class NNPredictionModel:
         self.numFeature = numFeature
         self.numStock = numStock
         self.model = CNN_LSTM_Model()
+        # self.model = CNN_LSTM_Model().to(device) 
 
     def train(self, X_train, y_train, epochs=50, lr=0.001):
         criterion = nn.MSELoss()

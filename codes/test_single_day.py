@@ -118,7 +118,9 @@ def process_df(index):
     # regulator = "Ridge"
     # regulator = "None"
     # breakpoint()
+    print(regulator)
     y_pred = regularity_ols(X_train, y_train, X_test, regulator,num)
+    print(regulator+"_finished")
     min_limit, max_limit = y_train.min(), y_train.max()
     broadcast = lambda x: np.full(y_pred.shape[0], x.to_numpy())
     min_limit, max_limit = map(broadcast, [min_limit, max_limit])
@@ -158,8 +160,9 @@ def get_universal(start_index, num_of_stocks):
     bin_size, train_size, test_size, x_list, y_list, original_space = param_define()
 
     total_test_days = (df.shape[0]//num - train_size)//bin_size # reached
-    num_processes = multiprocessing.cpu_count() -10 # Number of available CPU cores
-    # num_processes = 2 # Number of available CPU cores
+    # num_processes = multiprocessing.cpu_count()  # on local machine
+    # num_processes = multiprocessing.cpu_count() -10 # on flair-node-03
+    num_processes = 1 # Number of available CPU cores
     
     
 
@@ -205,3 +208,5 @@ if __name__=="__main__":
 
     print('total r2: ',df3.mean(axis=1).mean()) # all mean
     # df3.to_csv(path00 + "07_r2df_universal_day_483_"+"lasso"+"_.csv", mode = 'w')
+    
+    
