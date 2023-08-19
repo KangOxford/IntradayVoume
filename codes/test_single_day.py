@@ -87,6 +87,8 @@ def param_define():
     return bin_size, train_size, test_size, x_list, y_list, original_space
 
 def process_df(index, df, bin_size, num, train_size, test_size, x_list, y_list, original_space):
+    test_date = df.date[train_end_index]
+    print(index,test_date)
     train_start_index = (index * bin_size) * num
     train_end_index = (index * bin_size + train_size) * num
     test_start_index = train_end_index
@@ -111,8 +113,8 @@ def process_df(index, df, bin_size, num, train_size, test_size, x_list, y_list, 
     # regulator = "Lasso"
     # regulator = "XGB"
 
-    regulator = "cnnLstm"
-    # regulator = "OLS"
+    # regulator = "cnnLstm"
+    regulator = "OLS"
     # regulator = "Ridge"
     # regulator = "None"
     # breakpoint()
@@ -123,7 +125,6 @@ def process_df(index, df, bin_size, num, train_size, test_size, x_list, y_list, 
     y_pred_clipped = np.clip(y_pred, min_limit, max_limit)
     if any('log' in x for x in x_list):
         y_pred_clipped = np.exp(y_pred_clipped)
-    test_date = df.date[train_end_index]
     '''prob in the y_pred shapes'''
 
     # r2 = r2_score(y_test, y_pred_clipped)
@@ -147,24 +148,29 @@ def process_df(index, df, bin_size, num, train_size, test_size, x_list, y_list, 
     return lst
 
 
+# Define process_data outside of any other function
+def process_data(i, df, bin_size, num, train_size, test_size, x_list, y_list, original_space):
+    return process_df(i, df, bin_size, num, train_size, test_size, x_list, y_list, original_space)
 
+# Define a wrapper function to pass all the arguments to process_data
+def wrapper_func(i, df, bin_size, num, train_size, test_size, x_list, y_list, original_space):
+    return process_data(i, df, bin_size, num, train_size, test_size, x_list, y_list, original_space)
 
 def get_universal(start_index, num_of_stocks):
     num = num_of_stocks
     df = get_universal_df(start_index, num)
     bin_size, train_size, test_size, x_list, y_list, original_space = param_define()
 
-    total_test_days = (df.shape[0]//num - train_size)//bin_size # reached
-    num_processes = multiprocessing.cpu_count() -10 # Number of available CPU cores
+    total_test_days = (df.shape[0]//num - train_size)//bin_size
+    # num_processes = multiprocessing.cpu_count() - 10
+    num_processes = 2
+    print("num_processes: ",num_processes)
 
-
-    def process_data(i):
-        return process_df(i, df, bin_size, num, train_size, test_size, x_list, y_list, original_space)
-
+    args = [(i, df, bin_size, num, train_size, test_size, x_list, y_list, original_space) for i in range(total_test_days)]
 
     start = time.time()
     with multiprocessing.Pool(processes=num_processes) as pool:
-        results = pool.map(process_data, range(total_test_days))
+        results = pool.starmap(wrapper_func, args)
     end = time.time()
 
     r2arr = np.array(results).reshape(-1, 3)
