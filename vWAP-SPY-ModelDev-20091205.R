@@ -21,7 +21,7 @@
 
 rm(list = ls(all=TRUE))
 options(warn = 1)
-source("~/CMEM/r_code/vWAPMain_20081010.R")
+source("~/CMEM/vWAPMain_20081010.R")
 
 
 .dummyBin <- 
@@ -161,7 +161,7 @@ model <- matrix(data = model, ncol = 2, byrow = TRUE)
 
 #### Read
 data1 <- read.table(file = filein1, header = TRUE, sep = "\t", quote = "",
-                    na.strings = "..", colClasses = "numeric", comment.char = "")
+  na.strings = ".", colClasses = "numeric", comment.char = "")
 
 #### Only interesting days
 rangeDate <- range(rangeDate)

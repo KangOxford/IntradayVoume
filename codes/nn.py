@@ -10,10 +10,10 @@ numFeature = 40
 
 
 # Sample data
-X_train = torch.randn(260*numStock, numFeature)
-y_train = torch.randn(260*numStock, 1)
-X_test = torch.randn(26*numStock, numFeature)  # Test data
-y_test = torch.randn(26*numStock, 1)
+X_train = torch.randn(260*numStock, numFeature).double()
+y_train = torch.randn(260*numStock, 1).double()
+X_test = torch.randn(26*numStock, numFeature).double() # Test data
+y_test = torch.randn(26*numStock, 1).double()
 
 
 class CNN_LSTM_Model(nn.Module):
@@ -51,20 +51,32 @@ class NNPredictionModel:
     def __init__(self, numFeature, numStock):
         self.numFeature = numFeature
         self.numStock = numStock
-        self.model = CNN_LSTM_Model()
+        self.model = CNN_LSTM_Model().double()
 
     def train(self, X_train, y_train, epochs=50, lr=0.001):
         criterion = nn.MSELoss()
         optimizer = optim.Adam(self.model.parameters(), lr=lr)
 
         y_train = y_train.squeeze(-1)  # Ensuring the target shape matches the output shape
-
+        breakpoint()
         for epoch in range(epochs):
+            breakpoint()
             optimizer.zero_grad()
+            breakpoint()
             outputs = self.model(X_train)
+            breakpoint()
             loss = criterion(outputs, y_train)
+            
+            breakpoint()
+            
             loss.backward()
+            
+            breakpoint()
+
             optimizer.step()
+            
+            breakpoint()
+            
             print(f'Epoch {epoch + 1}/{epochs}, Loss: {loss.item()}')
 
     def test(self, X_test, y_test):

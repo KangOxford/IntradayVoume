@@ -20,32 +20,26 @@
 
 #### Formulation functions
 # source("~/Cipo/Volatility/package/vWAP/R/dev/vWAPFormulation_20081010.R")
-source("~/CMEM/r_code/vWAPFormulation-20091205.R")
-# source("~/ceme/r_code/vWAPFormulation-20091205.R")
+source("~/CMEM/vWAPFormulation-20091205.R")
 
 #### Filtering functions
 # source("~/Cipo/Volatility/package/vWAP/R/dev/vWAPFiltering_20081023.R")
-# source("~/ceme/r_code/vWAPFiltering-20091205.R")
-source("~/CMEM/r_code/vWAPFiltering-20091205.R")
+source("~/CMEM/vWAPFiltering-20091205.R")
 
 #### Estimation functions
 #source("~/Cipo/Volatility/package/vWAP/R/dev/vWAPEstimation_20081120.R")
-# source("~/ceme/r_code/vWAPEstimation-20091205.R")
-source("~/CMEM/r_code/vWAPEstimation-20091205.R")
+source("~/CMEM/vWAPEstimation-20091205.R")
 
 #### Forecasts functions
 #source("~/Cipo/Volatility/package/vWAP/R/dev/vWAPForecast_20081108.R")
-# source("~/ceme/r_code/vWAPForecast-20091210.R")
-source("~/CMEM/r_code/vWAPForecast-20091210.R")
+source("~/CMEM/vWAPForecast-20091210.R")
 
 #### Time functions
 #source("~/Cipo/Volatility/package/vWAP/R/dev/vWAPTime_20090301.R")
-# source("~/ceme/r_code/vWAPTime-20091205.R")
-source("~/CMEM/r_code/vWAPTime-20091205.R")
+source("~/CMEM/vWAPTime-20091205.R")
 
 #### Utilities functions
-# source("~/ceme/r_code/vWAPUtilities_20081220.R")
-source("~/CMEM/r_code/vWAPUtilities_20081220.R")
+source("~/CMEM/vWAPUtilities_20081220.R")
 
 
 ################################################################################
