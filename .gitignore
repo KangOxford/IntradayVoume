@@ -1,3 +1,20 @@
 /.Rproj.user/
 /src/cmem.Rproj
 .idea/**/
+**.pkl
+**.csv
+._**
+**.png
+**.txt
+**.pdf
+**.tar.gz
+.DS_Store
+.RData
+**.Rproj
+**.eps
+/.idea/
+/__pycache__/
+**.pyc
+**.npy
+
+ ApIQ

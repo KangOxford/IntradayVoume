@@ -13,6 +13,8 @@ import os;os.sys.path.append(os.path.expanduser('~') + "/cmem/codes/")
 import os;os.sys.path.append(os.path.expanduser('~') + "/cmem/")
 from utils import *
 from model import *
+import multiprocessing
+import time
 
 path0600_1Files = readFromPath(path0600_1)
 print(len(path0600_1Files))
@@ -140,42 +142,50 @@ def process_df(index, df, bin_size, num, train_size, test_size, x_list, y_list, 
         pass
         r2value = r2_score(item['true'], item['pred'])
         lst.append([test_date, stock, r2value])
-    print(index)
+    test_df = pd.DataFrame(lst,columns=["test_date", "stock", "r2value"])
+    print(index,test_date,test_df.r2value.mean())
     return lst
+
+
+def process_data(i):
+    return process_df(i, df, bin_size, num, train_size, test_size, x_list, y_list, original_space)
+
 
 def get_universal(start_index, num_of_stocks):
     num = num_of_stocks
-    df = get_universal_df(start_index,num)
-
-
-
-
+    df = get_universal_df(start_index, num)
     bin_size, train_size, test_size, x_list, y_list, original_space = param_define()
-    r2_list = []
-    index = 0
-    # for index in tqdm(range(111)):
-    # for index in tqdm(range(111)):
-    maxIndex = (df.shape[0]//num - train_size)//bin_size # reached
 
-    for i in range(maxIndex):
-        lst = process_df(i, df, bin_size, num, train_size, test_size, x_list, y_list, original_space)
-        r2_list.extend(lst)
+    total_test_days = (df.shape[0]//num - train_size)//bin_size # reached
+    num_processes = multiprocessing.cpu_count() -10 # Number of available CPU cores
 
 
+    start = time.time()
+    with multiprocessing.Pool(processes=num_processes) as pool:
+        results = pool.map(process_data, range(total_test_days))
+    end = time.time()
 
+    r2arr = np.array(results).reshape(-1, 3)
+    df1 = pd.DataFrame(r2arr)
+    df1.columns = ['test_date', 'stock_index', 'r2']
+    assert np.unique(df1['stock_index']).shape == (len(path0600_1Files),)
+    df2 = df1.pivot(index="test_date", columns="stock_index", values="r2")
+
+    print(f"time {(end-start)/60}")
+    return df2
+    
+    '''
     r2arr = np.array(r2_list)
     df1 = pd.DataFrame(r2arr)
     df1.columns = ['test_date','stock_index','r2']
     df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
-
-
-
     print(df2)
     df2.mean(axis=0) # stock
     df2.mean(axis=1) # date
     df2.mean(axis=1).mean()
-
     return df2
+    '''
+
 def print_mean(df3):
     print(f">>>> stock mean: \n",df3.mean(axis=0))  # stock
     print(f">>>> date mean: \n",df3.mean(axis=1))   # date
