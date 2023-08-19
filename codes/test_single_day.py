@@ -86,9 +86,9 @@ def param_define():
     original_space = ['turnover']
     return bin_size, train_size, test_size, x_list, y_list, original_space
 
-def process_df(index, df, bin_size, num, train_size, test_size, x_list, y_list, original_space):
-    test_date = df.date[train_end_index]
-    print(index,test_date)
+
+def process_df(index):
+    print("+ ",index)
     train_start_index = (index * bin_size) * num
     train_end_index = (index * bin_size + train_size) * num
     test_start_index = train_end_index
@@ -113,8 +113,8 @@ def process_df(index, df, bin_size, num, train_size, test_size, x_list, y_list, 
     # regulator = "Lasso"
     # regulator = "XGB"
 
-    # regulator = "cnnLstm"
-    regulator = "OLS"
+    regulator = "cnnLstm"
+    # regulator = "OLS"
     # regulator = "Ridge"
     # regulator = "None"
     # breakpoint()
@@ -125,6 +125,7 @@ def process_df(index, df, bin_size, num, train_size, test_size, x_list, y_list, 
     y_pred_clipped = np.clip(y_pred, min_limit, max_limit)
     if any('log' in x for x in x_list):
         y_pred_clipped = np.exp(y_pred_clipped)
+    test_date = df.date[train_end_index]
     '''prob in the y_pred shapes'''
 
     # r2 = r2_score(y_test, y_pred_clipped)
@@ -148,29 +149,24 @@ def process_df(index, df, bin_size, num, train_size, test_size, x_list, y_list, 
     return lst
 
 
-# Define process_data outside of any other function
-def process_data(i, df, bin_size, num, train_size, test_size, x_list, y_list, original_space):
-    return process_df(i, df, bin_size, num, train_size, test_size, x_list, y_list, original_space)
 
-# Define a wrapper function to pass all the arguments to process_data
-def wrapper_func(i, df, bin_size, num, train_size, test_size, x_list, y_list, original_space):
-    return process_data(i, df, bin_size, num, train_size, test_size, x_list, y_list, original_space)
 
 def get_universal(start_index, num_of_stocks):
+    global num, df, bin_size, train_size, test_size, x_list, y_list, original_space, total_test_days, num_processes
     num = num_of_stocks
     df = get_universal_df(start_index, num)
     bin_size, train_size, test_size, x_list, y_list, original_space = param_define()
 
-    total_test_days = (df.shape[0]//num - train_size)//bin_size
-    # num_processes = multiprocessing.cpu_count() - 10
-    num_processes = 2
-    print("num_processes: ",num_processes)
+    total_test_days = (df.shape[0]//num - train_size)//bin_size # reached
+    num_processes = multiprocessing.cpu_count() -10 # Number of available CPU cores
+    # num_processes = 2 # Number of available CPU cores
+    
+    
 
-    args = [(i, df, bin_size, num, train_size, test_size, x_list, y_list, original_space) for i in range(total_test_days)]
 
     start = time.time()
     with multiprocessing.Pool(processes=num_processes) as pool:
-        results = pool.starmap(wrapper_func, args)
+        results = pool.map(process_df, range(total_test_days))
     end = time.time()
 
     r2arr = np.array(results).reshape(-1, 3)
@@ -200,23 +196,12 @@ def print_mean(df3):
     print(f">>>> aggregate mean: \n",df3.mean(axis=1).mean())
 
 if __name__=="__main__":
-
+    
     df3 = get_universal(start_index=0,num_of_stocks=len(path0600_1Files))
-    # start_index = 0; num_of_stocks = len(path0600_1Files)
-
-
-    # import pandas as pd
-    # df3 = pd.read_csv("/home/kanli/cmem/07_r2df_universal_day_483_lasso_.csv",index_col=0)
-    # df3
-    # df3.index = df3.index.astype(int).astype(str)
-    # m = df3.mean(axis=1) # by date
-    # s = df3.std(axis=1) # by date
 
 
 
 
 
-    df3.mean(axis=1).mean() # all mean
+    print('total r2: ',df3.mean(axis=1).mean()) # all mean
     # df3.to_csv(path00 + "07_r2df_universal_day_483_"+"lasso"+"_.csv", mode = 'w')
-
-
