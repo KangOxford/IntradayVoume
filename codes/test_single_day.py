@@ -21,34 +21,6 @@ import time
 path0600_1Files = readFromPath(path0600_1)
 print(len(path0600_1Files))
 
-
-def get_universal_df(start_index, num):
-    df_lst = []
-    from tqdm import tqdm
-    for i in tqdm(range(start_index, start_index + num)):  # on mac4
-        df = pd.read_csv(path0600_1 + path0600_1Files[i], index_col=0)
-        df_lst.append(df)
-
-    new_dflst_lst = []
-    for index, dflst in enumerate(df_lst):
-        # assert dflst.shape[0] == 3172, f"index, {index}"
-        # if dflst.shape[0] == 3146:
-        # assert  dflst.shape[0] == 2834, f"shape, {dflst.shape}"
-        if dflst.shape[0] == 2834:
-            new_dflst_lst.append(dflst)
-
-    gs = [dflst.iterrows() for dflst in new_dflst_lst]
-    dff = []
-    for i in tqdm(range(dflst.shape[0])):
-        for g in gs:
-            elem = next(g)[1].T
-            dff.append(elem)
-    df = pd.concat(dff, axis=1).T
-    df.reset_index(inplace=True, drop=True)
-    print(">>> finish preparing the universal df")
-    return df
-
-
 def param_define():
     bin_size = 26
     train_size = 10 * 26
@@ -89,7 +61,7 @@ def param_define():
     return bin_size, train_size, test_size, x_list, y_list, original_space
 
 
-def process_df(index):
+def process_df(index,regulator):
     print("+ ",index)
     train_start_index = (index * bin_size) * num
     train_end_index = (index * bin_size + train_size) * num
@@ -112,13 +84,7 @@ def process_df(index):
     X_test, y_test = get_testData(df)
     original_images = df.loc[:, original_space].iloc[train_end_index:test_end_index, :]
 
-    # regulator = "Lasso"
-    # regulator = "XGB"
 
-    regulator = "cnnLstm"
-    # regulator = "OLS"
-    # regulator = "Ridge"
-    # regulator = "None"
     # breakpoint()
     print(regulator)
     y_pred = regularity_ols(X_train, y_train, X_test, regulator,num)
@@ -156,10 +122,13 @@ def process_df(index):
 
 
 
-def get_universal(start_index, num_of_stocks):
+def get_universal(num_of_stocks,regulator):
     global num, df, bin_size, train_size, test_size, x_list, y_list, original_space, total_test_days, num_processes
     num = num_of_stocks
-    df = get_universal_df(start_index, num)
+    df = pd.read_pickle(path0700+"universal.pkl")
+    # df = pd.read_csv(path0700+"universal.csv",index_col=0)
+    print("universal data loaded")
+    # breakpoint()
     bin_size, train_size, test_size, x_list, y_list, original_space = param_define()
 
     total_test_days = (df.shape[0]//num - train_size)//bin_size # reached
@@ -174,7 +143,7 @@ def get_universal(start_index, num_of_stocks):
     # with multiprocessing.Pool(processes=num_processes) as pool:
     results = []
     for i in range(total_test_days):
-        results.append(process_df(i))
+        results.append(process_df(i,regulator))
     end = time.time()
 
     r2arr = np.array(results).reshape(-1, 3)
@@ -204,14 +173,21 @@ def print_mean(df3):
     print(f">>>> aggregate mean: \n",df3.mean(axis=1).mean())
 
 if __name__=="__main__":
+    # regulator = "Lasso"
+    regulator = "XGB"
+
+    # regulator = "cnnLstm"
+    # regulator = "OLS"
+    # regulator = "Ridge"
+    # regulator = "None"
     
-    df3 = get_universal(start_index=0,num_of_stocks=len(path0600_1Files))
+    df3 = get_universal(num_of_stocks=len(path0600_1Files),regulator=regulator)
 
 
 
 
-
+    total_r2 = df3.mean(axis=1).mean()
     print('total r2: ',df3.mean(axis=1).mean()) # all mean
-    # df3.to_csv(path00 + "07_r2df_universal_day_483_"+"lasso"+"_.csv", mode = 'w')
+    df3.to_csv(path00 + "08_r2df_universal_day_"+str(num)+"_"+regulator+"_"+str(total_r2)[:6]+".csv", mode = 'w')
     
     

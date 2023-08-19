@@ -53,6 +53,7 @@ if __name__=="__main__":
     df = get_universal_df(start_index=0, num=len(path0600_1Files))
     tryMkdir(path0700)
     df.to_csv(path0700+"universal.csv")
+    df.to_pickle(path0700+"universal.pkl")
     
     
     
