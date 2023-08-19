@@ -1,5 +1,6 @@
 import os
-home_path = os.path.expanduser('~') + "/"
+home_path = "/homes/80/kang/"
+# home_path = os.path.expanduser('~') + "/"
 path00 = home_path + "cmem/"
 path01 = path00 + "data/01_raw/"
 path01_1=path00 + "data/01.1_raw/"
