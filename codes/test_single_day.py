@@ -11,6 +11,8 @@ import pandas as pd
 from tqdm import tqdm
 import os;os.sys.path.append(os.path.expanduser('~') + "/cmem/codes/")
 import os;os.sys.path.append(os.path.expanduser('~') + "/cmem/")
+import os;os.sys.path.append("/homes/80/kang/cmem/")
+import os;os.sys.path.append("/homes/80/kang/cmem/codes/")
 from utils import *
 from model import *
 import multiprocessing
@@ -116,8 +118,6 @@ def process_df(index):
     # regulator = "Lasso"
     # regulator = "XGB"
 
-    regulator = "cnnLstm"
-    # regulator = "OLS"
     regulator = "cnnLstm"
     # regulator = "OLS"
     # regulator = "Ridge"
