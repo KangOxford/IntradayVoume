@@ -147,8 +147,6 @@ def process_df(index, df, bin_size, num, train_size, test_size, x_list, y_list, 
     return lst
 
 
-def process_data(i):
-    return process_df(i, df, bin_size, num, train_size, test_size, x_list, y_list, original_space)
 
 
 def get_universal(start_index, num_of_stocks):
@@ -158,6 +156,10 @@ def get_universal(start_index, num_of_stocks):
 
     total_test_days = (df.shape[0]//num - train_size)//bin_size # reached
     num_processes = multiprocessing.cpu_count() -10 # Number of available CPU cores
+
+
+    def process_data(i):
+        return process_df(i, df, bin_size, num, train_size, test_size, x_list, y_list, original_space)
 
 
     start = time.time()
