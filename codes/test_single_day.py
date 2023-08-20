@@ -119,14 +119,18 @@ def process_df(index,regulator):
     print(index,test_date,test_df.r2value.mean())
     return lst
 
+def getUniversalDf():
+    # df = pd.read_csv(path0700+"universal.csv",index_col=0)
+    return pd.read_pickle(path0700+"universal.pkl")
 
-
+def getClusterDf():
+    return 0
 
 def get_universal(num_of_stocks,regulator):
     global num, df, bin_size, train_size, test_size, x_list, y_list, original_space, total_test_days, num_processes
     num = num_of_stocks
-    df = pd.read_pickle(path0700+"universal.pkl")
-    # df = pd.read_csv(path0700+"universal.csv",index_col=0)
+    df = getUniversalDf()
+    # df = getClusterDf()
     print("universal data loaded")
     # breakpoint()
     bin_size, train_size, test_size, x_list, y_list, original_space = param_define()

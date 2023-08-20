@@ -52,7 +52,27 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         return y_pred
     elif regulator == "XGB":
         import xgboost as xgb
-        model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160)
+        # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160,reg_lambda=0.1)
+        # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160,reg_lambda=1.0)
+        # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160,reg_lambda=10)
+        
+        # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160,reg_alpha=0.1)
+        # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160,reg_alpha=1.0)
+        # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160,reg_alpha=10)
+        
+        # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160)
+        # model = xgb.XGBRegressor(max_depth=6, learning_rate=0.1, n_estimators=160)
+        # model = xgb.XGBRegressor(max_depth=7, learning_rate=0.1, n_estimators=160)
+        
+        # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=200)
+        # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=300)
+        # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=400)
+        
+        # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.001, n_estimators=160)
+        # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.01, n_estimators=160)
+        model = xgb.XGBRegressor(max_depth=5, learning_rate=1.0, n_estimators=160)
+
+        print(model.get_params())
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
         y_pred = y_pred.flatten()
