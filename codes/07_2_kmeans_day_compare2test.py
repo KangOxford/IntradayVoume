@@ -22,33 +22,7 @@ readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile
 path0600_1Flies =readFromPath(path0600_1)
 
 
-
-# n_clusters = 2
-# n_clusters = 5
-n_clusters = 10
-# n_clusters = 20
-# n_clusters = 50
-
-
-ratio_cumsum = 0.80
-# ratio_cumsum = 0.99
-# ratio_cumsum = 0.9999
-# ratio_cumsum = 1.00
-
-
-new_dflst_lst,dflst = get_df_list(start_index=0, num = len(path0600_1Flies))
-total_num_stocks = len(new_dflst_lst)
-total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(new_dflst_lst)
-
-# one_stock_shape = 3146
-one_stock_shape = 109*26
-
-features = get_features(new_dflst_lst,x_list,type="volume")
-# features = get_features(new_dflst_lst,type="features")
-print(features.shape)
-
-
-def return_lst(list_, index):
+def return_lst(list_, index,regulator):
     print(f"\n+++@ return_lst() called\n")
     groupped_dfs = [new_dflst_lst[i] for i in list_]
     gs = [dflst.iterrows() for dflst in groupped_dfs]
@@ -63,11 +37,10 @@ def return_lst(list_, index):
     # print(df.shape)
 
     num = len(groupped_dfs)
-    return train_and_pred(index,num,bin_size,train_size,test_size,x_list,y_list,original_space,df,regulator,tile_array=list_)
+    result=train_and_pred(index,df,num,regulator,tile_array=list_)
+    return result
 
-
-date_index =0
-def process_data(date_index):
+def process_data(date_index,regulator):
     print(f"index, {date_index}")
 
 
@@ -88,26 +61,54 @@ def process_data(date_index):
     sub_r2_list = []
     # index2, list_ =  lst2[0]
     for i2, list_ in lst2:
-        lst = return_lst(list_, date_index)
+        lst = return_lst(list_, date_index,regulator)
         sub_r2_list+=lst
 
     return sub_r2_list
 
-
-if __name__ == '__main__':
+def multiprocessing():
     import multiprocessing
-    import time
     num_processes = multiprocessing.cpu_count()  # Get the number of available CPU cores
     import os; home = os.path.expanduser("~")
     if home == '/homes/80/kang':
         num_processes = 112
+    with multiprocessing.Pool(processes=num_processes) as pool:
+        results = pool.map(process_data,range(total_test_days))
+
+if __name__ == '__main__':
+    import time
     from tqdm import tqdm
     results = []
+    
+    # n_clusters = 2
+    # n_clusters = 5
+    n_clusters = 10
+    # n_clusters = 20
+    # n_clusters = 50
 
 
+    ratio_cumsum = 0.80
+    # ratio_cumsum = 0.99
+    # ratio_cumsum = 0.9999
+    # ratio_cumsum = 1.00
+
+
+    new_dflst_lst,dflst = get_df_list(start_index=0, num = len(path0600_1Flies))
+    total_num_stocks = len(new_dflst_lst)
+    total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(new_dflst_lst,total_num_stocks)
+
+    # one_stock_shape = 3146
+    one_stock_shape = 109*26
+
+    features = get_features(new_dflst_lst,x_list,type="volume")
+    # features = get_features(new_dflst_lst,type="features")
+    print(features.shape)
+
+
+    regulator = "OLS"
     start = time.time()
-    with multiprocessing.Pool(processes=num_processes) as pool:
-         results = pool.map(process_data,range(total_test_days))
+    for i in range(total_test_days):
+        process_data(i,regulator)
     end = time.time()
     print(f"time {(end-start)/60}")
 
