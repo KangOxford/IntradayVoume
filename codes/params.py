@@ -1,8 +1,13 @@
-def param_define():
+def param_define(df):
     bin_size = 26
     train_days = 10
     train_size = train_days * 26
     test_size = 1 * 26
+    if type(df) == list:
+        total_test_days = df[0].shape[0]//bin_size - train_days
+    else:
+        num = len(df)
+        total_test_days = (df.shape[0]//num - train_size)//bin_size # reached
     # index_max  = int((df.shape[0] -(train_size + test_size))/bin_size)
     # index = 0 for index in range(0, index_max+1)
     # index = 0 for index in range(0, index_max+0) # not sure
@@ -36,4 +41,4 @@ def param_define():
     # x_list = ['log_x']
     # y_list = ['log_turnover']
     original_space = ['turnover']
-    return bin_size, train_size, test_size, x_list, y_list, original_space
+    return total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space

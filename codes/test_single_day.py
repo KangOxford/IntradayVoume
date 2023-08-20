@@ -96,9 +96,8 @@ def get_r2df(num_of_stocks,regulator):
     # df = getClusterDf()
     print("universal data loaded")
     # breakpoint()
-    bin_size, train_size, test_size, x_list, y_list, original_space = param_define()
+    total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df)
 
-    total_test_days = (df.shape[0]//num - train_size)//bin_size # reached
     # num_processes = multiprocessing.cpu_count()  # on local machine
     # num_processes = multiprocessing.cpu_count() -10 # on flair-node-03
     num_processes = 1 # Number of available CPU cores
