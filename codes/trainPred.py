@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.metrics import r2_score
 
 def train_and_pred(index,df,num,regulator,tile_array):
-    total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df)
+    total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df,num)
     train_start_index = (index * bin_size) * num
     train_end_index = (index * bin_size + train_size) * num
     test_start_index = train_end_index

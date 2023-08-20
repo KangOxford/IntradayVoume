@@ -34,11 +34,10 @@ def getUniversalDf():
     return pd.read_pickle(path0700+"universal.pkl")
 
 
-def get_r2df(num_of_stocks,regulator):
-    num = num_of_stocks
+def get_r2df(num,regulator):
     df = getUniversalDf()
     print("universal data loaded")
-    total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df)
+    total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df,num)
 
     # num_processes = multiprocessing.cpu_count()  # on local machine
     # num_processes = multiprocessing.cpu_count() -10 # on flair-node-03
@@ -47,8 +46,11 @@ def get_r2df(num_of_stocks,regulator):
     start = time.time()
     # with multiprocessing.Pool(processes=num_processes) as pool:
     results = []
+    print("total_test_days",total_test_days)
     for index in range(total_test_days):
-        result = process_df(index,df,num,regulator)
+        print("+ ",index)
+        # breakpoint()
+        result = train_and_pred(index,df,num,regulator,tile_array=np.arange(num))
         results.append(result)
     end = time.time()
 
@@ -80,20 +82,20 @@ def print_mean(df3):
 
 if __name__=="__main__":
     # regulator = "Lasso"
-    regulator = "XGB"
+    # regulator = "XGB"
 
     # regulator = "cnnLstm"
-    # regulator = "OLS"
+    regulator = "OLS"
     # regulator = "Ridge"
     # regulator = "None"
     
-    df3 = get_r2df(num_of_stocks=len(path0600_1Files),regulator=regulator)
+    df3 = get_r2df(num=len(path0600_1Files),regulator=regulator)
 
 
 
 
     total_r2 = df3.mean(axis=1).mean()
     print('total r2: ',df3.mean(axis=1).mean()) # all mean
-    df3.to_csv(path00 + "08_r2df_universal_day_"+str(num)+"_"+regulator+"_"+str(total_r2)[:6]+".csv", mode = 'w')
+    df3.to_csv(path00 + "08_r2df_universal_day_"+str(len(path0600_1Files))+"_"+regulator+"_"+str(total_r2)[:6]+".csv", mode = 'w')
     
     
