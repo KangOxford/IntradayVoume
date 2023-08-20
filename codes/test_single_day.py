@@ -49,7 +49,6 @@ def get_r2df(num,regulator):
     print("total_test_days",total_test_days)
     for index in range(total_test_days):
         print("+ ",index)
-        # breakpoint()
         result = train_and_pred(index,df,num,regulator,tile_array=np.arange(num))
         results.append(result)
     end = time.time()
@@ -62,18 +61,6 @@ def get_r2df(num,regulator):
 
     print(f"time {(end-start)/60}")
     return df2
-    
-    '''
-    r2arr = np.array(r2_list)
-    df1 = pd.DataFrame(r2arr)
-    df1.columns = ['test_date','stock_index','r2']
-    df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
-    print(df2)
-    df2.mean(axis=0) # stock
-    df2.mean(axis=1) # date
-    df2.mean(axis=1).mean()
-    return df2
-    '''
 
 def print_mean(df3):
     print(f">>>> stock mean: \n",df3.mean(axis=0))  # stock
@@ -84,8 +71,8 @@ if __name__=="__main__":
     # regulator = "Lasso"
     # regulator = "XGB"
 
-    # regulator = "cnnLstm"
-    regulator = "OLS"
+    regulator = "cnnLstm"
+    # regulator = "OLS"
     # regulator = "Ridge"
     # regulator = "None"
     
