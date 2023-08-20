@@ -23,7 +23,7 @@ path0600_1Flies =readFromPath(path0600_1)
 
 
 def return_lst(list_, index,regulator):
-    print(f"\n+++@ return_lst() called\n")
+    # print(f"\n+++@ return_lst() called\n")
     groupped_dfs = [new_dflst_lst[i] for i in list_]
     gs = [dflst.iterrows() for dflst in groupped_dfs]
     dff = []
@@ -41,7 +41,7 @@ def return_lst(list_, index,regulator):
     return result
 
 def process_data(date_index,regulator):
-    print(f"index, {date_index}")
+    print(f"+++ index, {date_index}")
 
 
     # def classifyStocks(features):
@@ -75,11 +75,29 @@ def multiprocessing():
     with multiprocessing.Pool(processes=num_processes) as pool:
         results = pool.map(process_data,range(total_test_days))
 
+
+def get_r2df(num,n_clusters,ratio_cumsum,regulator):
+
+    start = time.time()
+    results = []
+    for i in range(total_test_days):
+        results.append(process_data(i,regulator))
+    end = time.time()
+    print(f"time {(end-start)/60}")
+
+
+    r2arr = np.array(results).reshape(-1,3)
+    df1 = pd.DataFrame(r2arr)
+    df1.columns = ['test_date','stock_index','r2']
+    assert np.unique(df1.stock_index).shape == (len(path0600_1Flies),)
+    df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
+    return df2
+
 if __name__ == '__main__':
     import time
     from tqdm import tqdm
-    results = []
-    
+    # regulator = "OLS"
+    regulator = "XGB"
     # n_clusters = 2
     # n_clusters = 5
     n_clusters = 10
@@ -91,33 +109,20 @@ if __name__ == '__main__':
     # ratio_cumsum = 0.99
     # ratio_cumsum = 0.9999
     # ratio_cumsum = 1.00
-
-
+    
     new_dflst_lst,dflst = get_df_list(start_index=0, num = len(path0600_1Flies))
     total_num_stocks = len(new_dflst_lst)
     total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(new_dflst_lst,total_num_stocks)
 
     # one_stock_shape = 3146
     one_stock_shape = 109*26
-
+    
     features = get_features(new_dflst_lst,x_list,type="volume")
     # features = get_features(new_dflst_lst,type="features")
     print(features.shape)
-
-
-    regulator = "OLS"
-    start = time.time()
-    for i in range(total_test_days):
-        process_data(i,regulator)
-    end = time.time()
-    print(f"time {(end-start)/60}")
-
-
-    r2arr = np.array(results).reshape(-1,3)
-    df1 = pd.DataFrame(r2arr)
-    df1.columns = ['test_date','stock_index','r2']
-    assert np.unique(df1.stock_index).shape == (len(path0600_1Flies),)
-    df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
+    
+    df2 = get_r2df(num=len(path0600_1Files),n_clusters=n_clusters,ratio_cumsum=ratio_cumsum,regulator=regulator)
+    
 
     print(df2)
     df2finalr2 = str(df2.mean(axis=1).mean())[:6]
