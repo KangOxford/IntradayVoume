@@ -21,7 +21,7 @@ import time
 path0600_1Files = readFromPath(path0600_1)
 print(len(path0600_1Files))
 
-def get_universal_df(start_index, num):
+def get_df_list(start_index, num):
     df_lst = []
     from tqdm import tqdm
     for i in tqdm(range(start_index, start_index + num)):  # on mac4
@@ -35,7 +35,11 @@ def get_universal_df(start_index, num):
         # assert  dflst.shape[0] == 2834, f"shape, {dflst.shape}"
         if dflst.shape[0] == 2834:
             new_dflst_lst.append(dflst)
+    return new_dflst_lst,dflst
 
+
+def get_universal_df(start_index, num):
+    new_dflst_lst,dflst = get_df_list(start_index, num)
     gs = [dflst.iterrows() for dflst in new_dflst_lst]
     dff = []
     for i in tqdm(range(dflst.shape[0])):
