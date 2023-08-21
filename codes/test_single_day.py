@@ -20,8 +20,8 @@ from trainPred import *
 import multiprocessing
 import time
 
-path0600_1Files = readFromPath(path0600_1)
-print(len(path0600_1Files))
+path060000Files = readFromPath(path060000)
+print(len(path060000Files))
 
 
 def getUniversalDf():
@@ -50,7 +50,7 @@ def get_r2df(num,regulator):
     r2arr = np.array(results).reshape(-1, 3)
     df1 = pd.DataFrame(r2arr)
     df1.columns = ['test_date', 'stock_index', 'r2']
-    assert np.unique(df1['stock_index']).shape == (len(path0600_1Files),)
+    assert np.unique(df1['stock_index']).shape == (len(path060000Files),)
     df2 = df1.pivot(index="test_date", columns="stock_index", values="r2")
 
     print(f"time {(end-start)/60}")
@@ -71,13 +71,13 @@ if __name__=="__main__":
     # regulator = "Ridge"
     # regulator = "None"
     
-    df3 = get_r2df(num=len(path0600_1Files),regulator=regulator)
+    df3 = get_r2df(num=len(path060000Files),regulator=regulator)
 
 
 
 
     total_r2 = df3.mean(axis=1).mean()
     print('total r2: ',df3.mean(axis=1).mean()) # all mean
-    df3.to_csv(path00 + "08_r2df_universal_day_"+str(len(path0600_1Files))+"_"+regulator+"_"+str(total_r2)[:6]+".csv", mode = 'w')
+    df3.to_csv(path00 + "08_r2df_universal_day_"+str(len(path060000Files))+"_"+regulator+"_"+str(total_r2)[:6]+".csv", mode = 'w')
     
     

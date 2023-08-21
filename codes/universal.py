@@ -19,28 +19,35 @@ from dates import *
 import multiprocessing
 import time
 
-path0600_1Files = readFromPath(path0600_1)
-print(len(path0600_1Files))
+path060000Files = readFromPath(path060000)
+print(len(path060000Files))
 
 def get_df_list(start_index, num):
     df_lst = []
+    new_dflst_lst = []
+    
     from tqdm import tqdm
     for i in tqdm(range(start_index, start_index + num)):  # on mac4
-        df = pd.read_csv(path0600_1 + path0600_1Files[i], index_col=0)
+        df = pd.read_csv(path060000 + path060000Files[i], index_col=0)
         df_lst.append(df)
 
     d = generate_unusual_date(year=2017)
+    shape_lst = [df.shape[0] for df in df_lst]
+    from statistics import mode
+    try:
+        mode_value = mode(shape_lst)
+        print(f"The mode of the list is {mode_value}")
+    except:
+        print("No unique mode found")
     
-    new_dflst_lst = []
     for index, dflst in enumerate(df_lst):
-        # assert dflst.shape[0] == 3172, f"index, {index}"
-        # if dflst.shape[0] == 3146:
-        # assert  dflst.shape[0] == 2834, f"shape, {dflst.shape}"
-        if dflst.shape[0] == 2834:
+        if dflst.shape[0] == mode_value:
+        # if dflst.shape[0] == 2834:
             dflst_filtered = dflst[~dflst['date'].isin(d)]
             new_dflst_lst.append(dflst_filtered)
-            # new_dflst_lst.append(dflst)
-    return new_dflst_lst,dflst_filtered
+
+    return new_dflst_lst, dflst_filtered
+
 
 
 def get_universal_df(start_index, num):
@@ -59,7 +66,7 @@ def get_universal_df(start_index, num):
 
 
 if __name__=="__main__":    
-    df = get_universal_df(start_index=0, num=len(path0600_1Files))
+    df = get_universal_df(start_index=0, num=len(path060000Files))
     tryMkdir(path0700)
     df.to_csv(path0700+"universal.csv")
     df.to_pickle(path0700+"universal.pkl")
