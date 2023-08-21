@@ -98,8 +98,10 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         def denormalize_predictions(y_pred_normalized, scaler_y):
             y_pred_normalized = y_pred_normalized.reshape(-1, 1)
             y_pred = scaler_y.inverse_transform(y_pred_normalized)
-
+            y_pred = y_pred.reshape(-1)
             return y_pred
+        X_train, y_train, X_test = X_train.to_numpy(), y_train.to_numpy(), X_test.to_numpy()
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         # Normalize the data
         X_train_scaled, y_train_scaled, X_test_scaled, scaler_X, scaler_y = normalize_data(X_train, y_train, X_test)
         # Convert to PyTorch tensors
@@ -107,16 +109,12 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         # Initialize the model
         stock_prediction_model = NNPredictionModel(numFeature=X_train.shape[1], numStock=num)
         # Convert the model's parameters to Double
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        stock_prediction_model.model.double().to(device)
-        # Convert the model's parameters to Double
         stock_prediction_model.model.double().to(device)
         # Train and predict
         stock_prediction_model.train(X_train_tensor, y_train_tensor)
         y_pred_normalized = stock_prediction_model.predict(X_test_tensor)  # y_pred as the output
         # Convert to NumPy and denormalize
-        y_pred_normalized = y_pred_normalized.cpu().numpy()
-        y_pred = denormalize_predictions(y_pred_normalized, scaler_y)
+        y_pred = denormalize_predictions(y_pred_normalized, scaler_y).cpu().numpy()
         return y_pred
     else:
         raise NotImplementedError
