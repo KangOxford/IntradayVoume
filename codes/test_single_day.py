@@ -63,9 +63,9 @@ def print_mean(df3):
 
 if __name__=="__main__":
     # regulator = "Lasso"
-    regulator = "XGB"
+    # regulator = "XGB"
 
-    # regulator = "cnnLstm"
+    regulator = "cnnLstm"
     # regulator = "CNN"
     # regulator = "OLS"
     # regulator = "Ridge"
