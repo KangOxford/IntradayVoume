@@ -17,11 +17,16 @@ path05 = path00 + "r_output/05_r_output_raw_pkl/"
 path0500 = path00 + "r_output/0500_r_output_raw_pkl/"
 path06 = path00 + "r_output/06_r_output_raw_pkl/"
 path0600 = path00 + "r_output/0600_r_output_raw_pkl/"
+path060000 = path00 + "output/06_r_output_raw_csv/"
 path0600_1 = path00+'output/0600_1_r_output_raw_csv/'
 path0600_1_22 = path00+'output/0600_1_22_r_output_raw_csv/'
 path0700 = path00+"output/0700_universal/"
 
+''''
+still confused about what is the difference between path0600_1 and path0600_1_22
+path060000: read pkl data from path06 and save into csv
 
+'''
 import numpy as np
 import pandas as pd
 from os import listdir;
@@ -32,7 +37,6 @@ import os
 os.sys.path.append("/home/kanli/cmem/src/")
 os.sys.path.append("/Users/kang/CMEM/src/")
 os.sys.path.append("/homes/80/kang/cmem/src/")
-from utils import *
 
 
 
@@ -40,8 +44,10 @@ def tryMkdir(path):
     try: listdir(path)
     except:import os;os.mkdir(path)
     return 0
-# _,_ = map(tryMkdir,[path05,path06])
+
 
 readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f)) and f != '.DS_Store'])
 # path01Files, path01_1Files, path02Files, path04Files, path0500Files, path0600Files =\
 #     map(readFromPath, [path01, path01_1, path02, path04, path0500, path0600])
+
+
