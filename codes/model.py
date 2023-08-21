@@ -79,23 +79,44 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         return y_pred
     elif regulator == "cnnLstm":
         from codes.nn import NNPredictionModel
-        # Convert Pandas DataFrame to PyTorch tensor (Double)
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        X_train = torch.tensor(X_train.to_numpy(), dtype=torch.float64).to(device)
-        y_train = torch.tensor(y_train.to_numpy(), dtype=torch.float64).to(device)
-        X_test = torch.tensor(X_test.to_numpy(), dtype=torch.float64).to(device)
+        from sklearn.preprocessing import MinMaxScaler
+        def normalize_data(X_train, y_train, X_test):
+            scaler_X = MinMaxScaler()
+            scaler_y = MinMaxScaler()
 
+            X_train_scaled = scaler_X.fit_transform(X_train)
+            y_train_scaled = scaler_y.fit_transform(y_train.reshape(-1, 1))
+            X_test_scaled = scaler_X.transform(X_test)
+
+            return X_train_scaled, y_train_scaled, X_test_scaled, scaler_X, scaler_y
+        def to_torch_tensors(X_train, y_train, X_test, device):
+            X_train_tensor = torch.tensor(X_train, dtype=torch.float64).to(device)
+            y_train_tensor = torch.tensor(y_train, dtype=torch.float64).to(device)
+            X_test_tensor = torch.tensor(X_test, dtype=torch.float64).to(device)
+            
+            return X_train_tensor, y_train_tensor, X_test_tensor
+        def denormalize_predictions(y_pred_normalized, scaler_y):
+            y_pred_normalized = y_pred_normalized.reshape(-1, 1)
+            y_pred = scaler_y.inverse_transform(y_pred_normalized)
+
+            return y_pred
+        # Normalize the data
+        X_train_scaled, y_train_scaled, X_test_scaled, scaler_X, scaler_y = normalize_data(X_train, y_train, X_test)
+        # Convert to PyTorch tensors
+        X_train_tensor, y_train_tensor, X_test_tensor = to_torch_tensors(X_train_scaled, y_train_scaled, X_test_scaled, device)
         # Initialize the model
         stock_prediction_model = NNPredictionModel(numFeature=X_train.shape[1], numStock=num)
-
+        # Convert the model's parameters to Double
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        stock_prediction_model.model.double().to(device)
         # Convert the model's parameters to Double
         stock_prediction_model.model.double().to(device)
-
         # Train and predict
-        stock_prediction_model.train(X_train, y_train)
-        y_pred = stock_prediction_model.predict(X_test)  # y_pred as the output
-        y_pred = y_pred.cpu().numpy()
-        # breakpoint()
+        stock_prediction_model.train(X_train_tensor, y_train_tensor)
+        y_pred_normalized = stock_prediction_model.predict(X_test_tensor)  # y_pred as the output
+        # Convert to NumPy and denormalize
+        y_pred_normalized = y_pred_normalized.cpu().numpy()
+        y_pred = denormalize_predictions(y_pred_normalized, scaler_y)
         return y_pred
     else:
         raise NotImplementedError
