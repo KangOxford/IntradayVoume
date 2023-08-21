@@ -119,7 +119,8 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         stock_prediction_model.train(X_train_tensor, y_train_tensor)
         y_pred_normalized = stock_prediction_model.predict(X_test_tensor)  # y_pred as the output
         # Convert to NumPy and denormalize
-        y_pred = denormalize_predictions(y_pred_normalized, scaler_y).cpu().numpy()
+        # y_pred = denormalize_predictions(y_pred_normalized.cpu().numpy(), scaler_y).cpu().numpy()
+        y_pred = denormalize_predictions(y_pred_normalized.cpu().numpy(), scaler_y)
         return y_pred
     else:
         raise NotImplementedError

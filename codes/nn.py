@@ -59,7 +59,8 @@ class NNPredictionModel:
         # self.model = CNN_LSTM_Model().to(device) 
 
 
-    def train(self, X_train, y_train, epochs=500, lr=0.0001):
+    def train(self, X_train, y_train, epochs=5, lr=0.0001):
+    # def train(self, X_train, y_train, epochs=500, lr=0.0001):
     # def train(self, X_train, y_train, epochs=2000, lr=0.0001):
     # def train(self, X_train, y_train, epochs=2000, lr=0.001):
     # def train(self, X_train, y_train, epochs=20000, lr=0.01):
