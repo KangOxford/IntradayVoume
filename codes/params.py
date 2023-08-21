@@ -1,6 +1,7 @@
 def param_define(df,num):
     bin_size = 26
-    train_days = 10
+    train_days = 20
+    # train_days = 10
     train_size = train_days * 26
     test_size = 1 * 26
     # breakpoint()
