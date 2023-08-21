@@ -59,11 +59,13 @@ class NNPredictionModel:
         # self.model = CNN_LSTM_Model().to(device) 
 
 
+    def train(self, X_train, y_train, epochs=500, lr=0.0001):
+    # def train(self, X_train, y_train, epochs=2000, lr=0.0001):
+    # def train(self, X_train, y_train, epochs=2000, lr=0.001):
     # def train(self, X_train, y_train, epochs=20000, lr=0.01):
-    def train(self, X_train, y_train, epochs=2000, lr=0.001):
     # def train(self, X_train, y_train, epochs=200, lr=0.001):
-        # criterion = nn.MSELoss()
-        criterion = nn.L1Loss()
+        criterion = nn.MSELoss()
+        # criterion = nn.L1Loss()
         optimizer = optim.Adam(self.model.parameters(), lr=lr)
 
         y_train = y_train.squeeze(-1)  # Ensuring the target shape matches the output shape
