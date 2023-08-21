@@ -17,12 +17,10 @@ class CNN_LSTM_Model(nn.Module):
         super(CNN_LSTM_Model, self).__init__() 
         self.numStock = numStock       
         self.numFeature = numFeature    
-        self.trainSize = 260
-        self.testSize = 26
         print(f"self.numStock{self.numStock},self.numFeature{self.numFeature}")   
 
         self.cnn = nn.Sequential(
-            nn.Conv1d(in_channels=self.trainSize, out_channels=self.testSize, kernel_size=3, stride=1, padding=1),
+            nn.Conv1d(in_channels=self.numFeature, out_channels=self.numFeature, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
         )
 
@@ -30,21 +28,21 @@ class CNN_LSTM_Model(nn.Module):
 
         # Replace max pooling with adaptive avg pooling
         self.pool = nn.MaxPool1d(1)  
-        # self.fc = nn.Linear(numStock, 1)
         self.flatten = nn.Flatten()
+        self.fc = nn.Linear(self.numFeature, 1)
         
 
     def forward(self, x):
         # x = x.unsqueeze(1)  # Add a channel dimension
-        x = x.reshape(self.numStock,self.trainSize,self.numFeature)
+        x = x.reshape(-1,self.numFeature,self.numStock)
         x = self.cnn(x) 
         # x = self.pool(x) 
-        # x = x.permute(0, 2, 1)
-        x = x.permute(1, 0, 2)
+        x = x.permute(2, 0, 1)
         x, _ = self.lstm(x)
         # x = x.permute(0, 2, 1)
-        # x = self.pool(x).squeeze(-1)
         # x = self.flatten(x)
+        x = self.fc(x)
+        # x = x.squeeze(-1)
         x = x.view(-1)
         return x
 
@@ -78,12 +76,12 @@ class NNPredictionModel:
             optimizer.step()
             print(f'Epoch {epoch + 1}/{epochs}, Loss: {loss.item()}')
 
-    def test(self, X_test, y_test):
-        with torch.no_grad():
-            y_test = y_test.squeeze(-1)  # Ensuring the target shape matches the output shape
-            outputs = self.model(X_test)
-            loss = F.mse_loss(outputs, y_test)
-            return loss.item()
+    # def test(self, X_test, y_test):
+    #     with torch.no_grad():
+    #         y_test = y_test.squeeze(-1)  # Ensuring the target shape matches the output shape
+    #         outputs = self.model(X_test)
+    #         loss = F.mse_loss(outputs, y_test)
+    #         return loss.item()
 
     def predict(self, X):
         with torch.no_grad():
