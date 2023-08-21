@@ -95,6 +95,7 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         stock_prediction_model.train(X_train, y_train)
         y_pred = stock_prediction_model.predict(X_test)  # y_pred as the output
         y_pred = y_pred.cpu().numpy()
+        # breakpoint()
         return y_pred
     else:
         raise NotImplementedError

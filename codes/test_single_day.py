@@ -24,11 +24,6 @@ path0600_1Files = readFromPath(path0600_1)
 print(len(path0600_1Files))
 
 
-
-def process_df(index,df,num,regulator):
-    print("+ ",index)
-    return train_and_pred(index,df,num,regulator,tile_array=np.arange(num))
-
 def getUniversalDf():
     # df = pd.read_csv(path0700+"universal.csv",index_col=0)
     return pd.read_pickle(path0700+"universal.pkl")
@@ -38,7 +33,6 @@ def get_r2df(num,regulator):
     df = getUniversalDf()
     print("universal data loaded")
     total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df,num)
-
     # num_processes = multiprocessing.cpu_count()  # on local machine
     # num_processes = multiprocessing.cpu_count() -10 # on flair-node-03
     num_processes = 1 # Number of available CPU cores
@@ -48,7 +42,7 @@ def get_r2df(num,regulator):
     results = []
     print("total_test_days",total_test_days)
     for index in range(total_test_days):
-        print("+ ",index)
+        print(f"+ {index} in {total_test_days}")
         result = train_and_pred(index,df,num,regulator,tile_array=np.arange(num))
         results.append(result)
     end = time.time()
@@ -72,6 +66,7 @@ if __name__=="__main__":
     # regulator = "XGB"
 
     regulator = "cnnLstm"
+    # regulator = "CNN"
     # regulator = "OLS"
     # regulator = "Ridge"
     # regulator = "None"
