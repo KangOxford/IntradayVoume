@@ -20,29 +20,25 @@ class CNN_LSTM_Model(nn.Module):
         print(f"self.numStock{self.numStock},self.numFeature{self.numFeature}")   
 
         self.cnn = nn.Sequential(
-            nn.Conv1d(in_channels=self.numFeature, out_channels=self.numFeature, kernel_size=3, stride=1, padding=1),
+            nn.Conv1d(in_channels=self.numFeature, out_channels=1, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
         )
 
-        self.lstm = nn.LSTM(input_size=self.numFeature, hidden_size=self.numFeature, num_layers=1, batch_first=True)
+        self.lstm = nn.LSTM(input_size=1, hidden_size=26, num_layers=1, batch_first=True)
 
         # Replace max pooling with adaptive avg pooling
         self.pool = nn.MaxPool1d(1)  
         self.flatten = nn.Flatten()
-        self.fc = nn.Linear(self.numFeature, 1)
+        self.fc = nn.Linear(26, 1)
         
 
     def forward(self, x):
         # x = x.unsqueeze(1)  # Add a channel dimension
         x = x.reshape(-1,self.numFeature,self.numStock)
         x = self.cnn(x) 
-        # x = self.pool(x) 
         x = x.permute(2, 0, 1)
         x, _ = self.lstm(x)
-        # x = x.permute(0, 2, 1)
-        # x = self.flatten(x)
         x = self.fc(x)
-        # x = x.squeeze(-1)
         x = x.view(-1)
         return x
 
@@ -59,8 +55,7 @@ class NNPredictionModel:
         # self.model = CNN_LSTM_Model().to(device) 
 
 
-    def train(self, X_train, y_train, epochs=5, lr=0.0001):
-    # def train(self, X_train, y_train, epochs=500, lr=0.0001):
+    def train(self, X_train, y_train, epochs=500, lr=0.0001):
     # def train(self, X_train, y_train, epochs=2000, lr=0.0001):
     # def train(self, X_train, y_train, epochs=2000, lr=0.001):
     # def train(self, X_train, y_train, epochs=20000, lr=0.01):
