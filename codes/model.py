@@ -70,7 +70,12 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         
         # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.001, n_estimators=160)
         # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.01, n_estimators=160)
-        model = xgb.XGBRegressor(max_depth=5, learning_rate=1.0, n_estimators=160)
+        # model = xgb.XGBRegressor(max_depth=5, learning_rate=1.0, n_estimators=160)
+        
+        
+        # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160,reg_lambda=0.1,reg_alpha=0.1)
+        model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160)
+        
 
         print(model.get_params())
         model.fit(X_train, y_train)

@@ -62,8 +62,8 @@ def print_mean(df3):
     print(f">>>> aggregate mean: \n",df3.mean(axis=1).mean())
 
 if __name__=="__main__":
-    regulator = "Lasso"
-    # regulator = "XGB"
+    # regulator = "Lasso"
+    regulator = "XGB"
 
     # regulator = "cnnLstm"
     # regulator = "CNN"
