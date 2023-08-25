@@ -26,8 +26,6 @@ class CNN_LSTM_Model(nn.Module):
 
         self.lstm = nn.LSTM(input_size=1, hidden_size=26, num_layers=1, batch_first=True)
 
-        # Replace max pooling with adaptive avg pooling
-        self.pool = nn.MaxPool1d(1)  
         self.flatten = nn.Flatten()
         self.fc = nn.Linear(26, 1)
         
