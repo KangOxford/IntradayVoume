@@ -31,6 +31,20 @@ def getUniversalDf():
 
 def get_r2df(num,regulator):
     df = getUniversalDf()
+    
+    # def check_baseline_oos(df,num):
+    #     pass
+    # check_baseline_oos(df,num=len(path060000Files))
+    
+    # df.columns
+    # num = 483
+    # df['stock']=np.repeat(np.arange(0,num),(df.shape[0]//num,))
+    # g=df.groupby(['date','stock'])
+    # for index,item in g:
+    #     pass
+    
+    
+    
     print("universal data loaded")
     total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df,num)
     # num_processes = multiprocessing.cpu_count()  # on local machine
@@ -62,10 +76,10 @@ def print_mean(df3):
     print(f">>>> aggregate mean: \n",df3.mean(axis=1).mean())
 
 if __name__=="__main__":
-    # regulator = "Lasso"
+    regulator = "Lasso"
     # regulator = "XGB"
 
-    regulator = "cnnLstm"
+    # regulator = "cnnLstm"
     # regulator = "CNN"
     # regulator = "OLS"
     # regulator = "Ridge"
