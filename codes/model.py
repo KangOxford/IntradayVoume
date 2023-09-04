@@ -83,14 +83,14 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         y_pred = y_pred.flatten()
         return y_pred
     elif regulator == "cnnLstm":
-        from codes.nn import NNPredictionModel
+        # from codes.nn import NNPredictionModel
         from sklearn.preprocessing import MinMaxScaler
         def normalize_data(X_train, y_train, X_test):
             scaler_X = MinMaxScaler()
             scaler_y = MinMaxScaler()
 
             X_train_scaled = scaler_X.fit_transform(X_train)
-            y_train_scaled = scaler_y.fit_transform(y_train.reshape(-1, 1))
+            y_train_scaled = scaler_y.fit_transform(y_train)
             X_test_scaled = scaler_X.transform(X_test)
 
             return X_train_scaled, y_train_scaled, X_test_scaled, scaler_X, scaler_y
@@ -106,13 +106,21 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
             y_pred = y_pred.reshape(-1)
             return y_pred
         X_train, y_train, X_test = X_train.to_numpy(), y_train.to_numpy(), X_test.to_numpy()
+        print(X_train.shape,y_train.shape)
+        X_test = np.concatenate([X_train[X_test.shape[0]:,:],X_test])
+        '''#TODO slice the last X_test.shape[0] y_pred'''
+        X_train_scaled, y_train_scaled, X_test_scaled, scaler_X, scaler_y = normalize_data(X_train, y_train, X_test)
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         # Normalize the data
-        X_train_scaled, y_train_scaled, X_test_scaled, scaler_X, scaler_y = normalize_data(X_train, y_train, X_test)
         # Convert to PyTorch tensors
         X_train_tensor, y_train_tensor, X_test_tensor = to_torch_tensors(X_train_scaled, y_train_scaled, X_test_scaled, device)
+        num_stock=483;num_feature=52
+        X_train_tensor=X_train_tensor.reshape(num_stock,-1,num_feature)
+        y_train_tensor=y_train_tensor.reshape(num_stock,-1,1)
+        X_test_tensor = X_test_tensor.reshape(num_stock,-1,num_feature)
         # Initialize the model
-        stock_prediction_model = NNPredictionModel(numFeature=X_train.shape[1], numStock=num)
+        print()
+        stock_prediction_model = NNPredictionModel()
         # Convert the model's parameters to Double
         stock_prediction_model.model.double().to(device)
         # Train and predict
@@ -120,7 +128,8 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         y_pred_normalized = stock_prediction_model.predict(X_test_tensor)  # y_pred as the output
         # Convert to NumPy and denormalize
         # y_pred = denormalize_predictions(y_pred_normalized.cpu().numpy(), scaler_y).cpu().numpy()
-        y_pred = denormalize_predictions(y_pred_normalized.cpu().numpy(), scaler_y)
+        # y_pred = denormalize_predictions(y_pred_normalized.cpu().numpy(), scaler_y)
+        y_pred = denormalize_predictions(y_pred_normalized.numpy(), scaler_y)
         return y_pred
     else:
         raise NotImplementedError

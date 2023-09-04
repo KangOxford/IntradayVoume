@@ -4,12 +4,13 @@ import torch.nn as nn
 class LSTMBlock(nn.Module):
     def __init__(self):
         super(LSTMBlock, self).__init__()
-        self.lstm = nn.LSTM(192, 256, batch_first=True)
-        self.fc = nn.Linear(256, 26)
+        self.lstm = nn.LSTM(192, 1300, batch_first=True)
+        self.fc = nn.Linear(1300, 1300)
     def forward(self, x):
         out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
         out = out[:, -1, :]  # Now out has shape (batch_size, 64)
         out = self.fc(out)  # Now out has shape (batch_size, 10)
+        out = out.reshape(-1,1300,1)
         return out
     
 
@@ -75,11 +76,71 @@ class CNNLSTM(nn.Module):
         x = self.inception(x)
         x = self.lstm_block(x)
         return x
-if __name__=="__main__":
+    
+import torch
+import torch.optim as optim
+from torch.utils.data import TensorDataset, DataLoader
+
+class NNPredictionModel:
+    def __init__(self, learning_rate=0.001, epochs=10, batch_size=32):
+        self.model = CNNLSTM()
+        self.learning_rate = learning_rate
+        self.epochs = epochs
+        self.batch_size = batch_size
+        self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
+        self.criterion = nn.MSELoss()  # Assuming a regression task
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        
+    def train(self, X_train, y_train):
+        self.model.to(self.device)
+        X_train, y_train = X_train.to(self.device), y_train.to(self.device)
+        
+        train_data = TensorDataset(X_train, y_train)
+        train_loader = DataLoader(train_data, batch_size=self.batch_size, shuffle=True)
+        
+        for epoch in range(self.epochs):
+            self.model.train()
+            for batch_idx, (X_batch, y_batch) in enumerate(train_loader):
+                self.optimizer.zero_grad()
+                outputs = self.model(X_batch)
+                loss = self.criterion(outputs, y_batch)
+                loss.backward()
+                self.optimizer.step()
+            print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.4f}")
+    
+    def predict(self, X_test):
+        self.model.eval()
+        X_test = X_test.to(self.device)
+        with torch.no_grad():
+            predictions = self.model(X_test)
+        return predictions.cpu()
+
+
+if __name__ == "__main__":
+    # Your existing code for CNNLSTM, LSTMBlock, InceptionBlock, ConvBlock goes here
+
     # Create an instance of the model
-    model = CNNLSTM()
-    # Create a dummy input tensor
-    input_tensor = torch.rand((1, 1, 1300, 52))
-    # Forward pass
-    output_tensor = model(input_tensor)
-    print("Output shape:", output_tensor.shape)
+    stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=32)
+    stock_prediction_model.model = stock_prediction_model.model.double()
+
+    # Assume X_train_tensor, y_train_tensor, X_test_tensor are already created and converted to tensor
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    stock_prediction_model.model.to(device)
+
+    X_train_tensor = torch.randn((1, 1, 1300, 52)).double()
+    y_train_tensor = torch.randn((1, 1300, 1)).double()
+    X_test_tensor = torch.randn((1, 1, 1300, 52)).double()
+
+    # Train and predict
+    stock_prediction_model.train(X_train_tensor, y_train_tensor)
+    y_pred_normalized = stock_prediction_model.predict(X_test_tensor)
+
+
+# if __name__=="__main__":
+#     # Create an instance of the model
+#     model = CNNLSTM()
+#     # Create a dummy input tensor
+#     input_tensor = torch.rand((1, 1, 1300, 52))
+#     # Forward pass
+#     output_tensor = model(input_tensor)
+#     print("Output shape:", output_tensor.shape)
