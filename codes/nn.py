@@ -11,6 +11,7 @@ class LSTMBlock(nn.Module):
         out = out[:, -1, :]  # Now out has shape (batch_size, 64)
         out = self.fc(out)  # Now out has shape (batch_size, 10)
         return out
+    
 
 # Define the inception block
 class InceptionBlock(nn.Module):
