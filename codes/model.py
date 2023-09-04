@@ -83,14 +83,14 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         y_pred = y_pred.flatten()
         return y_pred
     elif regulator == "cnnLstm":
-        # from codes.nn import NNPredictionModel
+        from codes.nn import NNPredictionModel
         from sklearn.preprocessing import MinMaxScaler
         def normalize_data(X_train, y_train, X_test):
             scaler_X = MinMaxScaler()
             scaler_y = MinMaxScaler()
 
             X_train_scaled = scaler_X.fit_transform(X_train)
-            y_train_scaled = scaler_y.fit_transform(y_train)
+            y_train_scaled = scaler_y.fit_transform(y_train.reshape(-1, 1))
             X_test_scaled = scaler_X.transform(X_test)
 
             return X_train_scaled, y_train_scaled, X_test_scaled, scaler_X, scaler_y
@@ -115,21 +115,24 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         # Convert to PyTorch tensors
         X_train_tensor, y_train_tensor, X_test_tensor = to_torch_tensors(X_train_scaled, y_train_scaled, X_test_scaled, device)
         num_stock=483;num_feature=52
-        X_train_tensor=X_train_tensor.reshape(num_stock,-1,num_feature)
+        X_train_tensor=X_train_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)
         y_train_tensor=y_train_tensor.reshape(num_stock,-1,1)
-        X_test_tensor = X_test_tensor.reshape(num_stock,-1,num_feature)
+        X_test_tensor = X_test_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)
+        print(X_train_tensor.shape,y_train_tensor.shape,X_test_tensor.shape)
         # Initialize the model
-        print()
-        stock_prediction_model = NNPredictionModel()
+        # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=1, batch_size=64)
+        stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=64)
         # Convert the model's parameters to Double
         stock_prediction_model.model.double().to(device)
         # Train and predict
         stock_prediction_model.train(X_train_tensor, y_train_tensor)
-        y_pred_normalized = stock_prediction_model.predict(X_test_tensor)  # y_pred as the output
-        # Convert to NumPy and denormalize
-        # y_pred = denormalize_predictions(y_pred_normalized.cpu().numpy(), scaler_y).cpu().numpy()
-        # y_pred = denormalize_predictions(y_pred_normalized.cpu().numpy(), scaler_y)
-        y_pred = denormalize_predictions(y_pred_normalized.numpy(), scaler_y)
+        y_pred_normalized = stock_prediction_model.predict(X_test_tensor)
+        # print(y_pred_normalized.shape)
+        y_pred = y_pred_normalized[:,-1*X_test.shape[0]:,:]
+        y_pred = y_pred.reshape(-1,1)
+        # print(y_pred.shape)
+        y_pred = denormalize_predictions(y_pred.numpy(), scaler_y)
+        '''caution how y_pred is flattened deserves attention!!!'''
         return y_pred
     else:
         raise NotImplementedError
