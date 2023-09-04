@@ -49,6 +49,8 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         # y_pred = reg.predict(X)
         y_pred = reg.predict(X_test)
         y_pred = y_pred.flatten()
+        print(y_pred.shape)
+        breakpoint()
         return y_pred
     elif regulator == "XGB":
         import xgboost as xgb
@@ -107,9 +109,9 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
             return y_pred
         X_train, y_train, X_test = X_train.to_numpy(), y_train.to_numpy(), X_test.to_numpy()
         print(X_train.shape,y_train.shape)
-        X_test = np.concatenate([X_train[X_test.shape[0]:,:],X_test])
+        X_test_new = np.concatenate([X_train[X_test.shape[0]:,:],X_test])
         '''#TODO slice the last X_test.shape[0] y_pred'''
-        X_train_scaled, y_train_scaled, X_test_scaled, scaler_X, scaler_y = normalize_data(X_train, y_train, X_test)
+        X_train_scaled, y_train_scaled, X_test_scaled, scaler_X, scaler_y = normalize_data(X_train, y_train, X_test_new)
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         # Normalize the data
         # Convert to PyTorch tensors
@@ -120,8 +122,8 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         X_test_tensor = X_test_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)
         print(X_train_tensor.shape,y_train_tensor.shape,X_test_tensor.shape)
         # Initialize the model
-        # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=1, batch_size=64)
-        stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=64)
+        stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=3, batch_size=64)
+        # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=64)
         # Convert the model's parameters to Double
         stock_prediction_model.model.double().to(device)
         # Train and predict
@@ -133,6 +135,8 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         # print(y_pred.shape)
         y_pred = denormalize_predictions(y_pred.numpy(), scaler_y)
         '''caution how y_pred is flattened deserves attention!!!'''
+        # print(y_pred.shape)
+        # breakpoint()
         return y_pred
     else:
         raise NotImplementedError
