@@ -2,10 +2,13 @@ import torch
 import torch.nn as nn
 
 class LSTMBlock(nn.Module):
+    # def __init__(self):
+    #     super(LSTMBlock, self).__init__()
+    #     self.lstm = nn.LSTM(192, 1300, batch_first=True) # TODO reduce 192 to lower !!!
     def __init__(self):
         super(LSTMBlock, self).__init__()
-        self.lstm = nn.LSTM(192, 1300, batch_first=True)
-        self.fc = nn.Linear(1300, 1300)
+        self.lstm = nn.LSTM(192, 10, batch_first=True) # TODO reduce 192 to lower !!!
+        self.fc = nn.Linear(10, 1300)
     def forward(self, x):
         out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
         out = out[:, -1, :]  # Now out has shape (batch_size, 64)
@@ -65,6 +68,7 @@ class ConvBlock(nn.Module):
         x = self.module2(x)
         x = self.module3(x)
         return x
+    
 class CNNLSTM(nn.Module):
     def __init__(self):
         super(CNNLSTM, self).__init__()
@@ -77,7 +81,7 @@ class CNNLSTM(nn.Module):
         x = self.inception(x)
         print("self.inception(x)",x.shape)
         x = self.lstm_block(x)
-        print("lstm_block",x.shape)
+        print("self.lstm_block",x.shape)
         return x
     
 import torch
@@ -123,8 +127,9 @@ if __name__ == "__main__":
     # Your existing code for CNNLSTM, LSTMBlock, InceptionBlock, ConvBlock goes here
 
     # Create an instance of the model
+    stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=100, batch_size=483)
     # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=2, batch_size=483)
-    stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=32)
+    # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=32)
     # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=2, batch_size=483)
     # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=32)
     stock_prediction_model.model = stock_prediction_model.model.double()
@@ -133,7 +138,7 @@ if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     stock_prediction_model.model.to(device)
 
-    X_train_tensor = torch.randn((483, 1, 1300, 52)).double()
+    X_train_tensor = torch.randn((483, 1, 1300, 52)).double() 
     y_train_tensor = torch.randn((483, 1300, 1)).double()
     X_test_tensor = torch.randn((483, 1, 1300, 52)).double()
     # X_train_tensor = torch.randn((128, 1, 1300, 52)).double()

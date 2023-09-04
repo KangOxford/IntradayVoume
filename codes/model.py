@@ -122,17 +122,20 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         X_test_tensor = X_test_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)
         print(X_train_tensor.shape,y_train_tensor.shape,X_test_tensor.shape)
         # Initialize the model
-        stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=3, batch_size=64)
+        stock_prediction_model = NNPredictionModel(learning_rate=0.0005, epochs=100, batch_size=128)
+        # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=3, batch_size=128)
+        # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=1, batch_size=128)
+        # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=3, batch_size=64)
         # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=64)
         # Convert the model's parameters to Double
         stock_prediction_model.model.double().to(device)
         # Train and predict
         stock_prediction_model.train(X_train_tensor, y_train_tensor)
         y_pred_normalized = stock_prediction_model.predict(X_test_tensor)
-        # print(y_pred_normalized.shape)
-        y_pred = y_pred_normalized[:,-1*X_test.shape[0]:,:]
+        print(y_pred_normalized.shape)
+        y_pred = y_pred_normalized[:,-26:,:]
         y_pred = y_pred.reshape(-1,1)
-        # print(y_pred.shape)
+        print(y_pred.shape)
         y_pred = denormalize_predictions(y_pred.numpy(), scaler_y)
         '''caution how y_pred is flattened deserves attention!!!'''
         # print(y_pred.shape)
