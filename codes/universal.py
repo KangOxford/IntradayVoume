@@ -45,23 +45,45 @@ def get_df_list(start_index, num):
         # if dflst.shape[0] == 2834:
             dflst_filtered = dflst[~dflst['date'].isin(d)]
             new_dflst_lst.append(dflst_filtered)
-
+    '''what is the meaning of dflst.shape to be 3146*109
+    109 is the num of features
+    dflst is for one single stock
+    and across different dates
+    26bins*121days==3146rows
+    up to here, it is all right'''
     return new_dflst_lst, dflst_filtered
 
 
 
 def get_universal_df(start_index, num):
     new_dflst_lst,dflst_filtered = get_df_list(start_index, num)
-    gs = [dflst.iterrows() for dflst in new_dflst_lst]
+    gs=[dflst.groupby("date") for dflst in new_dflst_lst]
     dff = []
-    for i in tqdm(range(dflst_filtered.shape[0])):
+    num_days = dflst_filtered.shape[0]//26
+    # for i in tqdm(range(num_days+1)):
+    for i in tqdm(range(num_days)):
         for g in gs:
-            elem = next(g)[1].T
-            dff.append(elem)
+            pass
+            _, group = next(iter(g))    
+            dff.append(group)
     df = pd.concat(dff, axis=1).T
     df.reset_index(inplace=True, drop=True)
     print(">>> finish preparing the universal df")
     return df
+    
+        
+    # gs = [dflst.iterrows() for dflst in new_dflst_lst]
+    # dff = []
+    # '''the way of stack is wrong, here it is stacked by perrows/bins.
+    # but actually it should be stacked by per day'''
+    # for i in tqdm(range(dflst_filtered.shape[0])):
+    #     for g in gs:
+    #         elem = next(g)[1].T
+    #         dff.append(elem)
+    # df = pd.concat(dff, axis=1).T
+    # df.reset_index(inplace=True, drop=True)
+    # print(">>> finish preparing the universal df")
+    # return df
 
 
 
