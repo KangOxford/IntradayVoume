@@ -123,7 +123,10 @@ if __name__ == "__main__":
     # Your existing code for CNNLSTM, LSTMBlock, InceptionBlock, ConvBlock goes here
 
     # Create an instance of the model
+    # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=2, batch_size=483)
     stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=32)
+    # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=2, batch_size=483)
+    # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=32)
     stock_prediction_model.model = stock_prediction_model.model.double()
 
     # Assume X_train_tensor, y_train_tensor, X_test_tensor are already created and converted to tensor
@@ -133,6 +136,9 @@ if __name__ == "__main__":
     X_train_tensor = torch.randn((483, 1, 1300, 52)).double()
     y_train_tensor = torch.randn((483, 1300, 1)).double()
     X_test_tensor = torch.randn((483, 1, 1300, 52)).double()
+    # X_train_tensor = torch.randn((128, 1, 1300, 52)).double()
+    # y_train_tensor = torch.randn((128, 1300, 1)).double()
+    # X_test_tensor = torch.randn((128, 1, 1300, 52)).double()
     # X_train_tensor = torch.randn((1, 1, 1300, 52)).double()
     # y_train_tensor = torch.randn((1, 1300, 1)).double()
     # X_test_tensor = torch.randn((1, 1, 1300, 52)).double()
@@ -140,6 +146,7 @@ if __name__ == "__main__":
     # Train and predict
     stock_prediction_model.train(X_train_tensor, y_train_tensor)
     y_pred_normalized = stock_prediction_model.predict(X_test_tensor)
+    print(y_pred_normalized.shape)
 
 
 # if __name__=="__main__":
