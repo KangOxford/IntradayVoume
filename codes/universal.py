@@ -57,16 +57,16 @@ def get_df_list(start_index, num):
 
 def get_universal_df(start_index, num):
     new_dflst_lst,dflst_filtered = get_df_list(start_index, num)
-    gs=[dflst.groupby("date") for dflst in new_dflst_lst]
+    gs=[[df for date, df in list(dflst.groupby("date") )] for dflst in new_dflst_lst]
     dff = []
     num_days = dflst_filtered.shape[0]//26
+    num_stocks = len(new_dflst_lst)
     # for i in tqdm(range(num_days+1)):
     for i in tqdm(range(num_days)):
-        for g in gs:
-            pass
-            _, group = next(iter(g))    
+        for j in range(num_stocks):
+            group = gs[j][i]    
             dff.append(group)
-    df = pd.concat(dff, axis=1).T
+    df = pd.concat(dff, axis=0)
     df.reset_index(inplace=True, drop=True)
     print(">>> finish preparing the universal df")
     return df
