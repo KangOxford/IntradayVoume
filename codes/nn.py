@@ -39,7 +39,7 @@ class InceptionBlock(nn.Module):
         x3 = self.subblock3(x)
         stacked = torch.stack((x1, x2, x3), dim=4)
         permuted = stacked.permute(0, 2, 1, 3, 4)
-        reshaped = permuted.reshape(1, 1300, -1)
+        reshaped = permuted.reshape(-1, 1300, 192)
         return reshaped
 
 
@@ -73,8 +73,11 @@ class CNNLSTM(nn.Module):
         self.lstm_block = LSTMBlock()
     def forward(self, x):
         x = self.conv(x)
+        print("self.conv(x)",x.shape)
         x = self.inception(x)
+        print("self.inception(x)",x.shape)
         x = self.lstm_block(x)
+        print("lstm_block",x.shape)
         return x
     
 import torch
@@ -127,9 +130,12 @@ if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     stock_prediction_model.model.to(device)
 
-    X_train_tensor = torch.randn((1, 1, 1300, 52)).double()
-    y_train_tensor = torch.randn((1, 1300, 1)).double()
-    X_test_tensor = torch.randn((1, 1, 1300, 52)).double()
+    X_train_tensor = torch.randn((483, 1, 1300, 52)).double()
+    y_train_tensor = torch.randn((483, 1300, 1)).double()
+    X_test_tensor = torch.randn((483, 1, 1300, 52)).double()
+    # X_train_tensor = torch.randn((1, 1, 1300, 52)).double()
+    # y_train_tensor = torch.randn((1, 1300, 1)).double()
+    # X_test_tensor = torch.randn((1, 1, 1300, 52)).double()
 
     # Train and predict
     stock_prediction_model.train(X_train_tensor, y_train_tensor)
