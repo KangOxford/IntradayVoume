@@ -116,14 +116,15 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         # Normalize the data
         # Convert to PyTorch tensors
         X_train_tensor, y_train_tensor, X_test_tensor = to_torch_tensors(X_train_scaled, y_train_scaled, X_test_scaled, device)
-        num_stock=483;num_feature=52
+        num_stock=1;num_feature=52
+        # num_stock=483;num_feature=52
         X_train_tensor=X_train_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)
         y_train_tensor=y_train_tensor.reshape(num_stock,-1,1)
         X_test_tensor = X_test_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)
         print(X_train_tensor.shape,y_train_tensor.shape,X_test_tensor.shape)
         # Initialize the model
-        stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=1, batch_size=483)
-        # stock_prediction_model = NNPredictionModel(learning_rate=0.0003, epochs=200, batch_size=483)
+        # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=1, batch_size=483)
+        stock_prediction_model = NNPredictionModel(learning_rate=0.0003, epochs=500, batch_size=483)
         # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=200, batch_size=483)
         # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=200, batch_size=128)
         # stock_prediction_model = NNPredictionModel(learning_rate=0.0005, epochs=100, batch_size=128)
