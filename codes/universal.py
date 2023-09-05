@@ -70,6 +70,8 @@ def get_universal_df(start_index, num):
     df.reset_index(inplace=True, drop=True)
     print(">>> finish preparing the universal df")
     return df
+
+
     
         
     # gs = [dflst.iterrows() for dflst in new_dflst_lst]
@@ -92,14 +94,22 @@ def get_universal_df(start_index, num):
 #     tryMkdir(path0700)
 #     df.to_csv(path0700+"universal.csv")
 #     df.to_pickle(path0700+"universal.pkl")
-    
-
-if __name__=="__main__":    
-    df = get_universal_df(start_index=0, num=1)
+def main1():
+    df = get_universal_df(start_index=0, num=len(path060000Files))
     tryMkdir(path0701)
     df.to_csv(path0701+"one_file.csv")
     df.to_pickle(path0701+"one_file.pkl")
-    
+def main2():
+    dfs,dflst_filtered = get_df_list(start_index=0, num=len(path060000Files))
+    # print(len(dfs))
+    tryMkdir(path0702)
+    for idx,df in enumerate(dfs):
+        df.to_csv(path0702+path060000Files[idx][:-4]+".csv")
+        df.to_pickle(path0702+path060000Files[idx][:-4]+".pkl")
+
+if __name__=="__main__":    
+    # main1()
+    main2()
     
     
     
