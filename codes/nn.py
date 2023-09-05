@@ -129,7 +129,7 @@ class NNPredictionModel:
                 loss = self.criterion(outputs, y_batch)
                 loss.backward()
                 self.optimizer.step()
-            print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.6f}")
+            print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.10f}")
     
     def predict(self, X_test):
         self.model.eval()

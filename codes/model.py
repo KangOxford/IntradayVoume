@@ -123,8 +123,9 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         X_test_tensor = X_test_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)
         print(X_train_tensor.shape,y_train_tensor.shape,X_test_tensor.shape)
         # Initialize the model
+        stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=1200, batch_size=483)
         # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=1, batch_size=483)
-        stock_prediction_model = NNPredictionModel(learning_rate=0.0003, epochs=500, batch_size=483)
+        # stock_prediction_model = NNPredictionModel(learning_rate=0.0003, epochs=500, batch_size=483)
         # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=200, batch_size=483)
         # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=200, batch_size=128)
         # stock_prediction_model = NNPredictionModel(learning_rate=0.0005, epochs=100, batch_size=128)
