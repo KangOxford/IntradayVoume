@@ -26,7 +26,8 @@ print(len(path060000Files))
 
 def getUniversalDf():
     # df = pd.read_csv(path0700+"universal.csv",index_col=0)
-    return pd.read_pickle(path0700+"universal.pkl")
+    # return pd.read_pickle(path0700+"universal.pkl")
+    return pd.read_pickle(path0701+"one_file.pkl")
 
 
 def get_r2df(num,regulator):

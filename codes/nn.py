@@ -7,8 +7,8 @@ class LSTMBlock(nn.Module):
     #     self.lstm = nn.LSTM(192, 1300, batch_first=True) # TODO reduce 192 to lower !!!
     def __init__(self):
         super(LSTMBlock, self).__init__()
-        self.lstm = nn.LSTM(192, 10, batch_first=True) # TODO reduce 192 to lower !!!
-        self.fc = nn.Linear(10, 1300)
+        self.lstm = nn.LSTM(20, 20, batch_first=True) # TODO reduce 192 to lower !!!
+        self.fc = nn.Linear(20, 1300)
     def forward(self, x):
         out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
         out = out[:, -1, :]  # Now out has shape (batch_size, 64)
@@ -36,6 +36,7 @@ class InceptionBlock(nn.Module):
             nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2), padding=(0, 1)),
             nn.Conv2d(32, 64, kernel_size=(1, 1), stride=(1, 1))
         )
+        self.fc = nn.Linear(192, 20)
     def forward(self, x):
         x1 = self.subblock1(x)
         x2 = self.subblock2(x)
@@ -43,7 +44,10 @@ class InceptionBlock(nn.Module):
         stacked = torch.stack((x1, x2, x3), dim=4)
         permuted = stacked.permute(0, 2, 1, 3, 4)
         reshaped = permuted.reshape(-1, 1300, 192)
-        return reshaped
+        out = self.fc(reshaped)
+        return out
+        # return reshaped
+        # return x3
 
 
 # Define the main model
@@ -51,23 +55,25 @@ class ConvBlock(nn.Module):
     def __init__(self):
         super(ConvBlock, self).__init__()
         self.module1 = nn.Sequential(
-            nn.Conv2d(1, 32, kernel_size=(1, 2), stride=(1, 2)),
+            nn.Conv2d(1, 32, kernel_size=(1, 32)),
             nn.Conv2d(32, 32, kernel_size=(4, 1), stride=(1, 1), padding=(2, 0)),
             nn.Conv2d(32, 32, kernel_size=(4, 1), stride=(1, 1), padding=(1, 0))
         )
         self.module2 = nn.Sequential(
-            nn.Conv2d(32, 32, kernel_size=(1, 2), stride=(1, 2)),
+            nn.Conv2d(32, 32, kernel_size=(1, 16)),
             nn.Conv2d(32, 32, kernel_size=(4, 1), stride=(1, 1), padding=(2, 0)),
             nn.Conv2d(32, 32, kernel_size=(4, 1), stride=(1, 1), padding=(1, 0))
         )
         self.module3 = nn.Sequential(
-            nn.Conv2d(32, 32, kernel_size=(1, 10), stride=(1, 10))
+            nn.Conv2d(32, 32, kernel_size=(1, 6))
         )
     def forward(self, x):
         x = self.module1(x)
         x = self.module2(x)
         x = self.module3(x)
         return x
+    
+    
     
 class CNNLSTM(nn.Module):
     def __init__(self):
@@ -83,7 +89,17 @@ class CNNLSTM(nn.Module):
         x = self.lstm_block(x)
         print("self.lstm_block",x.shape)
         return x
+
+# if __name__=="__main__":
+#     # Create an instance of the model
+#     model = CNNLSTM()
+#     # Create a dummy input tensor
+#     input_tensor = torch.rand((7, 1, 1300, 52))
+#     # Forward pass
+#     output_tensor = model(input_tensor)
+#     print("Output shape:", output_tensor.shape)    
     
+# '''
 import torch
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
@@ -121,12 +137,17 @@ class NNPredictionModel:
         with torch.no_grad():
             predictions = self.model(X_test)
         return predictions.cpu()
-
+    
+# Count parameters for the updated LSTM block
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 if __name__ == "__main__":
-    # Your existing code for CNNLSTM, LSTMBlock, InceptionBlock, ConvBlock goes here
-
+    print(count_parameters(ConvBlock()))
+    print(count_parameters(InceptionBlock()))
+    print(count_parameters(LSTMBlock()))
     # Create an instance of the model
+    # breakpoint()
     stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=100, batch_size=483)
     # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=2, batch_size=483)
     # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=32)
@@ -152,13 +173,6 @@ if __name__ == "__main__":
     stock_prediction_model.train(X_train_tensor, y_train_tensor)
     y_pred_normalized = stock_prediction_model.predict(X_test_tensor)
     print(y_pred_normalized.shape)
+# '''
 
 
-# if __name__=="__main__":
-#     # Create an instance of the model
-#     model = CNNLSTM()
-#     # Create a dummy input tensor
-#     input_tensor = torch.rand((1, 1, 1300, 52))
-#     # Forward pass
-#     output_tensor = model(input_tensor)
-#     print("Output shape:", output_tensor.shape)
