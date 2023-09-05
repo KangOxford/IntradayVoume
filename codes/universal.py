@@ -100,12 +100,13 @@ def main1():
     df.to_csv(path0701+"one_file.csv")
     df.to_pickle(path0701+"one_file.pkl")
 def main2():
-    dfs,dflst_filtered = get_df_list(start_index=0, num=len(path060000Files))
-    # print(len(dfs))
+    dfs,_ = get_df_list(start_index=0, num=len(path060000Files))
     tryMkdir(path0702)
-    for idx,df in enumerate(dfs):
-        df.to_csv(path0702+path060000Files[idx][:-4]+".csv")
-        df.to_pickle(path0702+path060000Files[idx][:-4]+".pkl")
+    # for idx,df in enumerate(dfs):
+    for idx, df in tqdm(enumerate(dfs), desc="Processing files", total=len(dfs)):
+        df.to_csv(path0702 + path060000Files[idx][:-4] + ".csv")
+        df.to_pickle(path0702 + path060000Files[idx][:-4] + ".pkl")
+
 
 if __name__=="__main__":    
     # main1()

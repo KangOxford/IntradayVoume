@@ -37,7 +37,7 @@ def train_and_pred(index,df,num,regulator,tile_array):
     y_pred_clipped = np.clip(y_pred, min_limit, max_limit)
     if any('log' in x for x in x_list):
         y_pred_clipped = np.exp(y_pred_clipped)
-    test_date = df.date[train_end_index]
+    test_date = df.date.iloc[train_end_index]
     '''prob in the y_pred shapes'''
 
     # r2 = r2_score(y_test, y_pred_clipped)

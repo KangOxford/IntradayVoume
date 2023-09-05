@@ -22,7 +22,9 @@ path0600_1 = path00+'output/0600_1_r_output_raw_csv/'
 path0600_1_22 = path00+'output/0600_1_22_r_output_raw_csv/'
 path0700 = path00+"output/0700_universal/"
 path0701 = path00+"output/0701_one_file/"
-path0702 = path00+"output/0702_single/" '''used as the input of the get_results 7=>8'''
+path0702 = path00+"output/0702_single/" 
+
+'''used as the input of the get_results 7=>8'''
 
 ''''
 still confused about what is the difference between path0600_1 and path0600_1_22
