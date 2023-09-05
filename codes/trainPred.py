@@ -49,7 +49,7 @@ def train_and_pred(index,df,num,regulator,tile_array):
     original_images['date'] = test_date
     stock_index = np.tile(tile_array, 26)
     original_images['stock_index'] = stock_index
-    oneday_df = pd.concat([original_images, y_pred_clipped], axis=1)
+    oneday_df = pd.concat([original_images, y_pred_clipped], axis=1)[['date','stock_index','true','pred']]
     lst = []
     g = oneday_df.groupby(stock_index)
     for stock, item in g:
@@ -59,4 +59,4 @@ def train_and_pred(index,df,num,regulator,tile_array):
     test_df = pd.DataFrame(lst,columns=["test_date", "stock", "r2value"])
     print(test_df)
     print(index,test_date,test_df.r2value.mean())
-    return lst
+    return lst,oneday_df

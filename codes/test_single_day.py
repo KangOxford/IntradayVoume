@@ -30,8 +30,7 @@ def getUniversalDf():
     # return pd.read_pickle(path0701+"one_file.pkl")
 
 
-def get_r2df(num,regulator):
-    df = getUniversalDf()
+def get_r2df(num,regulator,df):
     
     print("universal data loaded")
     total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df,num)
@@ -42,22 +41,27 @@ def get_r2df(num,regulator):
 
     start = time.time()
     # with multiprocessing.Pool(processes=num_processes) as pool:
-    results = []
+    r2results = [];oneday_dfs=[]
     print("total_test_days",total_test_days)
     for index in range(total_test_days):
         print(f"+ {index} in {total_test_days}")
-        result = train_and_pred(index,df,num,regulator,tile_array=np.arange(num))
-        results.append(result)
+        r2result,oneday_df = train_and_pred(index,df,num,regulator,tile_array=np.arange(num))
+        r2results.append(r2result)
+        oneday_dfs.append(oneday_df)
     end = time.time()
-
-    r2arr = np.array(results).reshape(-1, 3)
-    df1 = pd.DataFrame(r2arr)
-    df1.columns = ['test_date', 'stock_index', 'r2']
-    # assert np.unique(df1['stock_index']).shape == (len(path060000Files),)
-    df2 = df1.pivot(index="test_date", columns="stock_index", values="r2")
+    
+    def get_r2df_from_results(r2results):
+        r2arr = np.array(r2results).reshape(-1, 3)
+        df1 = pd.DataFrame(r2arr)
+        df1.columns = ['test_date', 'stock_index', 'r2']
+        # assert np.unique(df1['stock_index']).shape == (len(path060000Files),)
+        df2 = df1.pivot(index="test_date", columns="stock_index", values="r2")
+        return df2
+    df2 = get_r2df_from_results(r2results)
+    df22 =pd.concat(oneday_dfs,axis=0)
 
     print(f"time {(end-start)/60}")
-    return df2
+    return df2, df22
 
 def print_mean(df3):
     print(f">>>> stock mean: \n",df3.mean(axis=0))  # stock
@@ -76,7 +80,7 @@ if __name__=="__main__":
     
     # df3 = get_r2df(num=1,regulator=regulator)
     num_of_stocks = len(path060000Files)
-    df3 = get_r2df(num=num_of_stocks,regulator=regulator)
+    df3,df33 = get_r2df(num=num_of_stocks,regulator=regulator,df = getUniversalDf())
 
 
 
@@ -84,5 +88,6 @@ if __name__=="__main__":
     total_r2 = df3.mean(axis=1).mean()
     print('total r2: ',df3.mean(axis=1).mean()) # all mean
     df3.to_csv(path00 + "08_r2df_universal_day_"+str(num_of_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+".csv", mode = 'w')
+    df33.to_csv(path00 + "08_r2df_universal_day_"+str(num_of_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+".csv", mode = 'w')
     
     
