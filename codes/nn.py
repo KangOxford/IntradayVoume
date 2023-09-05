@@ -36,7 +36,7 @@ class InceptionBlock(nn.Module):
             nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2), padding=(0, 1)),
             nn.Conv2d(32, 64, kernel_size=(1, 1), stride=(1, 1))
         )
-        self.fc = nn.Linear(192, 20)
+        self.fc = nn.Linear(192, 1)
     def forward(self, x):
         x1 = self.subblock1(x)
         x2 = self.subblock2(x)
@@ -46,8 +46,9 @@ class InceptionBlock(nn.Module):
         reshaped = permuted.reshape(-1, 1300, 192)
         out = self.fc(reshaped)
         return out
-        # return reshaped
-        # return x3
+        
+        # # return reshaped
+        # return x1
 
 
 # Define the main model
@@ -86,8 +87,8 @@ class CNNLSTM(nn.Module):
         print("self.conv(x)",x.shape)
         x = self.inception(x)
         print("self.inception(x)",x.shape)
-        x = self.lstm_block(x)
-        print("self.lstm_block",x.shape)
+        # x = self.lstm_block(x)
+        # print("self.lstm_block",x.shape)
         return x
 
 # if __name__=="__main__":
@@ -147,7 +148,7 @@ if __name__ == "__main__":
     print(count_parameters(InceptionBlock()))
     print(count_parameters(LSTMBlock()))
     # Create an instance of the model
-    # breakpoint()
+    breakpoint()
     stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=100, batch_size=483)
     # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=2, batch_size=483)
     # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=32)
