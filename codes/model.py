@@ -116,8 +116,9 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         # Normalize the data
         # Convert to PyTorch tensors
         X_train_tensor, y_train_tensor, X_test_tensor = to_torch_tensors(X_train_scaled, y_train_scaled, X_test_scaled, device)
-        num_stock=1;num_feature=52
-        # num_stock=483;num_feature=52
+        # num_stock=1;num_feature=52
+        num_stock=483;num_feature=52 
+        '''CAUTION remeber to pass right value'''
         X_train_tensor=X_train_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)
         y_train_tensor=y_train_tensor.reshape(num_stock,-1,1)
         X_test_tensor = X_test_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)

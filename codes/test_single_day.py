@@ -26,28 +26,16 @@ print(len(path060000Files))
 
 def getUniversalDf():
     # df = pd.read_csv(path0700+"universal.csv",index_col=0)
-    # return pd.read_pickle(path0700+"universal.pkl")
-    return pd.read_pickle(path0701+"one_file.pkl")
+    return pd.read_pickle(path0700+"universal.pkl")
+    # return pd.read_pickle(path0701+"one_file.pkl")
 
 
 def get_r2df(num,regulator):
     df = getUniversalDf()
     
-    # def check_baseline_oos(df,num):
-    #     pass
-    # check_baseline_oos(df,num=len(path060000Files))
-    
-    # df.columns
-    # num = 483
-    # df['stock']=np.repeat(np.arange(0,num),(df.shape[0]//num,))
-    # g=df.groupby(['date','stock'])
-    # for index,item in g:
-    #     pass
-    
-    
-    
     print("universal data loaded")
     total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df,num)
+    print(f"num of stocks {num}, total test days {total_test_days}")
     # num_processes = multiprocessing.cpu_count()  # on local machine
     # num_processes = multiprocessing.cpu_count() -10 # on flair-node-03
     num_processes = 1 # Number of available CPU cores
@@ -80,20 +68,21 @@ if __name__=="__main__":
     # regulator = "Lasso"
     # regulator = "XGB"
 
-    regulator = "cnnLstm"
+    # regulator = "cnnLstm"
     # regulator = "CNN"
-    # regulator = "OLS"
+    regulator = "OLS"
     # regulator = "Ridge"
     # regulator = "None"
     
-    df3 = get_r2df(num=1,regulator=regulator)
-    # df3 = get_r2df(num=len(path060000Files),regulator=regulator)
+    # df3 = get_r2df(num=1,regulator=regulator)
+    num_of_stocks = len(path060000Files)
+    df3 = get_r2df(num=num_of_stocks,regulator=regulator)
 
 
 
 
     total_r2 = df3.mean(axis=1).mean()
     print('total r2: ',df3.mean(axis=1).mean()) # all mean
-    df3.to_csv(path00 + "08_r2df_universal_day_"+str(1)+"_"+regulator+"_"+str(total_r2)[:6]+".csv", mode = 'w')
+    df3.to_csv(path00 + "08_r2df_universal_day_"+str(num_of_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+".csv", mode = 'w')
     
     
