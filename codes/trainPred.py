@@ -28,9 +28,9 @@ def train_and_pred(index,df,num,regulator,tile_array):
 
 
     # breakpoint()
-    print(regulator)
+    # print(regulator)
     y_pred = regularity_ols(X_train, y_train, X_test, regulator,num)
-    print(regulator+"_finished")
+    # print(regulator+"_finished")
     min_limit, max_limit = y_train.min(), y_train.max()
     broadcast = lambda x: np.full(y_pred.shape[0], x.to_numpy())
     min_limit, max_limit = map(broadcast, [min_limit, max_limit])
@@ -57,6 +57,6 @@ def train_and_pred(index,df,num,regulator,tile_array):
         r2value = r2_score(item['true'], item['pred'])
         lst.append([test_date, stock, r2value])
     test_df = pd.DataFrame(lst,columns=["test_date", "stock", "r2value"])
-    print(test_df)
-    print(index,test_date,test_df.r2value.mean())
+    # print(test_df)
+    # print(index,test_date,test_df.r2value.mean())
     return lst,oneday_df

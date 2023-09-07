@@ -8,8 +8,9 @@ combined_array = np.array(list(zip(array1, array2))).flatten()
 
 # used for alphas
 def regularity_ols(X_train, y_train, X_test, regulator,num):
-    if regulator == "None":
-        y_pred = X_test.to_numpy().flatten()
+    if regulator == "CMEM":
+        y_pred = X_test['log_x'].to_numpy().flatten()
+        # y_pred = X_test['x'].to_numpy().flatten()
         return y_pred
     elif regulator == "OLS":
         # print("OLS")

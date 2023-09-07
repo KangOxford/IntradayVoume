@@ -52,9 +52,9 @@ if __name__=="__main__":
 
     # regulator = "cnnLstm"
     # regulator = "CNN"
-    regulator = "OLS"
+    # regulator = "OLS"
     # regulator = "Ridge"
-    # regulator = "None"
+    regulator = "CMEM"
     
     dfs = getSingleDfs()
     # for idex,df in enumerate(dfs):
@@ -68,9 +68,11 @@ if __name__=="__main__":
         df33s.append(df33)
         # df3.to_csv(path00 + "0802_r2df_single_day_"+str(1)+"_"+regulator+"_"+str(total_r2)[:6]+name+".csv", mode = 'w')
         # df33.to_csv(path00 + "0802_r2df_single_day_"+str(1)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+name+".csv", mode = 'w')
-        
+    
+    num_stock=len(dfs)
     df3_ = pd.concat(df3s,axis=1)
     df3_.mean(axis=1).mean()
     df33_ = pd.concat(df33s,axis=0)
     df33_.mean(axis=1).mean()
     r2_score(df33_.true,df33_.pred)
+    df33.stock_index=np.repeat(np.arange(num_stock),(df33.shape[0],))
