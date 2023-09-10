@@ -84,5 +84,5 @@ if __name__=="__main__":
     print(df33_.mean(axis=1).mean())
     r2_score(df33_.true,df33_.pred)
     df33_.stock_index=np.repeat(np.arange(num_stock),(df33.shape[0],))
-    df3_.to_csv(path00 + "0802_r2df_single_day_"+str(1)+"_"+regulator+"_"+str(total_r2)[:6]+name+".csv", mode = 'w')
-    df33_.to_csv(path00 + "0802_r2df_single_day_"+str(1)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+name+".csv", mode = 'w')
+    df3_.to_csv(path00 + "0802_r2df_single_day_"+str(1)+"_"+regulator+"_"+str(total_r2)[:6]+".csv", mode = 'w')
+    df33_.to_csv(path00 + "0802_r2df_single_day_"+str(1)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+".csv", mode = 'w')
