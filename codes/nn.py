@@ -84,9 +84,9 @@ class CNNLSTM(nn.Module):
         self.lstm_block = LSTMBlock()
     def forward(self, x):
         x = self.conv(x)
-        print("self.conv(x)",x.shape)
+        # print("self.conv(x)",x.shape)
         x = self.inception(x)
-        print("self.inception(x)",x.shape)
+        # print("self.inception(x)",x.shape)
         # x = self.lstm_block(x)
         # print("self.lstm_block",x.shape)
         return x

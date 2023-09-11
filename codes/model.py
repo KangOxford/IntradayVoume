@@ -50,7 +50,7 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         # y_pred = reg.predict(X)
         y_pred = reg.predict(X_test)
         y_pred = y_pred.flatten()
-        print(y_pred.shape)
+        # print(y_pred.shape)
         breakpoint()
         return y_pred
     elif regulator == "XGB":
@@ -117,13 +117,13 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         # Normalize the data
         # Convert to PyTorch tensors
         X_train_tensor, y_train_tensor, X_test_tensor = to_torch_tensors(X_train_scaled, y_train_scaled, X_test_scaled, device)
-        # num_stock=1;num_feature=52
-        num_stock=483;num_feature=52 
+        num_stock=1;num_feature=52
+        # num_stock=483;num_feature=52 
         '''CAUTION remeber to pass right value'''
         X_train_tensor=X_train_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)
         y_train_tensor=y_train_tensor.reshape(num_stock,-1,1)
         X_test_tensor = X_test_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)
-        print(X_train_tensor.shape,y_train_tensor.shape,X_test_tensor.shape)
+        # print(X_train_tensor.shape,y_train_tensor.shape,X_test_tensor.shape)
         # Initialize the model
         stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=1200, batch_size=483)
         # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=2000, batch_size=483)
@@ -142,10 +142,10 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         # Train and predict
         stock_prediction_model.train(X_train_tensor, y_train_tensor)
         y_pred_normalized = stock_prediction_model.predict(X_test_tensor)
-        print(y_pred_normalized.shape)
+        # print(y_pred_normalized.shape)
         y_pred = y_pred_normalized[:,-26:,:]
         y_pred_flatten = y_pred.reshape(-1,1)
-        print(y_pred_flatten.shape)
+        # print(y_pred_flatten.shape)
         y_pred_flatten = denormalize_predictions(y_pred_flatten.numpy(), scaler_y)
         '''caution how y_pred is flattened deserves attention!!!'''
         # print(y_pred.shape)

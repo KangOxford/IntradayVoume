@@ -50,11 +50,11 @@ if __name__=="__main__":
     # regulator = "Lasso"
     # regulator = "XGB"
 
-    # regulator = "cnnLstm"
+    regulator = "cnnLstm"
     # regulator = "CNN"
     # regulator = "OLS"
     # regulator = "Ridge"
-    regulator = "CMEM"
+    # regulator = "CMEM"
     
     dfs = getSingleDfs()
     # for idex,df in enumerate(dfs):

@@ -27,6 +27,8 @@ def get_r2df(num,regulator,df):
         r2result,oneday_df = train_and_pred(index,df,num,regulator,tile_array=np.arange(num))
         r2results.append(r2result)
         oneday_dfs.append(oneday_df)
+        print(r2results)
+        print(oneday_dfs)
     end = time.time()
     
     def get_r2df_from_results(r2results):
@@ -39,5 +41,7 @@ def get_r2df(num,regulator,df):
     df2 = get_r2df_from_results(r2results)
     df22 =pd.concat(oneday_dfs,axis=0)
 
+    print(df2)
+    print(df22)
     print(f"time {(end-start)/60}")
     return df2, df22
