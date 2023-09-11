@@ -36,18 +36,25 @@ class InceptionBlock(nn.Module):
             nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2), padding=(0, 1)),
             nn.Conv2d(32, 64, kernel_size=(1, 1), stride=(1, 1))
         )
-        self.fc = nn.Linear(192, 1)
+        self.fc1 = nn.Linear(192, 1)
+        self.fc2 = nn.Linear(1274, 26)
     def forward(self, x):
         x1 = self.subblock1(x)
         x2 = self.subblock2(x)
         x3 = self.subblock3(x)
         stacked = torch.stack((x1, x2, x3), dim=4)
         permuted = stacked.permute(0, 2, 1, 3, 4)
-        reshaped = permuted.reshape(-1, 1300, 192)
-        out = self.fc(reshaped)
-        return out
+        # reshaped = permuted.reshape(-1, 1300, 192)
+        reshaped = permuted.reshape(-1, 1274, 192)
+        '''Output reshaped shape: torch.Size([1, 1274, 192])'''
+        out1 = self.fc1(reshaped)
+        '''Output out1 shape: torch.Size([1, 1274, 1])'''
+        out2 = self.fc2(out1.squeeze(-1))
+        '''Output out2 shape: torch.Size([1, 26, 1])'''
+        return out2
         
-        # # return reshaped
+        # return reshaped
+        # torch.Size([1, 1274, 1]) =>(nn.Linear??)=>torch.Size([1, 26, 1])
         # return x1
 
 
@@ -95,7 +102,8 @@ class CNNLSTM(nn.Module):
 #     # Create an instance of the model
 #     model = CNNLSTM()
 #     # Create a dummy input tensor
-#     input_tensor = torch.rand((7, 1, 1300, 52))
+#     input_tensor = torch.rand((1, 1, 1274, 52))
+#     # input_tensor = torch.rand((7, 1, 1300, 52))
 #     # Forward pass
 #     output_tensor = model(input_tensor)
 #     print("Output shape:", output_tensor.shape)    
@@ -149,8 +157,8 @@ if __name__ == "__main__":
     print(count_parameters(LSTMBlock()))
     # Create an instance of the model
     breakpoint()
-    stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=100, batch_size=483)
-    # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=2, batch_size=483)
+    # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=100, batch_size=483)
+    stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=2, batch_size=483)
     # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=32)
     # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=2, batch_size=483)
     # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=32)
@@ -160,9 +168,12 @@ if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     stock_prediction_model.model.to(device)
 
-    X_train_tensor = torch.randn((483, 1, 1300, 52)).double() 
-    y_train_tensor = torch.randn((483, 1300, 1)).double()
-    X_test_tensor = torch.randn((483, 1, 1300, 52)).double()
+    X_train_tensor = torch.randn((1, 1, 1274, 52)).double() 
+    y_train_tensor = torch.randn((1, 26, 1)).double()
+    X_test_tensor = torch.randn((1, 1, 1274, 52)).double()
+    # X_train_tensor = torch.randn((483, 1, 1300, 52)).double() 
+    # y_train_tensor = torch.randn((483, 1300, 1)).double()
+    # X_test_tensor = torch.randn((483, 1, 1300, 52)).double()
     # X_train_tensor = torch.randn((128, 1, 1300, 52)).double()
     # y_train_tensor = torch.randn((128, 1300, 1)).double()
     # X_test_tensor = torch.randn((128, 1, 1300, 52)).double()

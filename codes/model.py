@@ -230,3 +230,60 @@ def model_nn(X_train, y_train, X_test, regulator,num):
     the nn file is also in need of modification to forecast 
     from 1,1,1300,52 X 1, 1300,1
     to   1,1,1274,52 X 1,   26,1   '''
+    
+    assert regulator == "Inception"
+    from codes.nn import NNPredictionModel
+    from sklearn.preprocessing import MinMaxScaler
+    def normalize_data(X_train, y_train, X_test):
+        scaler_X = MinMaxScaler()
+        scaler_y = MinMaxScaler()
+
+        X_train_scaled = scaler_X.fit_transform(X_train)
+        y_train_scaled = scaler_y.fit_transform(y_train.reshape(-1, 1))
+        X_test_scaled = scaler_X.transform(X_test)
+
+        return X_train_scaled, y_train_scaled, X_test_scaled, scaler_X, scaler_y
+    def to_torch_tensors(X_train, y_train, X_test, device):
+        X_train_tensor = torch.tensor(X_train, dtype=torch.float64).to(device)
+        y_train_tensor = torch.tensor(y_train, dtype=torch.float64).to(device)
+        X_test_tensor = torch.tensor(X_test, dtype=torch.float64).to(device)
+        
+        return X_train_tensor, y_train_tensor, X_test_tensor
+    def denormalize_predictions(y_pred_normalized, scaler_y):
+        y_pred_normalized = y_pred_normalized.reshape(-1, 1)
+        y_pred = scaler_y.inverse_transform(y_pred_normalized)
+        y_pred = y_pred.reshape(-1)
+        return y_pred
+    X_train, y_train, X_test = X_train.to_numpy(), y_train.to_numpy(), X_test.to_numpy()
+    X_train_=X_train[:1274,:];y_train_=y_train[-26:,:];X_test_=X_train[26:,:]
+    print(X_train_.shape,y_train_.shape,X_test_.shape)
+    '''#TODO slice the last X_test.shape[0] y_pred'''
+    X_train_scaled, y_train_scaled, X_test_scaled, scaler_X, scaler_y = normalize_data(X_train_, y_train_, X_test_)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    # Normalize the data
+    # Convert to PyTorch tensors
+    X_train_tensor, y_train_tensor, X_test_tensor = to_torch_tensors(X_train_scaled, y_train_scaled, X_test_scaled, device)
+    num_stock=1;num_feature=52
+    # num_stock=483;num_feature=52 
+    '''CAUTION remeber to pass right value'''
+    X_train_tensor=X_train_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)
+    y_train_tensor=y_train_tensor.reshape(num_stock,-1,1)
+    X_test_tensor = X_test_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)
+    print(X_train_tensor.shape,y_train_tensor.shape,X_test_tensor.shape)
+    '''torch.Size([1, 1, 1274, 52]) torch.Size([1, 26, 1]) torch.Size([1, 1, 1274, 52])'''
+    # Initialize the model
+    stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=1200, batch_size=483)
+    # Convert the model's parameters to Double
+    stock_prediction_model.model.double().to(device)
+    # Train and predict
+    stock_prediction_model.train(X_train_tensor, y_train_tensor)
+    y_pred_normalized = stock_prediction_model.predict(X_test_tensor)
+    print(y_pred_normalized.shape)
+    y_pred = y_pred_normalized[:,-26:,:]
+    y_pred_flatten = y_pred.reshape(-1,1)
+    print(y_pred_flatten.shape)
+    y_pred_flatten = denormalize_predictions(y_pred_flatten.numpy(), scaler_y)
+    '''caution how y_pred is flattened deserves attention!!!'''
+    # print(y_pred.shape)
+    # breakpoint()
+    return y_pred_flatten

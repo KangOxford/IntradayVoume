@@ -27,13 +27,15 @@ def train_and_pred(index,df,num,regulator,tile_array):
         original_images = df.loc[:, original_space].iloc[train_end_index:test_end_index, :]
         return X_train,y_train,X_test,original_images,train_end_index
     total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df,num)
-    X_train,y_train,X_test,original_images,train_end_index=get_X_train_y_train_X_test_original_images()
+    X_train,y_train,X_test,original_images,train_end_index=get_X_train_y_train_X_test_original_images(df,num)
 
     # breakpoint()
     # print(regulator)
-    # y_pred = regularity_ols(X_train, y_train, X_test, regulator,num)
-    y_pred = model_nn(X_train, y_train, X_test, regulator,num)
-    # y_pred = regularity_nn(X_train, y_train, X_test,y_test, regulator,num)
+    if regulator == "Inception":
+        y_pred = model_nn(X_train, y_train, X_test, regulator,num)
+        # y_pred = regularity_nn(X_train, y_train, X_test,y_test, regulator,num)
+    else:
+        y_pred = regularity_ols(X_train, y_train, X_test, regulator,num)
     # print(regulator+"_finished")
     min_limit, max_limit = y_train.min(), y_train.max()
     broadcast = lambda x: np.full(y_pred.shape[0], x.to_numpy())
