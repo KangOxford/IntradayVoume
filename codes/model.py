@@ -222,3 +222,11 @@ def regularity_nn(X_train, y_train, X_test,y_test, regulator,num):
     # Call pred function with appropriate data
     last_preds_denorm = pred(X_train, y_train, X_test,y_test)
     return  last_preds_denorm
+
+def model_nn(X_train, y_train, X_test, regulator,num):
+    '''take the first 9 days of X_train as X_train_new
+    y_train take the last 1 day of y_train as y_train_new
+    one day include 26bins(26rows) of data
+    the nn file is also in need of modification to forecast 
+    from 1,1,1300,52 X 1, 1300,1
+    to   1,1,1274,52 X 1,   26,1   '''

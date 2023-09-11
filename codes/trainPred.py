@@ -4,32 +4,35 @@ import pandas as pd
 from sklearn.metrics import r2_score
 
 def train_and_pred(index,df,num,regulator,tile_array):
+    def get_X_train_y_train_X_test_original_images(df,num):
+        train_start_index = (index * bin_size) * num
+        train_end_index = (index * bin_size + train_size) * num
+        test_start_index = train_end_index
+        test_end_index = train_end_index + test_size * num
+
+        def get_trainData(df):
+            x_train = df.loc[:, x_list].iloc[train_start_index: train_end_index, :]
+            y_train = df.loc[:, y_list].iloc[train_start_index: train_end_index, :]
+            # x_train = df.iloc[train_start_index : train_end_index, x_list]
+            # y_train = df.loc[train_start_index : train_end_index, y_list]
+            return x_train, y_train
+
+        def get_testData(df):
+            x_test = df.loc[:, x_list].iloc[train_end_index:  test_end_index, :]
+            y_test = df.loc[:, y_list].iloc[train_end_index: test_end_index, :]
+            return x_test, y_test
+
+        X_train, y_train = get_trainData(df)
+        X_test, y_test = get_testData(df)
+        original_images = df.loc[:, original_space].iloc[train_end_index:test_end_index, :]
+        return X_train,y_train,X_test,original_images,train_end_index
     total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df,num)
-    train_start_index = (index * bin_size) * num
-    train_end_index = (index * bin_size + train_size) * num
-    test_start_index = train_end_index
-    test_end_index = train_end_index + test_size * num
-
-    def get_trainData(df):
-        x_train = df.loc[:, x_list].iloc[train_start_index: train_end_index, :]
-        y_train = df.loc[:, y_list].iloc[train_start_index: train_end_index, :]
-        # x_train = df.iloc[train_start_index : train_end_index, x_list]
-        # y_train = df.loc[train_start_index : train_end_index, y_list]
-        return x_train, y_train
-
-    def get_testData(df):
-        x_test = df.loc[:, x_list].iloc[train_end_index:  test_end_index, :]
-        y_test = df.loc[:, y_list].iloc[train_end_index: test_end_index, :]
-        return x_test, y_test
-
-    X_train, y_train = get_trainData(df)
-    X_test, y_test = get_testData(df)
-    original_images = df.loc[:, original_space].iloc[train_end_index:test_end_index, :]
-
+    X_train,y_train,X_test,original_images,train_end_index=get_X_train_y_train_X_test_original_images()
 
     # breakpoint()
     # print(regulator)
-    y_pred = regularity_ols(X_train, y_train, X_test, regulator,num)
+    # y_pred = regularity_ols(X_train, y_train, X_test, regulator,num)
+    y_pred = model_nn(X_train, y_train, X_test, regulator,num)
     # y_pred = regularity_nn(X_train, y_train, X_test,y_test, regulator,num)
     # print(regulator+"_finished")
     min_limit, max_limit = y_train.min(), y_train.max()
