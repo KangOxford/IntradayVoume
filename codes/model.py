@@ -26,6 +26,14 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         # assert type(y_pred) == np.float64
         return y_pred
     elif regulator in ["Lasso", "Ridge"]:
+        import warnings
+        from sklearn.exceptions import DataConversionWarning
+
+        # Suppress DataConversionWarning globally
+        warnings.filterwarnings("ignore", category=DataConversionWarning)
+
+        # Now you can run your code that generates the warning
+        # model.fit(X, y)
         # print("LASSO / RIDGE")
         def find_best_regularity_alpha(X_train, y_train):
             if regulator == "Lasso":
@@ -51,7 +59,7 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
         y_pred = reg.predict(X_test)
         y_pred = y_pred.flatten()
         # print(y_pred.shape)
-        breakpoint()
+        # breakpoint()
         return y_pred
     elif regulator == "XGB":
         import xgboost as xgb

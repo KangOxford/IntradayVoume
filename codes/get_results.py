@@ -27,8 +27,8 @@ def get_r2df(num,regulator,df):
         r2result,oneday_df = train_and_pred(index,df,num,regulator,tile_array=np.arange(num))
         r2results.append(r2result)
         oneday_dfs.append(oneday_df)
-        print(r2results)
-        print(oneday_dfs)
+        # print(r2results)
+        # print(oneday_dfs)
     end = time.time()
     
     def get_r2df_from_results(r2results):
