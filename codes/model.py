@@ -108,32 +108,93 @@ def regularity_ols(X_train, y_train, X_test, regulator,num):
             y_pred = scaler_y.inverse_transform(y_pred_normalized)
             y_pred = y_pred.reshape(-1)
             return y_pred
-        X_train, y_train, X_test = X_train.to_numpy(), y_train.to_numpy(), X_test.to_numpy()
-        print(X_train.shape,y_train.shape)
-        X_test_new = np.concatenate([X_train[X_test.shape[0]:,:],X_test])
-        '''#TODO slice the last X_test.shape[0] y_pred'''
-        X_train_scaled, y_train_scaled, X_test_scaled, scaler_X, scaler_y = normalize_data(X_train, y_train, X_test_new)
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        # Normalize the data
-        # Convert to PyTorch tensors
-        X_train_tensor, y_train_tensor, X_test_tensor = to_torch_tensors(X_train_scaled, y_train_scaled, X_test_scaled, device)
-        num_stock=1;num_feature=52
-        # num_stock=483;num_feature=52 
-        '''CAUTION remeber to pass right value'''
-        X_train_tensor=X_train_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)
-        y_train_tensor=y_train_tensor.reshape(num_stock,-1,1)
-        X_test_tensor = X_test_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)
-        # Initialize the model
-        stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=1200, batch_size=483)
-        # Convert the model's parameters to Double
-        stock_prediction_model.model.double().to(device)
-        # Train and predict
-        stock_prediction_model.train(X_train_tensor, y_train_tensor)
-        y_pred_normalized = stock_prediction_model.predict(X_test_tensor)
-        y_pred = y_pred_normalized[:,-26:,:]
-        y_pred_flatten = y_pred.reshape(-1,1)
-        y_pred_flatten = denormalize_predictions(y_pred_flatten.numpy(), scaler_y)
-        '''caution how y_pred is flattened deserves attention!!!'''
-        return y_pred_flatten
+
+        def reshape_tensors(X_train_tensor, y_train_tensor, num_stock, num_feature):
+            X_train_tensor = X_train_tensor.reshape(num_stock, -1, num_feature).unsqueeze(1)
+            y_train_tensor = y_train_tensor.reshape(num_stock, -1, 1)
+            return X_train_tensor, y_train_tensor
+
+        def train_model(X_train_tensor, y_train_tensor, device):
+            # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=12, batch_size=483)
+            stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=1200, batch_size=483)
+            stock_prediction_model.model.double().to(device)
+            stock_prediction_model.train(X_train_tensor, y_train_tensor)
+            return stock_prediction_model
+
+        def predict_with_sliding_window(model, X_test_scaled, num_stock, num_feature, device):
+            last_preds = []
+            for i in range(1,26+1):  # For each of the 26 sliding windows
+                # start_idx = i * num_stock
+                # end_idx = (i + 1300) * num_stock
+                start_idx = i 
+                end_idx = (i + 1300) 
+                X_test_window = X_test_scaled[start_idx:end_idx, :]
+                X_test_window.shape
+                X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
+                X_test_tensor_window.shape
+                y_pred_normalized = model.predict(X_test_tensor_window)
+                last_pred = y_pred_normalized[0, -1, 0].item()
+                last_preds.append(last_pred)
+            return np.array(last_preds).reshape(-1, 1)
+
+        def pred(X_train, y_train, X_test):
+            # Conversion to numpy and Scaling
+            X_train, y_train, X_test = X_train.to_numpy(), y_train.to_numpy(), X_test.to_numpy()
+            X_test_new = np.concatenate([X_train, X_test])
+            X_train_scaled, y_train_scaled, X_test_scaled, scaler_X, scaler_y = normalize_data(X_train, y_train, X_test_new)
+            
+            # Device configuration
+            device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+            
+            # Conversion to Torch tensors
+            X_train_tensor, y_train_tensor, _ = to_torch_tensors(X_train_scaled, y_train_scaled, X_test_scaled, device)
+            
+            # Reshape tensors
+            num_stock = 1
+            num_feature = 52
+            X_train_tensor, y_train_tensor = reshape_tensors(X_train_tensor, y_train_tensor, num_stock, num_feature)
+            
+            # Train the model
+            trained_model = train_model(X_train_tensor, y_train_tensor, device)
+            
+            # Predict using sliding window
+            last_preds = predict_with_sliding_window(trained_model, X_test_scaled, num_stock, num_feature, device)
+            
+            # Denormalize the predictions
+            last_preds_denorm = denormalize_predictions(last_preds, scaler_y)
+            
+            return last_preds_denorm
+
+        # Call pred function with appropriate data
+        last_preds_denorm = pred(X_train, y_train, X_test)
+        return last_preds_denorm
+
+        # X_train, y_train, X_test = X_train.to_numpy(), y_train.to_numpy(), X_test.to_numpy()
+        # print(X_train.shape,y_train.shape)
+        # X_test_new = np.concatenate([X_train[X_test.shape[0]:,:],X_test])
+        # '''#TODO slice the last X_test.shape[0] y_pred'''
+        # X_train_scaled, y_train_scaled, X_test_scaled, scaler_X, scaler_y = normalize_data(X_train, y_train, X_test_new)
+        # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        # # Normalize the data
+        # # Convert to PyTorch tensors
+        # X_train_tensor, y_train_tensor, X_test_tensor = to_torch_tensors(X_train_scaled, y_train_scaled, X_test_scaled, device)
+        # num_stock=1;num_feature=52
+        # # num_stock=483;num_feature=52 
+        # '''CAUTION remeber to pass right value'''
+        # X_train_tensor=X_train_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)
+        # y_train_tensor=y_train_tensor.reshape(num_stock,-1,1)
+        # X_test_tensor = X_test_tensor.reshape(num_stock,-1,num_feature).unsqueeze(1)
+        # # Initialize the model
+        # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=1200, batch_size=483)
+        # # Convert the model's parameters to Double
+        # stock_prediction_model.model.double().to(device)
+        # # Train and predict
+        # stock_prediction_model.train(X_train_tensor, y_train_tensor)
+        # y_pred_normalized = stock_prediction_model.predict(X_test_tensor)
+        # y_pred = y_pred_normalized[:,-26:,:]
+        # y_pred_flatten = y_pred.reshape(-1,1)
+        # y_pred_flatten = denormalize_predictions(y_pred_flatten.numpy(), scaler_y)
+        # '''caution how y_pred is flattened deserves attention!!!'''
+        # return y_pred_flatten
     else:
         raise NotImplementedError
