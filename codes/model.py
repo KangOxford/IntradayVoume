@@ -173,9 +173,9 @@ def regularity_nn(X_train, y_train, X_test,y_test, regulator,num):
             model = train_model(X_train_tensor_window, y_train_tensor_window, device)
 
             # Prepare the test data for prediction
-            start_idx = i+1
-            end_idx = (i +1+ 1300)
-            X_test_window = X_scaled[start_idx:end_idx, :]
+    
+            X_test_window = X_scaled[i+1:1300 + i+1, :]
+            y_test_window = y_scaled[i+1:1300 + i+1]
             X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
 
             # Make a prediction using the updated model
