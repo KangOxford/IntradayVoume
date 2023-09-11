@@ -49,7 +49,7 @@ class InceptionBlock(nn.Module):
         '''Output reshaped shape: torch.Size([1, 1274, 192])'''
         out1 = self.fc1(reshaped)
         '''Output out1 shape: torch.Size([1, 1274, 1])'''
-        out2 = self.fc2(out1.squeeze(-1))
+        out2 = self.fc2(out1.squeeze(-1)).unsqueeze(-1)
         '''Output out2 shape: torch.Size([1, 26, 1])'''
         return out2
         
