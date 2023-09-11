@@ -272,8 +272,9 @@ def model_nn(X_train, y_train, X_test, regulator,num):
     print(X_train_tensor.shape,y_train_tensor.shape,X_test_tensor.shape)
     '''torch.Size([1, 1, 1274, 52]) torch.Size([1, 26, 1]) torch.Size([1, 1, 1274, 52])'''
     # Initialize the model
-    stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=2, batch_size=483)
+    # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=2, batch_size=483)
     # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=1200, batch_size=483)
+    stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=200, batch_size=483)
     # Convert the model's parameters to Double
     stock_prediction_model.model.double().to(device)
     # Train and predict
