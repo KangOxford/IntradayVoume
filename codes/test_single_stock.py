@@ -50,8 +50,8 @@ if __name__=="__main__":
     # regulator = "Lasso"
     # regulator = "XGB"
 
-    regulator = "cnnLstm"
-    # regulator = "CNN"
+    # regulator = "cnnLstm"
+    regulator = "CNN"
     # regulator = "OLS"
     # regulator = "Ridge"
     # regulator = "CMEM"

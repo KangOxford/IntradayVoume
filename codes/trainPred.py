@@ -29,7 +29,8 @@ def train_and_pred(index,df,num,regulator,tile_array):
 
     # breakpoint()
     # print(regulator)
-    y_pred = regularity_ols(X_train, y_train, X_test, regulator,num)
+    # y_pred = regularity_ols(X_train, y_train, X_test, regulator,num)
+    y_pred = regularity_nn(X_train, y_train, X_test,y_test, regulator,num)
     # print(regulator+"_finished")
     min_limit, max_limit = y_train.min(), y_train.max()
     broadcast = lambda x: np.full(y_pred.shape[0], x.to_numpy())
