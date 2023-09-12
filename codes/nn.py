@@ -57,7 +57,7 @@ class InceptionBlock(nn.Module):
         out1 = self.fc1(reshaped)
         # return out1.unsqueeze(1)
         '''Output out1 shape: torch.Size([1, 1274, 1])'''
-        out2 = self.module1(out1.unsqueeze(1))
+        out2 = self.module1(out1.unsqueeze(1)).squeeze(-1)
         return out2
         # out2 = self.fc2(out1.squeeze(-1))
         # '''Output out2 shape: torch.Size([1, 26])'''
@@ -110,17 +110,17 @@ class CNNLSTM(nn.Module):
         # print("self.lstm_block",x.shape)
         return x
 
-if __name__=="__main__":
-    # Create an instance of the model
-    model = CNNLSTM()
-    # Create a dummy input tensor
-    # input_tensor = torch.rand((1, 1, 1274, 52))
-    input_tensor = torch.rand((7, 1, 1300, 52))
-    # Forward pass
-    output_tensor = model(input_tensor)
-    print("Output shape:", output_tensor.shape)    
+# if __name__=="__main__":
+#     # Create an instance of the model
+#     model = CNNLSTM()
+#     # Create a dummy input tensor
+#     # input_tensor = torch.rand((1, 1, 1274, 52))
+#     input_tensor = torch.rand((7, 1, 1300, 52))
+#     # Forward pass
+#     output_tensor = model(input_tensor)
+#     print("Output shape:", output_tensor.shape)    
     
-'''
+# '''
 import torch
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
