@@ -37,8 +37,14 @@ class InceptionBlock(nn.Module):
             nn.Conv2d(32, 64, kernel_size=(1, 1), stride=(1, 1))
         )
         self.fc1 = nn.Linear(192, 1)
-        self.fc2 = nn.Linear(1300, 26)
-        self.fc3 = nn.Linear(26, 1)
+        self.module1 = nn.Sequential(
+            nn.Conv2d(1, 1, kernel_size=(520, 1),stride=(26, 1),padding=(25, 0)),
+            nn.Conv2d(1, 1, kernel_size=(26, 1),padding=(1, 0)),
+            nn.Conv2d(1, 1, kernel_size=(8, 1)),
+            nn.Conv2d(1, 1, kernel_size=(2, 1)),
+        )
+        # self.fc2 = nn.Linear(1300, 26)
+        # self.fc3 = nn.Linear(26, 1)
     def forward(self, x):
         x1 = self.subblock1(x)
         x2 = self.subblock2(x)
@@ -49,12 +55,15 @@ class InceptionBlock(nn.Module):
         # reshaped = permuted.reshape(-1, 1274, 192)
         '''Output reshaped shape: torch.Size([1, 1274, 192])'''
         out1 = self.fc1(reshaped)
+        # return out1.unsqueeze(1)
         '''Output out1 shape: torch.Size([1, 1274, 1])'''
-        out2 = self.fc2(out1.squeeze(-1))
-        '''Output out2 shape: torch.Size([1, 26])'''
-        out3 = self.fc3(out2).unsqueeze(-1)
-        '''Output out3 shape: torch.Size([1, 1, 1])'''
-        return out3
+        out2 = self.module1(out1.unsqueeze(1))
+        return out2
+        # out2 = self.fc2(out1.squeeze(-1))
+        # '''Output out2 shape: torch.Size([1, 26])'''
+        # out3 = self.fc3(out2).unsqueeze(-1)
+        # '''Output out3 shape: torch.Size([1, 1, 1])'''
+        # return out3
         
         # return reshaped
         # torch.Size([1, 1274, 1]) =>(nn.Linear??)=>torch.Size([1, 26, 1])
@@ -101,17 +110,17 @@ class CNNLSTM(nn.Module):
         # print("self.lstm_block",x.shape)
         return x
 
-# if __name__=="__main__":
-#     # Create an instance of the model
-#     model = CNNLSTM()
-#     # Create a dummy input tensor
-#     input_tensor = torch.rand((1, 1, 1274, 52))
-#     # input_tensor = torch.rand((7, 1, 1300, 52))
-#     # Forward pass
-#     output_tensor = model(input_tensor)
-#     print("Output shape:", output_tensor.shape)    
+if __name__=="__main__":
+    # Create an instance of the model
+    model = CNNLSTM()
+    # Create a dummy input tensor
+    # input_tensor = torch.rand((1, 1, 1274, 52))
+    input_tensor = torch.rand((7, 1, 1300, 52))
+    # Forward pass
+    output_tensor = model(input_tensor)
+    print("Output shape:", output_tensor.shape)    
     
-# '''
+'''
 import torch
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
