@@ -38,6 +38,7 @@ class InceptionBlock(nn.Module):
         )
         self.fc1 = nn.Linear(192, 1)
         self.fc2 = nn.Linear(1274, 26)
+        self.fc3 = nn.Linear(26, 1)
     def forward(self, x):
         x1 = self.subblock1(x)
         x2 = self.subblock2(x)
@@ -49,9 +50,11 @@ class InceptionBlock(nn.Module):
         '''Output reshaped shape: torch.Size([1, 1274, 192])'''
         out1 = self.fc1(reshaped)
         '''Output out1 shape: torch.Size([1, 1274, 1])'''
-        out2 = self.fc2(out1.squeeze(-1)).unsqueeze(-1)
-        '''Output out2 shape: torch.Size([1, 26, 1])'''
-        return out2
+        out2 = self.fc2(out1.squeeze(-1))
+        '''Output out2 shape: torch.Size([1, 26])'''
+        out3 = self.fc3(out2).unsqueeze(-1)
+        '''Output out3 shape: torch.Size([1, 1, 1])'''
+        return out3
         
         # return reshaped
         # torch.Size([1, 1274, 1]) =>(nn.Linear??)=>torch.Size([1, 26, 1])

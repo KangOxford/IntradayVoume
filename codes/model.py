@@ -248,13 +248,10 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
         first_preds = []
         for i in range(0, 26):
             # Update the training data to include data up to bin i
-            # X_train_window = X_scaled[i:1274+i, :]
-            # y_train_window = y_scaled[i:1274+i]
-            # X_test_window = X_scaled[i+1:1274 + i+1, :]
             
-            X_train_window=X_scaled[i:1274+i, :]
-            y_train_window=y_scaled[1274+i:1300+i,:]
-            X_test_window=X_scaled[26+i:1300+i,:]
+            X_train_window=X_scaled[i:1300+i, :]
+            y_train_window=y_scaled[1300+i-1,:]
+            X_test_window=X_scaled[i+1:1300+i+1, :]
             
             # Convert to Torch tensors and Reshape
             X_train_tensor_window, y_train_tensor_window = to_torch_tensors(X_train_window, y_train_window, device)
