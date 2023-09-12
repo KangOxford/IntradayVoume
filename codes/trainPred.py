@@ -25,14 +25,14 @@ def train_and_pred(index,df,num,regulator,tile_array):
         X_train, y_train = get_trainData(df)
         X_test, y_test = get_testData(df)
         original_images = df.loc[:, original_space].iloc[train_end_index:test_end_index, :]
-        return X_train,y_train,X_test,original_images,train_end_index
+        return X_train,y_train,X_test,y_test,original_images,train_end_index
     total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df,num)
-    X_train,y_train,X_test,original_images,train_end_index=get_X_train_y_train_X_test_original_images(df,num)
+    X_train,y_train,X_test,y_test,original_images,train_end_index=get_X_train_y_train_X_test_original_images(df,num)
 
     # breakpoint()
     # print(regulator)
     if regulator == "Inception":
-        y_pred = model_nn(X_train, y_train, X_test, regulator,num)
+        y_pred = model_nn(X_train, y_train, X_test, y_test, regulator,num)
         # y_pred = regularity_nn(X_train, y_train, X_test,y_test, regulator,num)
     else:
         y_pred = regularity_ols(X_train, y_train, X_test, regulator,num)
@@ -63,6 +63,6 @@ def train_and_pred(index,df,num,regulator,tile_array):
         r2value = r2_score(item['true'], item['pred'])
         lst.append([test_date, stock, r2value])
     test_df = pd.DataFrame(lst,columns=["test_date", "stock", "r2value"])
-    # print(test_df)
+    print(test_df)
     # print(index,test_date,test_df.r2value.mean())
     return lst,oneday_df
