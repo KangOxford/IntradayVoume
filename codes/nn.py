@@ -37,7 +37,7 @@ class InceptionBlock(nn.Module):
             nn.Conv2d(32, 64, kernel_size=(1, 1), stride=(1, 1))
         )
         self.fc1 = nn.Linear(192, 1)
-        self.fc2 = nn.Linear(1274, 26)
+        self.fc2 = nn.Linear(1300, 26)
         self.fc3 = nn.Linear(26, 1)
     def forward(self, x):
         x1 = self.subblock1(x)
@@ -45,8 +45,8 @@ class InceptionBlock(nn.Module):
         x3 = self.subblock3(x)
         stacked = torch.stack((x1, x2, x3), dim=4)
         permuted = stacked.permute(0, 2, 1, 3, 4)
-        # reshaped = permuted.reshape(-1, 1300, 192)
-        reshaped = permuted.reshape(-1, 1274, 192)
+        reshaped = permuted.reshape(-1, 1300, 192)
+        # reshaped = permuted.reshape(-1, 1274, 192)
         '''Output reshaped shape: torch.Size([1, 1274, 192])'''
         out1 = self.fc1(reshaped)
         '''Output out1 shape: torch.Size([1, 1274, 1])'''
