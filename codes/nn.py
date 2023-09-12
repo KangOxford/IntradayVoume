@@ -23,20 +23,20 @@ class InceptionBlock(nn.Module):
         super(InceptionBlock, self).__init__()
         
         self.subblock1 = nn.Sequential(
-            nn.Conv2d(32, 64, kernel_size=(1, 1), stride=(1, 1)),
-            nn.Conv2d(64, 64, kernel_size=(3, 1), stride=(1, 1), padding=(1, 0))
+            nn.Conv2d(8, 8, kernel_size=(1, 1), stride=(1, 1)),
+            nn.Conv2d(8, 8, kernel_size=(3, 1), stride=(1, 1), padding=(1, 0))
         )
         
         self.subblock2 = nn.Sequential(
-            nn.Conv2d(32, 64, kernel_size=(1, 1), stride=(1, 1)),
-            nn.Conv2d(64, 64, kernel_size=(5, 1), stride=(1, 1), padding=(2, 0))
+            nn.Conv2d(8, 8, kernel_size=(1, 1), stride=(1, 1)),
+            nn.Conv2d(8, 8, kernel_size=(5, 1), stride=(1, 1), padding=(2, 0))
         )
         
         self.subblock3 = nn.Sequential(
             nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2), padding=(0, 1)),
-            nn.Conv2d(32, 64, kernel_size=(1, 1), stride=(1, 1))
+            nn.Conv2d(8, 8, kernel_size=(1, 1), stride=(1, 1))
         )
-        self.fc1 = nn.Linear(192, 1)
+        self.fc1 = nn.Linear(24, 1)
         self.module1 = nn.Sequential(
             nn.Conv2d(1, 1, kernel_size=(520, 1),stride=(26, 1),padding=(25, 0)),
             nn.Conv2d(1, 1, kernel_size=(26, 1)),
@@ -49,7 +49,7 @@ class InceptionBlock(nn.Module):
         x3 = self.subblock3(x)
         stacked = torch.stack((x1, x2, x3), dim=4)
         permuted = stacked.permute(0, 2, 1, 3, 4)
-        reshaped = permuted.reshape(-1, 1300, 192)
+        reshaped = permuted.reshape(-1, 1300, 24)
         # reshaped = permuted.reshape(-1, 1274, 192)
         '''Output reshaped shape: torch.Size([1, 1274, 192])'''
         out1 = self.fc1(reshaped)
@@ -75,16 +75,16 @@ class ConvBlock(nn.Module):
         super(ConvBlock, self).__init__()
         self.module1 = nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=(1, 32)),
-            nn.Conv2d(32, 32, kernel_size=(4, 1), stride=(1, 1), padding=(2, 0)),
-            nn.Conv2d(32, 32, kernel_size=(4, 1), stride=(1, 1), padding=(1, 0))
+            nn.Conv2d(32, 16, kernel_size=(4, 1), stride=(1, 1), padding=(2, 0)),
+            nn.Conv2d(16, 8, kernel_size=(4, 1), stride=(1, 1), padding=(1, 0))
         )
         self.module2 = nn.Sequential(
-            nn.Conv2d(32, 32, kernel_size=(1, 16)),
-            nn.Conv2d(32, 32, kernel_size=(4, 1), stride=(1, 1), padding=(2, 0)),
-            nn.Conv2d(32, 32, kernel_size=(4, 1), stride=(1, 1), padding=(1, 0))
+            nn.Conv2d(8, 8, kernel_size=(1, 16)),
+            nn.Conv2d(8, 8, kernel_size=(4, 1), stride=(1, 1), padding=(2, 0)),
+            nn.Conv2d(8, 8, kernel_size=(4, 1), stride=(1, 1), padding=(1, 0))
         )
         self.module3 = nn.Sequential(
-            nn.Conv2d(32, 32, kernel_size=(1, 6))
+            nn.Conv2d(8, 8, kernel_size=(1, 6))
         )
     def forward(self, x):
         x = self.module1(x)
@@ -109,17 +109,17 @@ class CNNLSTM(nn.Module):
         # print("self.lstm_block",x.shape)
         return x
 
-if __name__=="__main__":
-    # Create an instance of the model
-    model = CNNLSTM()
-    # Create a dummy input tensor
-    # input_tensor = torch.rand((1, 1, 1274, 52))
-    input_tensor = torch.rand((7, 1, 1300, 52))
-    # Forward pass
-    output_tensor = model(input_tensor)
-    print("Output shape:", output_tensor.shape)    
+# if __name__=="__main__":
+#     # Create an instance of the model
+#     model = CNNLSTM()
+#     # Create a dummy input tensor
+#     # input_tensor = torch.rand((1, 1, 1274, 52))
+#     input_tensor = torch.rand((7, 1, 1300, 52))
+#     # Forward pass
+#     output_tensor = model(input_tensor)
+#     print("Output shape:", output_tensor.shape)    
     
-'''
+# '''
 import torch
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
@@ -167,7 +167,7 @@ if __name__ == "__main__":
     print(count_parameters(InceptionBlock()))
     print(count_parameters(LSTMBlock()))
     # Create an instance of the model
-    breakpoint()
+    # breakpoint()
     # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=100, batch_size=483)
     stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=2, batch_size=483)
     # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=32)
