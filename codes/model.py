@@ -163,6 +163,7 @@ def regularity_nn(X_train, y_train, X_test,y_test, regulator,num):
         stock_prediction_model.train(X_train_tensor, y_train_tensor)
         return stock_prediction_model
 
+
     def train_and_predict_with_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device):
         last_preds = []
         for i in range(0, 26):
@@ -228,7 +229,8 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
     one day include 26bins(26rows) of data
     the nn file is also in need of modification to forecast 
     from 1,1,1300,52 X 1, 1300,1
-    to   1,1,1274,52 X 1,   26,1   '''
+    to   1,1,1274,52 X 1,   26,1   
+    '''
     
     assert regulator == "Inception"
     from codes.nn import NNPredictionModel
@@ -299,3 +301,5 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
     last_preds_denorm = denormalize_predictions(last_preds, scaler_y)
     
     return last_preds_denorm
+
+
