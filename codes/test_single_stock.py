@@ -84,20 +84,27 @@ if __name__=="__main__":
         # df3.to_csv(path00 + "0802_r2df_single_day_"+str(1)+"_"+regulator+"_"+str(total_r2)[:6]+name+".csv", mode = 'w')
         # df33.to_csv(path00 + "0802_r2df_single_day_"+str(1)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+name+".csv", mode = 'w')
     
-    num_stock=len(dfs)
+    # num_stock=len(dfs)
     df3_ = pd.concat(df3s,axis=1)
-    df3_.columns=np.arange(num_stock)
-    pd.set_option('display.max_rows', None) 
+    # df3_.columns=np.arange(num_stock)
+    # pd.set_option('display.max_rows', None) 
     print(df3_.mean(axis=0))
     
+    
+    '''
     df3_.mean(axis=0)[df3_.mean(axis=0)>df3_.mean(axis=0).quantile(q=0.25)].mean()
-    '''0.3993333265521051 the result is same to the previous research
-    means that there is no error in the codes'''
+    0.3993333265521051 the result is same to the previous research
+    means that there is no error in the codes
+    '''
     
     print(df3_.mean(axis=1).mean())
     df33_ = pd.concat(df33s,axis=0)
     print(df33_.mean(axis=1).mean())
-    r2_score(df33_.true,df33_.pred)
-    df33_.stock_index=np.repeat(np.arange(num_stock),(df33.shape[0],))
+    # r2_score(df33_.true,df33_.pred)
+    df33_.stock_index=np.tile(np.arange(483).repeat(26),61)
+    df33_.reset_index(drop=True)
     df3_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+".csv", mode = 'w')
     df33_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+".csv", mode = 'w')
+
+
+df = pd.read_csv("/homes/80/kang/cmem/0802_r2df_universal_day_483_Lasso_0.4285_values_.csv")

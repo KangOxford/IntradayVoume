@@ -64,6 +64,23 @@ def train_and_pred(index,df,num,regulator,tile_array):
         r2value = r2_score(item['true'], item['pred'])
         lst.append([test_date, stock, r2value])
     test_df = pd.DataFrame(lst,columns=["test_date", "stock", "r2value"])
+    test_df = test_df.pivot(index='test_date',columns='stock')
     print(test_df)
+    from datetime import datetime
+
+    # Get current date and time
+    current_time = datetime.now()
+
+    # Format date and time to be used in the file name
+    date_str = current_time.strftime("%Y-%m-%d")
+    time_str = current_time.strftime("%H")
+
+    # Combine date and time to form the file name
+    idnetificator = f"_{date_str}_{time_str}"
+    # In subsequent iterations, append without the header
+    test_df.to_csv('/homes/80/kang/cmem/'+'data_summary'+idnetificator+'.csv', mode='a', header=False, index=True)
+    # test_df.to_csv('/homes/80/kang/cmem/'+'data_summary.csv', mode='a', header=False, index=True)
     # print(index,test_date,test_df.r2value.mean())
+    oneday_df.to_csv('/homes/80/kang/cmem/'+'data_all_values'+idnetificator+'.csv', mode='a', header=False, index=False)
+    # oneday_df.to_csv('/homes/80/kang/cmem/'+'data_all_values.csv', mode='a', header=False, index=False)
     return lst,oneday_df
