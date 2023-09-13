@@ -31,15 +31,26 @@ print(len(path0702Files))
 path0702Files_filtered = list(filter(lambda x: x.endswith('.pkl'), path0702Files))
 print(len(path0702Files_filtered))
 
-def getSingleDfs():
-    # df = pd.read_csv(path0700+"universal.csv",index_col=0)
-    dfs=[]
-    for i in range(len(path0702Files_filtered)):
-        print(f">>> {i}")
-        df=pd.read_pickle(path0702+path0702Files_filtered[i])
-        dfs.append(df)
+def getSingleDfs(trainType):
+    
+    if trainType=="universal":
+        df = pd.read_pickle(path0700+"universal.pkl")
+        dfs=[df]
+        num_of_stacked_stocks = 483
+        return dfs, num_of_stacked_stocks
+    
+    elif trainType=="single_stock":
+        dfs=[]
+        for i in range(len(path0702Files_filtered)):
+            print(f">>> {i}")
+            df=pd.read_pickle(path0702+path0702Files_filtered[i])
+            dfs.append(df)
+        num_of_stacked_stocks = 1
+        return dfs, num_of_stacked_stocks
+    else: raise NotImplementedError
+        
     # return pd.read_pickle(path0701+"one_file.pkl")
-    return dfs
+    # return dfs
 
 def print_mean(df3):
     print(f">>>> stock mean: \n",df3.mean(axis=0))  # stock
@@ -47,26 +58,29 @@ def print_mean(df3):
     print(f">>>> aggregate mean: \n",df3.mean(axis=1).mean())
 
 if __name__=="__main__":
-    # regulator = "Lasso"
+    
+    regulator = "Lasso"
     # regulator = "XGB"
 
     # regulator = "cnnLstm"
     # regulator = "CNN"
-    regulator = "Inception"
+    # regulator = "Inception"
     # regulator = "OLS"
     # regulator = "Ridge"
     # regulator = "CMEM"
     
-    dfs = getSingleDfs()
+    trainType = "universal"
+    
+    dfs,num_of_stacked_stocks = getSingleDfs(trainType)
     # for idex,df in enumerate(dfs):
     df3s=[];df33s=[]
     for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs)):
-        name = path0702Files_filtered[idx][:-4]
-        df3,df33 = get_r2df(num=1,regulator=regulator,df=df)
+        df3,df33 = get_r2df(num=num_of_stacked_stocks,regulator=regulator,df=df)
         total_r2 = df3.mean(axis=1).mean()
         print('total r2: ',df3.mean(axis=1).mean()) # all mean
         df3s.append(df3)
         df33s.append(df33)
+        # name = path0702Files_filtered[idx][:-4]
         # df3.to_csv(path00 + "0802_r2df_single_day_"+str(1)+"_"+regulator+"_"+str(total_r2)[:6]+name+".csv", mode = 'w')
         # df33.to_csv(path00 + "0802_r2df_single_day_"+str(1)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+name+".csv", mode = 'w')
     
@@ -85,5 +99,5 @@ if __name__=="__main__":
     print(df33_.mean(axis=1).mean())
     r2_score(df33_.true,df33_.pred)
     df33_.stock_index=np.repeat(np.arange(num_stock),(df33.shape[0],))
-    df3_.to_csv(path00 + "0802_r2df_single_day_"+str(1)+"_"+regulator+"_"+str(total_r2)[:6]+".csv", mode = 'w')
-    df33_.to_csv(path00 + "0802_r2df_single_day_"+str(1)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+".csv", mode = 'w')
+    df3_.to_csv(path00 + "0802_r2df_single_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+".csv", mode = 'w')
+    df33_.to_csv(path00 + "0802_r2df_single_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+".csv", mode = 'w')

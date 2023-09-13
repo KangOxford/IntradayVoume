@@ -15,7 +15,7 @@ def get_r2df(num,regulator,df):
     print(f"num of stocks {num}, total test days {total_test_days}")
     # num_processes = multiprocessing.cpu_count()  # on local machine
     # num_processes = multiprocessing.cpu_count() -10 # on flair-node-03
-    num_processes = 1 # Number of available CPU cores
+    # num_processes = 1 # Number of available CPU cores
 
     start = time.time()
     # with multiprocessing.Pool(processes=num_processes) as pool:
