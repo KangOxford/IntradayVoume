@@ -39,7 +39,7 @@ def getSingleDfs(trainType):
         num_of_stacked_stocks = 483
         return dfs, num_of_stacked_stocks
     
-    elif trainType=="single_stock":
+    elif trainType=="single":
         dfs=[]
         for i in range(len(path0702Files_filtered)):
             print(f">>> {i}")
@@ -99,5 +99,5 @@ if __name__=="__main__":
     print(df33_.mean(axis=1).mean())
     r2_score(df33_.true,df33_.pred)
     df33_.stock_index=np.repeat(np.arange(num_stock),(df33.shape[0],))
-    df3_.to_csv(path00 + "0802_r2df_single_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+".csv", mode = 'w')
-    df33_.to_csv(path00 + "0802_r2df_single_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+".csv", mode = 'w')
+    df3_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+".csv", mode = 'w')
+    df33_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+".csv", mode = 'w')

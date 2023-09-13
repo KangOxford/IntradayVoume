@@ -53,7 +53,8 @@ def train_and_pred(index,df,num,regulator,tile_array):
     original_images.columns = ['true']
 
     original_images['date'] = test_date
-    stock_index = np.tile(tile_array, 26)
+    # stock_index = np.tile(tile_array, 26) # original [[bin,483] 26]
+    stock_index = np.arange(num).repeat(26)
     original_images['stock_index'] = stock_index
     oneday_df = pd.concat([original_images, y_pred_clipped], axis=1)[['date','stock_index','true','pred']]
     lst = []
