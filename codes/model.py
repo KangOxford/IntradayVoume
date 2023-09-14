@@ -1,4 +1,3 @@
-import pandas as pd
 import torch
 import numpy as np
 array1 = np.concatenate([np.arange(1, 10, 0.01), np.arange(10, 50, 0.1)])
@@ -251,14 +250,8 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             # Update the training data to include data up to bin i
             print("bin: ",i)
             X_train_window=X_scaled[i:1300+i, :]
-            y_train_window=y_scaled[1300+i,:]
+            y_train_window=y_scaled[1300+i-1,:]
             X_test_window=X_scaled[i+1:1300+i+1, :]
-
-            # # def check iloc idx
-            # X_train_window[-1,:3]
-            # X_scaled[1299,:3]
-            # y_train_window
-            # y_scaled[1300]
             
             # Convert to Torch tensors and Reshape
             X_train_tensor_window, y_train_tensor_window = to_torch_tensors(X_train_window, y_train_window, device)
@@ -282,16 +275,13 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
         return np.array(first_preds).reshape(-1, 1)
 
     # Ensure inputs are NumPy arrays
-    # X_train, y_train, X_test, y_test = np.array(X_train), np.array(y_train), np.array(X_test), np.array(y_test)
+    X_train, y_train, X_test, y_test = np.array(X_train), np.array(y_train), np.array(X_test), np.array(y_test)
     
-    # # Concatenate training and test data for scaling
-    # X = np.concatenate([X_train, X_test])
-    # y = np.concatenate([y_train, y_test])
-    X = pd.concat([X_train, X_test])
-    y = pd.concat([y_train, y_test])
+    # Concatenate training and test data for scaling
+    X = np.concatenate([X_train, X_test])
+    y = np.concatenate([y_train, y_test])
     
     # Normalize data and get scalers
-    X,y = np.array(X),np.array(y)
     X_scaled, y_scaled, scaler_X, scaler_y = normalize_data(X, y)
     
     # Device configuration
