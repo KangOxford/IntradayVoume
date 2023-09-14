@@ -101,7 +101,11 @@ class CNNLSTM(nn.Module):
         self.inception = InceptionBlock()
         self.lstm_block = LSTMBlock()
     def forward(self, x):
-        x = self.conv(x)
+        # x1 = self.conv(x[:,:,:1299,:]) # shape 7,8,1299,1
+        # x2 = self.conv2(x[:,:,-1,:]) # shape 7,8,1,1
+        # x = torch.cat((x1, x2), dim=2) # shape 7,8,1300,1
+        
+        x = self.conv(x) # shape 7,8,1299,1
         # print("self.conv(x)",x.shape)
         x = self.inception(x)
         # print("self.inception(x)",x.shape)
@@ -109,17 +113,17 @@ class CNNLSTM(nn.Module):
         # print("self.lstm_block",x.shape)
         return x
 
-# if __name__=="__main__":
-#     # Create an instance of the model
-#     model = CNNLSTM()
-#     # Create a dummy input tensor
-#     # input_tensor = torch.rand((1, 1, 1274, 52))
-#     input_tensor = torch.rand((7, 1, 1300, 52))
-#     # Forward pass
-#     output_tensor = model(input_tensor)
-#     print("Output shape:", output_tensor.shape)    
+if __name__=="__main__":
+    # Create an instance of the model
+    model = CNNLSTM()
+    # Create a dummy input tensor
+    # input_tensor = torch.rand((1, 1, 1274, 52))
+    input_tensor = torch.rand((7, 1, 1300, 52))
+    # Forward pass
+    output_tensor = model(input_tensor)
+    print("Output shape:", output_tensor.shape)    
     
-# '''
+'''
 import torch
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
