@@ -50,23 +50,14 @@ class InceptionBlock(nn.Module):
         stacked = torch.stack((x1, x2, x3), dim=4)
         permuted = stacked.permute(0, 2, 1, 3, 4)
         reshaped = permuted.reshape(-1, 1300, 24)
-        # reshaped = permuted.reshape(-1, 1274, 192)
         '''Output reshaped shape: torch.Size([1, 1274, 192])'''
+        
         out1 = self.fc1(reshaped)
-        # return out1.unsqueeze(1)
         '''Output out1 shape: torch.Size([1, 1274, 1])'''
+        
         out2 = self.module1(out1.unsqueeze(1)).squeeze([1,-1])
         out3 = self.fc2(out2).unsqueeze(-1)
         return out3
-        # out2 = self.fc2(out1.squeeze(-1))
-        # '''Output out2 shape: torch.Size([1, 26])'''
-        # out3 = self.fc3(out2).unsqueeze(-1)
-        # '''Output out3 shape: torch.Size([1, 1, 1])'''
-        # return out3
-        
-        # return reshaped
-        # torch.Size([1, 1274, 1]) =>(nn.Linear??)=>torch.Size([1, 26, 1])
-        # return x1
 
 
 # Define the main model
@@ -101,10 +92,6 @@ class CNNLSTM(nn.Module):
         self.inception = InceptionBlock()
         self.lstm_block = LSTMBlock()
     def forward(self, x):
-        # x1 = self.conv(x[:,:,:1299,:]) # shape 7,8,1299,1
-        # x2 = self.conv2(x[:,:,-1,:]) # shape 7,8,1,1
-        # x = torch.cat((x1, x2), dim=2) # shape 7,8,1300,1
-        
         x = self.conv(x) # shape 7,8,1299,1
         # print("self.conv(x)",x.shape)
         x = self.inception(x)
