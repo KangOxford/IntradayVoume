@@ -100,14 +100,16 @@ class CNNLSTM(nn.Module):
             nn.Conv2d(1, 1, kernel_size=(1, 4)),
             nn.Conv2d(1, 1, kernel_size=(1, 2)),
         )
-        self.fc2 = nn.Linear(20, 1)
+        self.fc2 = nn.Linear(17, 1)
     def forward(self, x_input):
         x2 = self.module1(x_input[:,:,-1,:]).squeeze(1)
+        
         x = self.conv(x_input) # shape 7,8,1299,1
         # print("self.conv(x)",x.shape)
         x1 = self.inception(x)
         # print(x1.shape,x2.shape)
-        x3 = torch.cat((x2, x2), dim=1)
+        
+        x3 = torch.cat((x1, x2), dim=1)
         out3 = self.fc2(x3).unsqueeze(-1)
         return out3
     
