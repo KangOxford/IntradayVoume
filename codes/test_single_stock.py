@@ -41,9 +41,10 @@ def getSingleDfs(trainType):
     
     elif trainType=="single":
         dfs=[]
-        for i in range(len(path0702Files_filtered)):
-            print(f">>> {i}")
+        for i in tqdm(range(len(path0702Files_filtered))):
+            # print(f">>> {i}")
             df=pd.read_pickle(path0702+path0702Files_filtered[i])
+            df=df.reset_index(drop=True)
             dfs.append(df)
         num_of_stacked_stocks = 1
         return dfs, num_of_stacked_stocks
