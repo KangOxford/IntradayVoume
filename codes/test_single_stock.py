@@ -59,18 +59,20 @@ def print_mean(df3):
 
 if __name__=="__main__":
     
-    regulator = "Lasso"
+    # regulator = "Lasso"
     # regulator = "XGB"
 
     # regulator = "cnnLstm"
     # regulator = "CNN"
-    # regulator = "Inception"
+    regulator = "Inception"
     # regulator = "OLS"
     # regulator = "Ridge"
     # regulator = "CMEM"
     
-    trainType = "universal"
-    
+
+    # trainType = "universal"
+    trainType = "single"
+
     dfs,num_of_stacked_stocks = getSingleDfs(trainType)
     # for idex,df in enumerate(dfs):
     df3s=[];df33s=[]

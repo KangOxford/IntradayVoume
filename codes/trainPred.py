@@ -78,9 +78,9 @@ def train_and_pred(index,df,num,regulator,tile_array):
     # Combine date and time to form the file name
     idnetificator = f"_{date_str}_{time_str}"
     # In subsequent iterations, append without the header
-    test_df.to_csv('/homes/80/kang/cmem/'+'data_summary'+idnetificator+'.csv', mode='a', header=False, index=True)
+    test_df.to_csv('/homes/80/kang/cmem/'+'data_summary_'+regulator+idnetificator+'.csv', mode='a', header=False, index=True)
     # test_df.to_csv('/homes/80/kang/cmem/'+'data_summary.csv', mode='a', header=False, index=True)
     # print(index,test_date,test_df.r2value.mean())
-    oneday_df.to_csv('/homes/80/kang/cmem/'+'data_all_values'+idnetificator+'.csv', mode='a', header=False, index=False)
+    oneday_df.to_csv('/homes/80/kang/cmem/'+'data_allValues_'+regulator+idnetificator+'.csv', mode='a', header=False, index=False)
     # oneday_df.to_csv('/homes/80/kang/cmem/'+'data_all_values.csv', mode='a', header=False, index=False)
     return lst,oneday_df
