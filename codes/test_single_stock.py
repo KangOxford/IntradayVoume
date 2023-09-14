@@ -106,5 +106,17 @@ if __name__=="__main__":
     df3_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+".csv", mode = 'w')
     df33_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+".csv", mode = 'w')
 
-
-df = pd.read_csv("/homes/80/kang/cmem/0802_r2df_universal_day_483_Lasso_0.4285_values_.csv")
+# # %%
+# import  pandas as pd
+# df = pd.read_csv("/homes/80/kang/cmem/0802_r2df_universal_day_483_Lasso_0.4285_values_.csv")
+# # %%
+# lst=[]
+# g=df.groupby(['date','stock_index'])
+# for idx,itm in g:
+#     r2=r2_score(itm['true'],itm['pred'])
+#     lst.append([itm.date.iloc[0],itm.stock_index.iloc[0],r2])
+# # %%
+# df1=pd.DataFrame(lst,columns=['date','stock','r2'])
+# df2=df1.pivot(index='date',columns='stock')
+# # %%
+# df2.mean(axis=0).mean()
