@@ -4,12 +4,12 @@ import torch.nn as nn
 class LSTMBlock(nn.Module):
     def __init__(self):
         super(LSTMBlock, self).__init__()
-        self.lstm = nn.LSTM(24,4, batch_first=True) # TODO reduce 192 to lower !!!
-        self.fc = nn.Linear(4, 1300)
+        self.lstm = nn.LSTM(24,16, batch_first=True) # TODO reduce 192 to lower !!!
+        self.fc = nn.Linear(16, 1)
     def forward(self, x):
         out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
-        out = out[:, -1, :]  # Now out has shape (batch_size, 64)
-        # out = self.fc(out)  # Now out has shape (batch_size, 10)
+        # out = out[:, -1, :]  # Now out has shape (batch_size, 64)
+        out = self.fc(out)  # Now out has shape (batch_size, 10)
         out = out.reshape(-1,1300,1)
         return out
     
@@ -90,17 +90,17 @@ class CNNLSTM(nn.Module):
         # print("self.lstm_block",x.shape)
         return x
 
-if __name__=="__main__":
-    # Create an instance of the model
-    model = CNNLSTM()
-    # Create a dummy input tensor
-    # input_tensor = torch.rand((1, 1, 1274, 52))
-    input_tensor = torch.rand((7, 1, 1300, 52))
-    # Forward pass
-    output_tensor = model(input_tensor)
-    print("Output shape:", output_tensor.shape)
-
-'''
+# if __name__=="__main__":
+#     # Create an instance of the model
+#     model = CNNLSTM()
+#     # Create a dummy input tensor
+#     # input_tensor = torch.rand((1, 1, 1274, 52))
+#     input_tensor = torch.rand((7, 1, 1300, 52))
+#     # Forward pass
+#     output_tensor = model(input_tensor)
+#     print("Output shape:", output_tensor.shape)
+#
+# '''
 import torch
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
