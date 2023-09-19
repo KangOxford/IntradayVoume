@@ -4,8 +4,8 @@ import torch.nn as nn
 class LSTMBlock(nn.Module):
     def __init__(self):
         super(LSTMBlock, self).__init__()
-        self.lstm = nn.LSTM(24,16, batch_first=True) # TODO reduce 192 to lower !!!
-        self.fc = nn.Linear(16, 1)
+        self.lstm = nn.LSTM(32,26, batch_first=True) # TODO reduce 192 to lower !!!
+        self.fc = nn.Linear(26, 1)
     def forward(self, x):
         out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
         # out = out[:, -1, :]  # Now out has shape (batch_size, 64)
@@ -32,6 +32,10 @@ class InceptionBlock(nn.Module):
         self.subblock3 = nn.Sequential(
             nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2), padding=(0, 1)),
             nn.Conv2d(8, 8, kernel_size=(1, 1), stride=(1, 1))
+        )
+
+        self.subblock4 = nn.Sequential(
+            nn.Conv2d(8, 8, kernel_size=(1, 26),padding=(0,2))
         )
         # self.fc1 = nn.Linear(24, 1)
 
