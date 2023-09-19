@@ -251,7 +251,7 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             # Update the training data to include data up to bin i
             print("bin: ",i)
             X_train_window=X_scaled[i:1300+i, :]
-            y_train_window=y_scaled[1300+i,:]
+            y_train_window=y_scaled[i:1300+i,:]
             X_test_window=X_scaled[i+1:1300+i+1, :]
             
             # Convert to Torch tensors and Reshape
@@ -261,7 +261,8 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             
             # Train the model with the new data
             # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=2, batch_size=483)
-            stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=200, batch_size=483)
+            # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=200, batch_size=483)
+            stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=400, batch_size=483)
             stock_prediction_model.model.double().to(device)
             stock_prediction_model.train(X_train_tensor_window, y_train_tensor_window)
             
@@ -270,7 +271,7 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             
             # Make a prediction using the updated model
             y_pred_normalized = stock_prediction_model.predict(X_test_tensor_window)
-            first_pred = y_pred_normalized[0, 0, 0].item()
+            first_pred = y_pred_normalized[0, -1, 0].item()
             first_preds.append(first_pred)
 
         return np.array(first_preds).reshape(-1, 1)
