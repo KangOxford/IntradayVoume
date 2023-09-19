@@ -2,13 +2,10 @@ import torch
 import torch.nn as nn
 
 class LSTMBlock(nn.Module):
-    # def __init__(self):
-    #     super(LSTMBlock, self).__init__()
-    #     self.lstm = nn.LSTM(192, 1300, batch_first=True) # TODO reduce 192 to lower !!!
     def __init__(self):
         super(LSTMBlock, self).__init__()
-        self.lstm = nn.LSTM(20, 20, batch_first=True) # TODO reduce 192 to lower !!!
-        self.fc = nn.Linear(20, 1300)
+        self.lstm = nn.LSTM(24,104, batch_first=True) # TODO reduce 192 to lower !!!
+        self.fc = nn.Linear(104, 1300)
     def forward(self, x):
         out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
         out = out[:, -1, :]  # Now out has shape (batch_size, 64)
@@ -36,13 +33,8 @@ class InceptionBlock(nn.Module):
             nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2), padding=(0, 1)),
             nn.Conv2d(8, 8, kernel_size=(1, 1), stride=(1, 1))
         )
-        self.fc1 = nn.Linear(24, 1)
-        self.module1 = nn.Sequential(
-            nn.Conv2d(1, 1, kernel_size=(520, 1),stride=(26, 1),padding=(25, 0)),
-            nn.Conv2d(1, 1, kernel_size=(26, 1)),
-        )
-        # self.fc2 = nn.Linear(1300, 26)
-        self.fc2 = nn.Linear(7, 1)
+        # self.fc1 = nn.Linear(24, 1)
+
     def forward(self, x):
         x1 = self.subblock1(x)
         x2 = self.subblock2(x)
@@ -50,26 +42,12 @@ class InceptionBlock(nn.Module):
         stacked = torch.stack((x1, x2, x3), dim=4)
         permuted = stacked.permute(0, 2, 1, 3, 4)
         reshaped = permuted.reshape(-1, 1300, 24)
+        return reshaped
 
-        # reshaped = permuted.reshape(-1, 1274, 192)
         '''Output reshaped shape: torch.Size([1, 1274, 192])'''
-        out1 = self.fc1(reshaped)
-        return out1
+        # out1 = self.fc1(reshaped)
+        # return out1
 
-        # # return out1.unsqueeze(1)
-        # '''Output out1 shape: torch.Size([1, 1274, 1])'''
-        # out2 = self.module1(out1.unsqueeze(1)).squeeze([1,-1])
-        # out3 = self.fc2(out2).unsqueeze(-1)
-        # return out3
-        # # out2 = self.fc2(out1.squeeze(-1))
-        # # '''Output out2 shape: torch.Size([1, 26])'''
-        # # out3 = self.fc3(out2).unsqueeze(-1)
-        # # '''Output out3 shape: torch.Size([1, 1, 1])'''
-        # # return out3
-        #
-        # # return reshaped
-        # # torch.Size([1, 1274, 1]) =>(nn.Linear??)=>torch.Size([1, 26, 1])
-        # # return x1
 
 
 # Define the main model
@@ -108,21 +86,21 @@ class CNNLSTM(nn.Module):
         # print("self.conv(x)",x.shape)
         x = self.inception(x)
         # print("self.inception(x)",x.shape)
-        # x = self.lstm_block(x)
+        x = self.lstm_block(x)
         # print("self.lstm_block",x.shape)
         return x
 
-# if __name__=="__main__":
-#     # Create an instance of the model
-#     model = CNNLSTM()
-#     # Create a dummy input tensor
-#     # input_tensor = torch.rand((1, 1, 1274, 52))
-#     input_tensor = torch.rand((7, 1, 1300, 52))
-#     # Forward pass
-#     output_tensor = model(input_tensor)
-#     print("Output shape:", output_tensor.shape)
-#
-# '''
+if __name__=="__main__":
+    # Create an instance of the model
+    model = CNNLSTM()
+    # Create a dummy input tensor
+    # input_tensor = torch.rand((1, 1, 1274, 52))
+    input_tensor = torch.rand((7, 1, 1300, 52))
+    # Forward pass
+    output_tensor = model(input_tensor)
+    print("Output shape:", output_tensor.shape)
+
+'''
 import torch
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
@@ -185,15 +163,7 @@ if __name__ == "__main__":
     X_train_tensor = torch.randn((1, 1, 1274, 52)).double() 
     y_train_tensor = torch.randn((1, 26, 1)).double()
     X_test_tensor = torch.randn((1, 1, 1274, 52)).double()
-    # X_train_tensor = torch.randn((483, 1, 1300, 52)).double() 
-    # y_train_tensor = torch.randn((483, 1300, 1)).double()
-    # X_test_tensor = torch.randn((483, 1, 1300, 52)).double()
-    # X_train_tensor = torch.randn((128, 1, 1300, 52)).double()
-    # y_train_tensor = torch.randn((128, 1300, 1)).double()
-    # X_test_tensor = torch.randn((128, 1, 1300, 52)).double()
-    # X_train_tensor = torch.randn((1, 1, 1300, 52)).double()
-    # y_train_tensor = torch.randn((1, 1300, 1)).double()
-    # X_test_tensor = torch.randn((1, 1, 1300, 52)).double()
+
 
     # Train and predict
     stock_prediction_model.train(X_train_tensor, y_train_tensor)
