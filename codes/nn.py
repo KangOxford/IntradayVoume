@@ -4,12 +4,12 @@ import torch.nn as nn
 class LSTMBlock(nn.Module):
     def __init__(self):
         super(LSTMBlock, self).__init__()
-        self.lstm = nn.LSTM(24,104, batch_first=True) # TODO reduce 192 to lower !!!
-        self.fc = nn.Linear(104, 1300)
+        self.lstm = nn.LSTM(24,4, batch_first=True) # TODO reduce 192 to lower !!!
+        self.fc = nn.Linear(4, 1300)
     def forward(self, x):
         out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
         out = out[:, -1, :]  # Now out has shape (batch_size, 64)
-        out = self.fc(out)  # Now out has shape (batch_size, 10)
+        # out = self.fc(out)  # Now out has shape (batch_size, 10)
         out = out.reshape(-1,1300,1)
         return out
     
