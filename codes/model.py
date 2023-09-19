@@ -262,7 +262,8 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             # Train the model with the new data
             # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=2, batch_size=483)
             # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=200, batch_size=483)
-            stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=400, batch_size=483)
+            # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=400, batch_size=483)
+            stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=1200, batch_size=483)
             stock_prediction_model.model.double().to(device)
             stock_prediction_model.train(X_train_tensor_window, y_train_tensor_window)
             

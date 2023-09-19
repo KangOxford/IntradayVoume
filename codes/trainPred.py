@@ -76,7 +76,9 @@ def train_and_pred(index,df,num,regulator,tile_array):
     time_str = current_time.strftime("%H")
 
     # Combine date and time to form the file name
-    idnetificator = f"_{date_str}_{time_str}"
+    # Get the short Git hash
+    short_hash = get_git_hash()
+    idnetificator = f"_{date_str}_{time_str}_{short_hash}"
     # In subsequent iterations, append without the header
     test_df.to_csv('/homes/80/kang/cmem/'+'data_summary_'+regulator+idnetificator+'.csv', mode='a', header=False, index=True)
     # test_df.to_csv('/homes/80/kang/cmem/'+'data_summary.csv', mode='a', header=False, index=True)
@@ -84,3 +86,21 @@ def train_and_pred(index,df,num,regulator,tile_array):
     oneday_df.to_csv('/homes/80/kang/cmem/'+'data_allValues_'+regulator+idnetificator+'.csv', mode='a', header=False, index=False)
     # oneday_df.to_csv('/homes/80/kang/cmem/'+'data_all_values.csv', mode='a', header=False, index=False)
     return lst,oneday_df
+
+
+import subprocess
+def get_git_hash():
+    try:
+        # Execute the command to get the latest commit hash
+        git_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip().decode('utf-8')
+
+        # Slice the first 4 characters
+        short_hash = git_hash[:4]
+
+        return short_hash
+
+    except subprocess.CalledProcessError:
+        print("An error occurred while fetching the Git hash.")
+        return None
+
+
