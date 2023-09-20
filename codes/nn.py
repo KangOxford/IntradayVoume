@@ -21,11 +21,11 @@ class InceptionBlock(nn.Module):
         self.numStock=numStock
 
 
-        self.subblock1 = nn.Sequential(
-            nn.Conv2d(4, 4, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0)),  # Padding for first layer (m1, n1)
-            nn.Conv2d(4, 4, kernel_size=(5 * numStock, 1), stride=(1, 1), padding=((5 * numStock - 1) // 2+1, 0)),
-            nn.Conv2d(4, 4, kernel_size=(3 * numStock, 1), stride=(1, 1), padding=((3 * numStock - 1) // 2 , 0)),
-        )
+        # self.subblock1 = nn.Sequential(
+        #     nn.Conv2d(4, 4, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0)),  # Padding for first layer (m1, n1)
+        #     nn.Conv2d(4, 4, kernel_size=(5 * numStock, 1), stride=(1, 1), padding=((5 * numStock - 1) // 2+1, 0)),
+        #     nn.Conv2d(4, 4, kernel_size=(3 * numStock, 1), stride=(1, 1), padding=((3 * numStock - 1) // 2 , 0)),
+        # )
 
         self.subblock2 = nn.Sequential(
             nn.Conv2d(4, 4, kernel_size=(1, 1), stride=(1, 1)),
@@ -37,19 +37,19 @@ class InceptionBlock(nn.Module):
         self.subblock3 = nn.Sequential(
             nn.Conv2d(4, 4, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0)),
             nn.Conv2d(4, 4, kernel_size=(26*numStock, 1),padding=((26 * numStock - 1) // 2,0)),
-            nn.Conv2d(4, 4, kernel_size=(13*numStock, 1),padding=((13 * numStock - 1) // 2+1,0)),
+            nn.Conv2d(4, 4, kernel_size=(2*numStock, 1),padding=((2 * numStock - 1) // 2+1,0)),
         )
 
     def forward(self, x):
-        x1 = self.subblock1(x)
+        # x1 = self.subblock1(x)
         x2 = self.subblock2(x)
         x3 = self.subblock3(x)
         # print(x.shape,x1.shape,'\n',x3.shape)
-        print(x.shape,x1.shape,'\n',x2.shape,x3.shape)
+        print(x.shape,'\n',x2.shape,x3.shape)
         # stacked = torch.stack((x1, x3), dim=4)
-        stacked = torch.stack((x1, x2, x3), dim=4)
+        stacked = torch.stack((x2, x3), dim=4)
         permuted = stacked.permute(0, 2, 1, 3, 4)
-        reshaped = permuted.reshape(-1, 1300*self.numStock, 9)
+        reshaped = permuted.reshape(-1, 1300*self.numStock, 6)
         return reshaped
 
         '''Output reshaped shape: torch.Size([1, 1274, 192])'''
@@ -98,18 +98,18 @@ class CNNLSTM(nn.Module):
         # print("self.lstm_block",x.shape)
         return x
 
-# if __name__=="__main__":
-#     numStock = 200
-#     # Create an instance of the model
-#     model = CNNLSTM(numStock)
-#     # Create a dummy input tensor
-#     # input_tensor = torch.rand((1, 1, 1274, 52))
-#     input_tensor = torch.rand((1, 1, 1300*numStock, 52))
-#     # Forward pass
-#     output_tensor = model(input_tensor)
-#     print("Output shape:", output_tensor.shape)
-#
-# '''
+if __name__=="__main__":
+    numStock = 200
+    # Create an instance of the model
+    model = CNNLSTM(numStock)
+    # Create a dummy input tensor
+    # input_tensor = torch.rand((1, 1, 1274, 52))
+    input_tensor = torch.rand((1, 1, 1300*numStock, 52))
+    # Forward pass
+    output_tensor = model(input_tensor)
+    print("Output shape:", output_tensor.shape)
+
+'''
 import torch
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
