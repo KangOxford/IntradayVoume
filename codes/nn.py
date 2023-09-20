@@ -4,13 +4,14 @@ import torch.nn as nn
 class LSTMBlock(nn.Module):
     def __init__(self,numStock):
         super(LSTMBlock, self).__init__()
-        self.lstm = nn.LSTM(32,26, batch_first=True) # TODO reduce 192 to lower !!!
-        self.fc = nn.Linear(26, 1)
+        self.numStock = numStock
+        self.lstm = nn.LSTM(6,6, batch_first=True) # TODO reduce 192 to lower !!!
+        self.fc = nn.Linear(6, 1)
     def forward(self, x):
         out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
         # out = out[:, -1, :]  # Now out has shape (batch_size, 64)
         out = self.fc(out)  # Now out has shape (batch_size, 10)
-        out = out.reshape(-1,1300,1)
+        out = out.reshape(-1,1300*self.numStock,1)
         return out
 
 
@@ -37,24 +38,23 @@ class InceptionBlock(nn.Module):
         self.subblock3 = nn.Sequential(
             nn.Conv2d(4, 4, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0)),
             nn.Conv2d(4, 4, kernel_size=(26*numStock, 1),padding=((26 * numStock - 1) // 2,0)),
-            nn.Conv2d(4, 4, kernel_size=(2*numStock, 1),padding=((2 * numStock - 1) // 2+1,0)),
+            nn.Conv2d(4, 4, kernel_size=(1*numStock, 1),padding=((1 * numStock - 1) // 2+1,0)),
         )
 
     def forward(self, x):
         # x1 = self.subblock1(x)
         x2 = self.subblock2(x)
+
         x3 = self.subblock3(x)
         # print(x.shape,x1.shape,'\n',x3.shape)
-        print(x.shape,'\n',x2.shape,x3.shape)
+        # print(x.shape,'\n',x2.shape,x3.shape)
         # stacked = torch.stack((x1, x3), dim=4)
         stacked = torch.stack((x2, x3), dim=4)
         permuted = stacked.permute(0, 2, 1, 3, 4)
         reshaped = permuted.reshape(-1, 1300*self.numStock, 6)
         return reshaped
 
-        '''Output reshaped shape: torch.Size([1, 1274, 192])'''
-        # out1 = self.fc1(reshaped)
-        # return out1
+        #'''Output reshaped shape: torch.Size([1, 1274, 192])'''
 
 
 
@@ -93,23 +93,23 @@ class CNNLSTM(nn.Module):
         x = self.conv(x) # ([7, 8, 1300, 1])
         # print("self.conv(x)",x.shape)
         x = self.inception(x)
-        # print("self.inception(x)",x.shape)
-        # x = self.lstm_block(x)
+        print("self.inception(x)",x.shape)
+        x = self.lstm_block(x)
         # print("self.lstm_block",x.shape)
         return x
 
-if __name__=="__main__":
-    numStock = 200
-    # Create an instance of the model
-    model = CNNLSTM(numStock)
-    # Create a dummy input tensor
-    # input_tensor = torch.rand((1, 1, 1274, 52))
-    input_tensor = torch.rand((1, 1, 1300*numStock, 52))
-    # Forward pass
-    output_tensor = model(input_tensor)
-    print("Output shape:", output_tensor.shape)
-
-'''
+# if __name__=="__main__":
+#     numStock = 200
+#     # Create an instance of the model
+#     model = CNNLSTM(numStock)
+#     # Create a dummy input tensor
+#     # input_tensor = torch.rand((1, 1, 1274, 52))
+#     input_tensor = torch.rand((1, 1, 1300*numStock, 52))
+#     # Forward pass
+#     output_tensor = model(input_tensor)
+#     print("Output shape:", output_tensor.shape)
+#
+# '''
 import torch
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
