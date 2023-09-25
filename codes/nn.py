@@ -115,8 +115,8 @@ import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
 class NNPredictionModel:
-    def __init__(self, learning_rate=0.001, epochs=10, batch_size=32):
-        self.model = CNNLSTM()
+    def __init__(self, numStock, learning_rate=0.001, epochs=10, batch_size=32,):
+        self.model = CNNLSTM(numStock)
         self.learning_rate = learning_rate
         self.epochs = epochs
         self.batch_size = batch_size

@@ -71,8 +71,8 @@ if __name__=="__main__":
     # regulator = "CMEM"
     
 
-    trainType = "universal"
-    # trainType = "single"
+    # trainType = "universal"
+    trainType = "single"
 
     dfs,num_of_stacked_stocks = getSingleDfs(trainType)
     # for idex,df in enumerate(dfs):
