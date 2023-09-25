@@ -6,6 +6,14 @@ array2 = np.arange(1, 0.001, -0.001)
 
 combined_array = np.array(list(zip(array1, array2))).flatten()
 
+def check_GPU_memory():
+    import GPUtil
+    # Get the list of GPU devices
+    devices = GPUtil.getGPUs()
+    # Loop through devices and print their memory usage
+    for device in devices:
+        print(f"Device: {device.id}, Free Memory: {device.memoryFree}MB, Used Memory: {device.memoryUsed}MB")
+
 
 # used for alphas
 def regularity_ols(X_train, y_train, X_test, regulator,num):
@@ -213,7 +221,10 @@ def regularity_nn(X_train, y_train, X_test,y_test, regulator,num):
         NUM_FEATURE = 52
         
         # Train model and predict with sliding window
+        check_GPU_memory()
         last_preds = train_and_predict_with_sliding_window(X_scaled, y_scaled, NUM_STOCK, NUM_FEATURE, device)
+        check_GPU_memory()
+        
         
         # Denormalize predictions
         last_preds_denorm = denormalize_predictions(last_preds, scaler_y)
@@ -288,6 +299,7 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             # X_train_window=X_scaled[i:1300+i, :]
             # y_train_window=y_scaled[i:1300+i,:]
             # X_test_window=X_scaled[i+1:1300+i+1, :]
+            check_GPU_memory()
             
             X_train_window,y_train_window,X_test_window=slice_and_stack(X_scaled, y_scaled, num_stock)
             
@@ -300,8 +312,13 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=2, batch_size=483)
             # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=200, batch_size=483)
             # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=400, batch_size=483)
+            check_GPU_memory()
+            # breakpoint()
             stock_prediction_model = NNPredictionModel(num, learning_rate=0.0002, epochs=1200, batch_size=483)
+            print("G")
             stock_prediction_model.model.double().to(device)
+            print("H")
+            torch.cuda.empty_cache()
             stock_prediction_model.train(X_train_tensor_window, y_train_tensor_window)
             
             # Prepare the test data for prediction
@@ -334,6 +351,8 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
     num_stock = num
     num_feature = 52
     
+    
+    check_GPU_memory()
     # Train model and predict with sliding window
     last_preds = train_and_predict_with_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device)
     

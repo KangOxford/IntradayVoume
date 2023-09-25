@@ -22,6 +22,14 @@ import multiprocessing
 import time
 
 
+def check_GPU_memory():
+    import GPUtil
+    # Get the list of GPU devices
+    devices = GPUtil.getGPUs()
+    # Loop through devices and print their memory usage
+    for device in devices:
+        print(f"Device: {device.id}, Free Memory: {device.memoryFree}MB, Used Memory: {device.memoryUsed}MB")
+
 
 path060000Files = readFromPath(path060000)
 print(len(path060000Files))
@@ -71,14 +79,18 @@ if __name__=="__main__":
     # regulator = "CMEM"
     
 
-    # trainType = "universal"
-    trainType = "single"
+    trainType = "universal"
+    # trainType = "single"
 
     dfs,num_of_stacked_stocks = getSingleDfs(trainType)
     # for idex,df in enumerate(dfs):
+    check_GPU_memory()
+    
     df3s=[];df33s=[]
     for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs)):
+        print("A")
         df3,df33 = get_r2df(num=num_of_stacked_stocks,regulator=regulator,df=df)
+        print("B")
         total_r2 = df3.mean(axis=1).mean()
         print('total r2: ',df3.mean(axis=1).mean()) # all mean
         df3s.append(df3)

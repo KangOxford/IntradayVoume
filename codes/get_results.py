@@ -8,6 +8,15 @@ from params import *
 from trainPred import *
 import time
 
+def check_GPU_memory():
+    import GPUtil
+    # Get the list of GPU devices
+    devices = GPUtil.getGPUs()
+    # Loop through devices and print their memory usage
+    for device in devices:
+        print(f"Device: {device.id}, Free Memory: {device.memoryFree}MB, Used Memory: {device.memoryUsed}MB")
+
+
 def get_r2df(num,regulator,df):
     
     print("universal data loaded")
@@ -23,7 +32,9 @@ def get_r2df(num,regulator,df):
     print("total_test_days",total_test_days)
     for index in range(total_test_days):
         print(f"+ {index} in {total_test_days}")
+        print(f"C_{index}")        
         r2result,oneday_df = train_and_pred(index,df,num,regulator,tile_array=np.arange(num))
+        print(f"D_{index}")        
         r2results.append(r2result)
         oneday_dfs.append(oneday_df)
         # print(r2results)
@@ -37,7 +48,9 @@ def get_r2df(num,regulator,df):
         # assert np.unique(df1['stock_index']).shape == (len(path060000Files),)
         df2 = df1.pivot(index="test_date", columns="stock_index", values="r2")
         return df2
+    check_GPU_memory()
     df2 = get_r2df_from_results(r2results)
+    check_GPU_memory()
     df22 =pd.concat(oneday_dfs,axis=0)
 
     print(df2)
