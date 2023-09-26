@@ -410,7 +410,7 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             # X_train_window=X_scaled[i:1300+i, :]
             # y_train_window=y_scaled[i:1300+i,:]
             # X_test_window=X_scaled[i+1:1300+i+1, :]
-            check_GPU_memory()
+            # check_GPU_memory()
             
             X_train_window,y_train_window,X_test_window=slice_and_stack(X_scaled, y_scaled, num_stock, i)
             
@@ -424,9 +424,13 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=200, batch_size=483)
             # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=400, batch_size=483)
             stock_prediction_model = NNPredictionModel(num, learning_rate=0.0002, epochs=1200, batch_size=483)
-            stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model.double()) # wrap your model in DataParallel
-            stock_prediction_model.model.to(device) # send it to the device
-            # torch.cuda.empty_cache()
+            
+            # choice 1
+            # stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model.double()) # wrap your model in DataParallel
+            # stock_prediction_model.model.to(device) # send it to the device
+            # choice 2
+            stock_prediction_model.model.double().to(device)
+            
             
             stock_prediction_model.train(X_train_tensor_window, y_train_tensor_window)
             
