@@ -50,6 +50,7 @@ class InceptionBlock(nn.Module):
         # print(x.shape,'\n',x2.shape,x3.shape)
         # stacked = torch.stack((x1, x3), dim=4)
         stacked = torch.stack((x2, x3), dim=4)
+        breakpoint()
         permuted = stacked.permute(0, 2, 1, 3, 4)
         reshaped = permuted.reshape(-1, 1300*self.numStock, 6)
         return reshaped

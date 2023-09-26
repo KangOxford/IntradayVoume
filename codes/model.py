@@ -245,6 +245,7 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
     '''
     
     assert regulator == "Inception"
+    import torch.nn as nn
     from codes.nn import NNPredictionModel
 
     def to_torch_tensors(X_train, y_train, device):
@@ -272,7 +273,7 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             y_sub_scaled = y_scaled[i:i + rows_per_stock, :]
             
             # Perform the window slicing operation on each sub-matrix
-            for j in range(rows_per_stock - 1300):
+            for j in range(26):
                 X_train_window = X_sub_scaled[j:1300+j, :]
                 y_train_window = y_sub_scaled[j:1300+j, :]
                 X_test_window = X_sub_scaled[j+1:1300+j+1, :]
@@ -312,13 +313,11 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=2, batch_size=483)
             # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=200, batch_size=483)
             # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=400, batch_size=483)
-            check_GPU_memory()
-            # breakpoint()
             stock_prediction_model = NNPredictionModel(num, learning_rate=0.0002, epochs=1200, batch_size=483)
-            print("G")
-            stock_prediction_model.model.double().to(device)
-            print("H")
-            torch.cuda.empty_cache()
+            stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model.double()) # wrap your model in DataParallel
+            stock_prediction_model.model.to(device) # send it to the device
+            # torch.cuda.empty_cache()
+            
             stock_prediction_model.train(X_train_tensor_window, y_train_tensor_window)
             
             # Prepare the test data for prediction
