@@ -258,37 +258,147 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
         y_pred = y_pred.reshape(-1)
         return y_pred
 
-    def slice_and_stack(X_scaled, y_scaled, num_stock):
-        '''this func is wrong TODO debug'''
-        # Initialize empty lists to collect the slices
-        X_train_window_list = []
-        y_train_window_list = []
-        X_test_window_list = []
+    # def slice_and_stack(X_scaled, y_scaled, num_stock):
+    #     '''this func is wrong TODO debug'''
+    #     # Initialize empty lists to collect the slices
+    #     X_train_window_list = []
+    #     y_train_window_list = []
+    #     X_test_window_list = []
         
-        rows_per_stock = 1326  # Number of rows for each stock's data
+    #     rows_per_stock = 1326  # Number of rows for each stock's data
         
-        for i in range(0, num_stock * rows_per_stock, rows_per_stock):
-            # Extract each sub-matrix corresponding to each stock
-            X_sub_scaled = X_scaled[i:i + rows_per_stock, :]
-            y_sub_scaled = y_scaled[i:i + rows_per_stock, :]
+    #     for i in range(0, num_stock * rows_per_stock, rows_per_stock):
+    #         # Extract each sub-matrix corresponding to each stock
+    #         X_sub_scaled = X_scaled[i:i + rows_per_stock, :]
+    #         y_sub_scaled = y_scaled[i:i + rows_per_stock, :]
             
-            # Perform the window slicing operation on each sub-matrix
-            for j in range(26):
-                X_train_window = X_sub_scaled[j:1300+j, :]
-                y_train_window = y_sub_scaled[j:1300+j, :]
-                X_test_window = X_sub_scaled[j+1:1300+j+1, :]
+    #         # Perform the window slicing operation on each sub-matrix
+    #         for j in range(26):
+    #             X_train_window = X_sub_scaled[j:1300+j, :]
+    #             y_train_window = y_sub_scaled[j:1300+j, :]
+    #             X_test_window = X_sub_scaled[j+1:1300+j+1, :]
                 
-                # Append the slices to the lists
-                X_train_window_list.append(X_train_window)
-                y_train_window_list.append(y_train_window)
-                X_test_window_list.append(X_test_window)
+    #             # Append the slices to the lists
+    #             X_train_window_list.append(X_train_window)
+    #             y_train_window_list.append(y_train_window)
+    #             X_test_window_list.append(X_test_window)
                 
-        # Stack the slices together vertically to form new matrices
-        X_train_window_stacked = np.vstack(X_train_window_list)
-        y_train_window_stacked = np.vstack(y_train_window_list)
-        X_test_window_stacked = np.vstack(X_test_window_list)
+    #     # Stack the slices together vertically to form new matrices
+    #     X_train_window_stacked = np.vstack(X_train_window_list)
+    #     y_train_window_stacked = np.vstack(y_train_window_list)
+    #     X_test_window_stacked = np.vstack(X_test_window_list)
         
-        return X_train_window_stacked, y_train_window_stacked, X_test_window_stacked
+    #     return X_train_window_stacked, y_train_window_stacked, X_test_window_stacked
+    
+    
+    
+    def slice_and_stack(X_scaled, y_scaled, num_stock,i):
+        '''
+        X_scaled is stacked by: 
+            26 bins of stock1 of day1
+            26 bins of stock2 of day1
+            ...
+            26 bins of stockn of day1
+            
+            26 bins of stock1 of day2
+            26 bins of stock2 of day2
+            ...
+            26 bins of stockn of day2
+
+            26 bins of stock1 of daym
+            26 bins of stock2 of daym
+            ...
+            26 bins of stockn of daym
+            
+        for example, 
+        if num_stock == 1:
+        X_scaled is stacked by:  
+            26 bins of stock1 of day1
+            26 bins of stock1 of day2
+            ...
+            26 bins of stock1 of daym
+            X_scaled[i:1300+i, :] means take 1300/26=50 days of bins out.
+            if i == 1, then we expect to take
+                25 bins of stock1 of day1, start from index 1 (included)
+                26 bins of stock1 of day2
+                ...
+                26 bins of stock1 of day50
+                1 bins of stock1 of day50, end to index 1 (not included)
+                at this point, the X_test is expected to be one element difference from X_train:
+                25 bins of stock1 of day1, start from index 2(1+1, the first 1 is the value of i, the second 1 is fixed) (included)
+                26 bins of stock1 of day2
+                ...
+                26 bins of stock1 of day50
+                1 bins of stock1 of day50, end to index 2(1+1) (not included)
+                
+            
+             
+        if num_stock == 2:
+        X_scaled is stacked by:  
+            26 bins of stock1 of day1
+            26 bins of stock2 of day1
+            26 bins of stock1 of day2
+            26 bins of stock2 of day2
+            ...
+            26 bins of stock1 of daym
+            26 bins of stock2 of daym
+            if i == 1, then we expect to take
+                25 bins of stock1 of day1, start from index 1 (included)
+                25 bins of stock2 of day1, start from index 1 (included)
+                26 bins of stock1 of day1
+                26 bins of stock2 of day2
+                ...
+                26 bins of stock1 of day50
+                26 bins of stock2 of day50
+                1 bins of stock1 of day50, end to index 1 (not included)
+                1 bins of stock2 of day50, end to index 1 (not included)
+                at this point, the X_test is expected to be one element difference from X_train:
+                25 bins of stock1 of day1, start from index 2 (included)
+                25 bins of stock2 of day1, start from index 2 (included)
+                26 bins of stock1 of day1
+                26 bins of stock2 of day2
+                ...
+                26 bins of stock1 of day50
+                26 bins of stock2 of day50
+                1 bins of stock1 of day50, end to index 2 (not included)
+                1 bins of stock2 of day50, end to index 2 (not included)
+        ''' 
+        if num_stock ==1 :
+            X_train_window=X_scaled[i:1300+i, :]
+            y_train_window=y_scaled[i:1300+i,:]
+            X_test_window=X_scaled[i+1:1300+i+1, :]
+            return X_train_window, y_train_window, X_test_window
+        else:
+            '''It include the situation of num_stock to be 1'''
+            num_bins_per_day = 26  # Number of bins for each stock each day
+            num_days = 50  # Number of days you want to consider
+            # Number of bins for 'num_stock' stocks for 'num_days' days
+            total_bins = num_bins_per_day * num_stock * num_days
+            
+            # Initialize the arrays to hold the training and test data
+            X_train_window = np.zeros((total_bins, X_scaled.shape[1]))
+            y_train_window = np.zeros((total_bins, y_scaled.shape[1]))
+            X_test_window = np.zeros((total_bins, X_scaled.shape[1]))
+            
+            # Loop to populate the training and test data
+            for j in range(num_days):  # For each of the 'num_days' days
+                for k in range(num_stock):  # For each stock
+                    start_idx = j * (num_bins_per_day * num_stock) + k * num_bins_per_day + i
+                    end_idx = start_idx + num_bins_per_day
+                    
+                    # Corresponding indices in the output arrays
+                    out_start_idx = j * (num_bins_per_day * num_stock) + k * num_bins_per_day
+                    out_end_idx = out_start_idx + num_bins_per_day
+                    
+                    # Slice and copy data for training window
+                    X_train_window[out_start_idx:out_end_idx, :] = X_scaled[start_idx:end_idx, :]
+                    y_train_window[out_start_idx:out_end_idx, :] = y_scaled[start_idx:end_idx, :]
+                    
+                    # Slice and copy data for test window
+                    X_test_window[out_start_idx:out_end_idx, :] = X_scaled[start_idx + 1:end_idx + 1, :]
+            
+            return X_train_window, y_train_window, X_test_window
+
 
 
     def train_and_predict_with_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device):
@@ -302,7 +412,7 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             # X_test_window=X_scaled[i+1:1300+i+1, :]
             check_GPU_memory()
             
-            X_train_window,y_train_window,X_test_window=slice_and_stack(X_scaled, y_scaled, num_stock)
+            X_train_window,y_train_window,X_test_window=slice_and_stack(X_scaled, y_scaled, num_stock, i)
             
             # Convert to Torch tensors and Reshape
             X_train_tensor_window, y_train_tensor_window = to_torch_tensors(X_train_window, y_train_window, device)
