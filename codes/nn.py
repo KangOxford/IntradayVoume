@@ -161,6 +161,11 @@ if __name__ == "__main__":
     print(count_parameters(ConvBlock(numStock)))
     print(count_parameters(InceptionBlock(numStock)))
     print(count_parameters(LSTMBlock(numStock)))
+    
+    # 124124
+    # 262808
+    # 5435
+    
     # # Create an instance of the model
     # # breakpoint()
     # # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=100, batch_size=483)
