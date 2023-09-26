@@ -221,9 +221,9 @@ def regularity_nn(X_train, y_train, X_test,y_test, regulator,num):
         NUM_FEATURE = 52
         
         # Train model and predict with sliding window
-        check_GPU_memory()
+        # check_GPU_memory()
         last_preds = train_and_predict_with_sliding_window(X_scaled, y_scaled, NUM_STOCK, NUM_FEATURE, device)
-        check_GPU_memory()
+        # check_GPU_memory()
         
         
         # Denormalize predictions
@@ -426,10 +426,10 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             stock_prediction_model = NNPredictionModel(num, learning_rate=0.0002, epochs=1200, batch_size=483)
             
             # choice 1
-            # stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model.double()) # wrap your model in DataParallel
-            # stock_prediction_model.model.to(device) # send it to the device
+            stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model.double()) # wrap your model in DataParallel
+            stock_prediction_model.model.to(device) # send it to the device
             # choice 2
-            stock_prediction_model.model.double().to(device)
+            # stock_prediction_model.model.double().to(device)
             
             
             stock_prediction_model.train(X_train_tensor_window, y_train_tensor_window)
@@ -465,7 +465,7 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
     num_feature = 52
     
     
-    check_GPU_memory()
+    # check_GPU_memory()
     # Train model and predict with sliding window
     last_preds = train_and_predict_with_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device)
     

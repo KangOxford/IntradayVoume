@@ -47,7 +47,7 @@ class InceptionBlock(nn.Module):
 
         x3 = self.subblock3(x) #TODO
         # print(x.shape,x1.shape,'\n',x3.shape)
-        print(x2.shape,'\n',x3.shape)
+        # print(x2.shape,'\n',x3.shape)
         # stacked = torch.stack((x1, x3), dim=4)
         stacked = torch.stack((x2, x3), dim=4)
         # breakpoint()
@@ -94,24 +94,24 @@ class CNNLSTM(nn.Module):
         x = self.conv(x) # ([7, 8, 1300, 1])
         # print("self.conv(x)",x.shape)
         x = self.inception(x)
-        print("self.inception(x)",x.shape)
+        # print("self.inception(x)",x.shape)
         x = self.lstm_block(x)
         # print("self.lstm_block",x.shape)
         return x
 
-if __name__=="__main__":
-    numStock = 1
-    # numStock = 200
-    # Create an instance of the model
-    model = CNNLSTM(numStock)
-    # Create a dummy input tensor
-    # input_tensor = torch.rand((1, 1, 1274, 52))
-    input_tensor = torch.rand((1, 1, 1300*numStock, 52))
-    # Forward pass
-    output_tensor = model(input_tensor)
-    print("Output shape:", output_tensor.shape)
+# if __name__=="__main__":
+#     numStock = 1
+#     # numStock = 200
+#     # Create an instance of the model
+#     model = CNNLSTM(numStock)
+#     # Create a dummy input tensor
+#     # input_tensor = torch.rand((1, 1, 1274, 52))
+#     input_tensor = torch.rand((1, 1, 1300*numStock, 52))
+#     # Forward pass
+#     output_tensor = model(input_tensor)
+#     print("Output shape:", output_tensor.shape)
 
-'''
+# '''
 import torch
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
