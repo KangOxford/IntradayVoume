@@ -51,8 +51,8 @@ class InceptionBlock(nn.Module):
         # stacked = torch.stack((x1, x3), dim=4)
         stacked = torch.stack((x2, x3), dim=4)
         # breakpoint()
-        permuted = stacked.permute(0, 2, 1, 3, 4)
-        reshaped = permuted.reshape(-1, 1300*self.numStock, 6)
+        # permuted = stacked.permute(0, 2, 1, 3, 4)
+        reshaped = stacked.reshape(-1, 1300*self.numStock, 6)
         return reshaped
 
         #'''Output reshaped shape: torch.Size([1, 1274, 192])'''
@@ -100,8 +100,9 @@ class CNNLSTM(nn.Module):
         return x
 
 # if __name__=="__main__":
-#     numStock = 1
+#     # numStock = 1
 #     # numStock = 200
+#     numStock = 483
 #     # Create an instance of the model
 #     model = CNNLSTM(numStock)
 #     # Create a dummy input tensor

@@ -257,38 +257,6 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
         y_pred = scaler_y.inverse_transform(y_pred_normalized)
         y_pred = y_pred.reshape(-1)
         return y_pred
-
-    # def slice_and_stack(X_scaled, y_scaled, num_stock):
-    #     '''this func is wrong TODO debug'''
-    #     # Initialize empty lists to collect the slices
-    #     X_train_window_list = []
-    #     y_train_window_list = []
-    #     X_test_window_list = []
-        
-    #     rows_per_stock = 1326  # Number of rows for each stock's data
-        
-    #     for i in range(0, num_stock * rows_per_stock, rows_per_stock):
-    #         # Extract each sub-matrix corresponding to each stock
-    #         X_sub_scaled = X_scaled[i:i + rows_per_stock, :]
-    #         y_sub_scaled = y_scaled[i:i + rows_per_stock, :]
-            
-    #         # Perform the window slicing operation on each sub-matrix
-    #         for j in range(26):
-    #             X_train_window = X_sub_scaled[j:1300+j, :]
-    #             y_train_window = y_sub_scaled[j:1300+j, :]
-    #             X_test_window = X_sub_scaled[j+1:1300+j+1, :]
-                
-    #             # Append the slices to the lists
-    #             X_train_window_list.append(X_train_window)
-    #             y_train_window_list.append(y_train_window)
-    #             X_test_window_list.append(X_test_window)
-                
-    #     # Stack the slices together vertically to form new matrices
-    #     X_train_window_stacked = np.vstack(X_train_window_list)
-    #     y_train_window_stacked = np.vstack(y_train_window_list)
-    #     X_test_window_stacked = np.vstack(X_test_window_list)
-        
-    #     return X_train_window_stacked, y_train_window_stacked, X_test_window_stacked
     
     
     
