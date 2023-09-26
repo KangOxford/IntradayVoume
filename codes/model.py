@@ -384,8 +384,8 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             
             # Convert to Torch tensors and Reshape
             X_train_tensor_window, y_train_tensor_window = to_torch_tensors(X_train_window, y_train_window, device)
-            X_train_tensor_window = X_train_tensor_window.reshape(num_stock, -1, num_feature).unsqueeze(1)
-            y_train_tensor_window = y_train_tensor_window.reshape(num_stock, -1, 1)
+            X_train_tensor_window = X_train_tensor_window.reshape(1, -1, num_feature).unsqueeze(1)
+            y_train_tensor_window = y_train_tensor_window.reshape(1, -1, 1)
             
             # Train the model with the new data
             # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=2, batch_size=483)
@@ -400,7 +400,7 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             # stock_prediction_model.model.double().to(device)
             
             
-            stock_prediction_model.train(X_train_tensor_window, y_train_tensor_window)
+            stock_prediction_model.train(X_train_tensor_window, y_train_tensor_window) 
             
             # Prepare the test data for prediction
             X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)

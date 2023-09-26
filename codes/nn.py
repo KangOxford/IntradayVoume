@@ -91,6 +91,7 @@ class CNNLSTM(nn.Module):
         self.inception = InceptionBlock(numStock)
         self.lstm_block = LSTMBlock(numStock)
     def forward(self, x):
+        # TODO the input,x is wrong, should be with shape 1,1,1300*483,52
         x = self.conv(x) # ([7, 8, 1300, 1])
         # print("self.conv(x)",x.shape)
         x = self.inception(x)
