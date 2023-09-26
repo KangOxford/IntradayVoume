@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import time
 
 class LSTMBlock(nn.Module):
     def __init__(self,numStock):
@@ -136,6 +137,7 @@ class NNPredictionModel:
         train_loader = DataLoader(train_data, batch_size=self.batch_size, shuffle=True)
         
         for epoch in range(self.epochs):
+            start = time.time()
             self.model.train()
             for batch_idx, (X_batch, y_batch) in enumerate(train_loader):
                 self.optimizer.zero_grad()
@@ -143,7 +145,7 @@ class NNPredictionModel:
                 loss = self.criterion(outputs, y_batch)
                 loss.backward()
                 self.optimizer.step()
-            print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}")
+            print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-start:.4f}s")
     
     def predict(self, X_test):
         self.model.eval()
