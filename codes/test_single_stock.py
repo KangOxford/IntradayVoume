@@ -88,9 +88,7 @@ if __name__=="__main__":
     
     df3s=[];df33s=[]
     for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs)):
-        print("A")
         df3,df33 = get_r2df(num=num_of_stacked_stocks,regulator=regulator,df=df)
-        print("B")
         total_r2 = df3.mean(axis=1).mean()
         print('total r2: ',df3.mean(axis=1).mean()) # all mean
         df3s.append(df3)

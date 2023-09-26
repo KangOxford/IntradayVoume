@@ -5,13 +5,13 @@ class LSTMBlock(nn.Module):
     def __init__(self,numStock):
         super(LSTMBlock, self).__init__()
         self.numStock = numStock
-        self.lstm = nn.LSTM(6,6, batch_first=True) # TODO reduce 192 to lower !!!
-        self.fc = nn.Linear(6, 1)
+        self.lstm = nn.LSTM(24,26, batch_first=True) # TODO reduce 192 to lower !!!
+        self.fc = nn.Linear(26, 1)
     def forward(self, x):
         out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
         # out = out[:, -1, :]  # Now out has shape (batch_size, 64)
         out = self.fc(out)  # Now out has shape (batch_size, 10)
-        out = out.reshape(-1,1300*self.numStock,1)
+        out = out.reshape(1,1300*self.numStock,1)
         return out
 
 
@@ -52,7 +52,7 @@ class InceptionBlock(nn.Module):
         stacked = torch.stack((x2, x3), dim=4)
         # breakpoint()
         # permuted = stacked.permute(0, 2, 1, 3, 4)
-        reshaped = stacked.reshape(-1, 1300*self.numStock, 6)
+        reshaped = stacked.reshape(1, 1300*self.numStock, 24)
         return reshaped
 
         #'''Output reshaped shape: torch.Size([1, 1274, 192])'''
