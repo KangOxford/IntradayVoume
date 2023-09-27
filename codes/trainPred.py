@@ -3,7 +3,8 @@ from params import *
 import pandas as pd
 from sklearn.metrics import r2_score
 
-def train_and_pred(index,df,num,regulator,tile_array):
+def train_and_pred(index,df,config):
+    num,regulator = config["num"],config["regulator"]
     def get_X_train_y_train_X_test_original_images(df,num):
         train_start_index = (index * bin_size) * num
         train_end_index = (index * bin_size + train_size) * num
@@ -31,13 +32,11 @@ def train_and_pred(index,df,num,regulator,tile_array):
 
     # breakpoint()
     # print(regulator)
-    print(f"E")        
     if regulator == "Inception":
-        y_pred = model_nn(X_train, y_train, X_test, y_test, regulator,num)
+        y_pred = model_nn(X_train, y_train, X_test, y_test, config)
         # y_pred = regularity_nn(X_train, y_train, X_test,y_test, regulator,num)
     else:
-        y_pred = regularity_ols(X_train, y_train, X_test, regulator,num)
-    print(f"F")        
+        y_pred = regularity_ols(X_train, y_train, X_test, config)
     # print(regulator+"_finished")
     min_limit, max_limit = y_train.min(), y_train.max()
     broadcast = lambda x: np.full(y_pred.shape[0], x.to_numpy())
@@ -79,7 +78,7 @@ def train_and_pred(index,df,num,regulator,tile_array):
 
     # Combine date and time to form the file name
     # Get the short Git hash
-    short_hash = get_git_hash()
+    short_hash = config["short_hash"]
     idnetificator = f"_{date_str}_{time_str}_{short_hash}"
     # In subsequent iterations, append without the header
     test_df.to_csv('/homes/80/kang/cmem/'+'data_summary_'+regulator+idnetificator+'.csv', mode='a', header=False, index=True)
@@ -89,20 +88,5 @@ def train_and_pred(index,df,num,regulator,tile_array):
     # oneday_df.to_csv('/homes/80/kang/cmem/'+'data_all_values.csv', mode='a', header=False, index=False)
     return lst,oneday_df
 
-
-import subprocess
-def get_git_hash():
-    try:
-        # Execute the command to get the latest commit hash
-        git_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip().decode('utf-8')
-
-        # Slice the first 4 characters
-        short_hash = git_hash[:4]
-
-        return short_hash
-
-    except subprocess.CalledProcessError:
-        print("An error occurred while fetching the Git hash.")
-        return None
 
 

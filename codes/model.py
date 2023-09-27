@@ -17,7 +17,8 @@ def check_GPU_memory():
 
 
 # used for alphas
-def regularity_ols(X_train, y_train, X_test, regulator,num):
+def regularity_ols(X_train, y_train, X_test, config):
+    regulator,num = config["regulator"],config["num"]
     if regulator == "CMEM":
         y_pred = X_test['log_x'].to_numpy().flatten()
         # y_pred = X_test['x'].to_numpy().flatten()
@@ -144,9 +145,10 @@ def normalize_data(X, y):
     y_scaled = scaler_y.fit_transform(y.reshape(-1, 1))
     return X_scaled, y_scaled, scaler_X, scaler_y
 
-def regularity_nn(X_train, y_train, X_test,y_test, regulator,num):
-    bin_size = 26
-    train_days = 50
+def regularity_nn(X_train, y_train, X_test,y_test, config):
+    bin_size = config["bin_size"]
+    train_days = config["train_days"]
+    regulator = config["regulator"]
     
     assert regulator == "CNN", regulator
     from codes.nn import NNPredictionModel
@@ -239,7 +241,7 @@ def regularity_nn(X_train, y_train, X_test,y_test, regulator,num):
     last_preds_denorm = pred(X_train, y_train, X_test,y_test)
     return  last_preds_denorm
 
-def model_nn(X_train, y_train, X_test, y_test, regulator,num):
+def model_nn(X_train, y_train, X_test, y_test, config):
     '''take the first 9 days of X_train as X_train_new
     y_train take the last 1 day of y_train as y_train_new
     one day include 26bins(26rows) of data
@@ -247,9 +249,10 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
     from 1,1,train_days*bin_size,52 X 1, train_days*bin_size,1
     to   1,1,1274,52 X 1,   26,1   
     '''
-    
-    bin_size = 26
-    train_days = 50
+    regulator = config["regulator"]
+    num = config["num"]
+    bin_size = config["bin_size"]
+    train_days = config["train_days"]
     
     assert regulator == "Inception"
     import torch.nn as nn

@@ -31,6 +31,8 @@ def get_r2df(num,regulator,df):
         "regulator":regulator,
         "bin_size": bin_size,
         "train_days":train_size//bin_size,
+        # "tile_array":np.arange(num),
+        "short_hash":get_git_hash()
     }
     
     start = time.time()
@@ -40,7 +42,7 @@ def get_r2df(num,regulator,df):
     for index in range(total_test_days):
         print(f"+ {index} in {total_test_days}")
         print(f"C_{index}")        
-        r2result,oneday_df = train_and_pred(index,df,num,regulator,tile_array=np.arange(num))
+        r2result,oneday_df = train_and_pred(index,df,config)
         print(f"D_{index}")        
         r2results.append(r2result)
         oneday_dfs.append(oneday_df)
@@ -64,3 +66,20 @@ def get_r2df(num,regulator,df):
     print(df22)
     print(f"time {(end-start)/60}")
     return df2, df22
+
+
+
+import subprocess
+def get_git_hash():
+    try:
+        # Execute the command to get the latest commit hash
+        git_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip().decode('utf-8')
+
+        # Slice the first 4 characters
+        short_hash = git_hash[:4]
+
+        return short_hash
+
+    except subprocess.CalledProcessError:
+        print("An error occurred while fetching the Git hash.")
+        return None
