@@ -3,7 +3,7 @@ import torch.nn as nn
 import time
 
 bin_size = 26
-train_days = 80
+train_days = 50
 
 class LSTMBlock(nn.Module):
     def __init__(self,numStock):
@@ -91,9 +91,9 @@ class MLPBlock(nn.Module):
         super().__init__()
         self.numStock = numStock
         self.fc = nn.Sequential(
-            nn.Linear(52, 128),  # Input layer: 52 input features, 128 output features
+            nn.Linear(52, 52),  # Input layer: 52 input features, 128 output features
             nn.ReLU(),  # Activation function
-            nn.Linear(128, 52),  # Hidden layer: 128 input features, 64 output features
+            nn.Linear(52, 52),  # Hidden layer: 128 input features, 64 output features
             nn.Sigmoid()  # Activation function to ensure output is between 0 and 1
         )
     

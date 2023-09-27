@@ -249,7 +249,7 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
     '''
     
     bin_size = 26
-    train_days = 80
+    train_days = 50
     
     assert regulator == "Inception"
     import torch.nn as nn
