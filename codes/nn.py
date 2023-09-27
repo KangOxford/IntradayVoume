@@ -83,38 +83,57 @@ class ConvBlock(nn.Module):
         x = self.module3(x)
         return x
 
+class MLPBlock(nn.Module):
+    def __init__(self, numStock):
+        super().__init__()
+        self.numStock = numStock
+        self.fc = nn.Sequential(
+            nn.Flatten(start_dim=2, end_dim=-1),  # Flattens the last two dimensions; shape becomes (1, 1, 627900*52)
+            nn.Linear(1300*numStock * 52, 512),  # Fully connected layer; shape becomes (1, 1, 512)
+            nn.ReLU(),  # Activation function
+            nn.Linear(512, 1300*numStock),  # Fully connected layer; shape becomes (1, 1, 627900)
+            nn.Sigmoid()  # Activation function to ensure output is between 0 and 1
+        )
+    
+    def forward(self, x):
+        x = self.fc(x)
+        x = x.view(1, 1300*self.numStock, 1)  # Reshape the output to the desired shape
+        return x
 
 
 class CNNLSTM(nn.Module):
     def __init__(self,numStock):
         super(CNNLSTM, self).__init__()
-        self.conv = ConvBlock(numStock)
-        self.inception = InceptionBlock(numStock)
+        self.mlp = MLPBlock(numStock)
+        # self.conv = ConvBlock(numStock)
+        # self.inception = InceptionBlock(numStock)
         self.lstm_block = LSTMBlock(numStock)
     def forward(self, x):
         # TODO the input,x is wrong, should be with shape 1,1,1300*483,52
-        x = self.conv(x) # ([7, 8, 1300, 1])
+        # x = self.conv(x) # ([7, 8, 1300, 1])
         # print("self.conv(x)",x.shape)
-        x = self.inception(x)
+        # x = self.inception(x)
         # print("self.inception(x)",x.shape)
+        start1 = time.time()
+        x = self.mlp(x)
+        print(f"mlp_time: {time.time()-start1:.4f}s")
+        start2 = time.time()
         x = self.lstm_block(x)
+        print(f"mlp_time: {time.time()-start2:.4f}s")
         # print("self.lstm_block",x.shape)
         return x
 
-# if __name__=="__main__":
-#     # numStock = 1
-#     # numStock = 200
-#     numStock = 483
-#     # Create an instance of the model
-#     model = CNNLSTM(numStock)
-#     # Create a dummy input tensor
-#     # input_tensor = torch.rand((1, 1, 1274, 52))
-#     input_tensor = torch.rand((1, 1, 1300*numStock, 52))
-#     # Forward pass
-#     output_tensor = model(input_tensor)
-#     print("Output shape:", output_tensor.shape)
 
-# '''
+    
+if __name__=="__main__":
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Detect if CUDA is available
+    numStock = 483
+    model = CNNLSTM(numStock).to(device)  # Move the model to the CUDA device
+    input_tensor = torch.rand((1, 1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
+    output_tensor = model(input_tensor)
+    print("Output shape:", output_tensor.shape)
+
+'''
 import torch
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
