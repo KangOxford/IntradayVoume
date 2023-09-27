@@ -3,7 +3,7 @@ import torch.nn as nn
 import time
 
 bin_size = 26
-train_days = 10
+train_days = 50
 
 class LSTMBlock(nn.Module):
     def __init__(self,numStock):
@@ -170,10 +170,12 @@ class NNPredictionModel:
                 self.optimizer.zero_grad()
                 outputs = self.model(X_batch)
                 loss = self.criterion(outputs, y_batch)
+                if batch_idx==0: startLoss = loss.item()
                 loss.backward()
                 self.optimizer.step()
             print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-start:.4f}s")
-
+        print(f"Loss Reduced from {startLoss:.20f} to {loss.item():.20f}")
+        
     def predict(self, X_test):
         self.model.eval()
         X_test = X_test.to(self.device)
