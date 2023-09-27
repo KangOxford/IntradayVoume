@@ -6,8 +6,8 @@ class LSTMBlock(nn.Module):
     def __init__(self,numStock):
         super(LSTMBlock, self).__init__()
         self.numStock = numStock
-        self.lstm = nn.LSTM(1,1, batch_first=True) # TODO reduce 192 to lower !!!
-        self.fc = nn.Linear(1, 1)
+        self.lstm = nn.LSTM(52,26,num_layers=4,batch_first=True) # TODO reduce 192 to lower !!!
+        self.fc = nn.Linear(26, 1)
     def forward(self, x):
         out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
         # out = out[:, -1, :]  # Now out has shape (batch_size, 64)
@@ -88,12 +88,15 @@ class MLPBlock(nn.Module):
         super().__init__()
         self.numStock = numStock
         self.fc = nn.Sequential(
-            nn.Linear(52, 1),
+            nn.Linear(52, 128),  # Input layer: 52 input features, 128 output features
+            nn.ReLU(),  # Activation function
+            nn.Linear(128, 52),  # Hidden layer: 128 input features, 64 output features
+            nn.Sigmoid()  # Activation function to ensure output is between 0 and 1
         )
     
     def forward(self, x):
-        x = self.fc(x) # torch.Size([1, 1, 1300*self.numStock, 1])
-        x = x.view(1, 1300*self.numStock, 1)  # Reshape the output to the desired shape
+        x = self.fc(x)  # Output shape: torch.Size([1, 1, 1300*numStock, 1])
+        x = x.view(1, 1300*self.numStock, 52)  # Reshape the output to the desired shape
         return x
 
 
@@ -131,8 +134,8 @@ if __name__=="__main__":
     input_tensor = torch.rand((1, 1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
     output_tensor = model(input_tensor)
     print("Output shape:", output_tensor.shape)
-    print(count_parameters(MLPBlock(numStock)))
-    print(count_parameters(LSTMBlock(numStock)))
+    print(f"MLPBlock: {count_parameters(MLPBlock(numStock))}".rjust(30))
+    print(f"LSTMBlock:{count_parameters(LSTMBlock(numStock))}".rjust(30))
 
 '''
 
