@@ -2,17 +2,20 @@ import torch
 import torch.nn as nn
 import time
 
+bin_size = 26
+train_days = 5
+
 class LSTMBlock(nn.Module):
     def __init__(self,numStock):
         super(LSTMBlock, self).__init__()
         self.numStock = numStock
-        self.lstm = nn.LSTM(52,26,num_layers=2,batch_first=True) # TODO reduce 192 to lower !!!
-        self.fc = nn.Linear(26, 1)
+        self.lstm = nn.LSTM(52,bin_size,num_layers=2,batch_first=True) # TODO reduce 192 to lower !!!
+        self.fc = nn.Linear(bin_size, 1)
     def forward(self, x):
         out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
         # out = out[:, -1, :]  # Now out has shape (batch_size, 64)
         out = self.fc(out)  # Now out has shape (batch_size, 10)
-        out = out.reshape(1,1300*self.numStock,1)
+        out = out.reshape(1,train_days*bin_size*self.numStock,1)
         return out
 
 
@@ -38,7 +41,7 @@ class InceptionBlock(nn.Module):
 
         self.subblock3 = nn.Sequential(
             nn.Conv2d(4, 4, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0)),
-            nn.Conv2d(4, 4, kernel_size=(26*numStock, 1),padding=((26 * numStock - 1) // 2+1,0)),
+            nn.Conv2d(4, 4, kernel_size=(bin_size*numStock, 1),padding=((bin_size * numStock - 1) // 2+1,0)),
             nn.Conv2d(4, 4, kernel_size=(2*numStock, 1),padding=((2 * numStock - 1) // 2,0)),
         )
 
@@ -53,7 +56,7 @@ class InceptionBlock(nn.Module):
         stacked = torch.stack((x2, x3), dim=4)
         # breakpoint()
         # permuted = stacked.permute(0, 2, 1, 3, 4)
-        reshaped = stacked.reshape(1, 1300*self.numStock, 24)
+        reshaped = stacked.reshape(1, train_days*bin_size*self.numStock, 24)
         return reshaped
 
         #'''Output reshaped shape: torch.Size([1, 1274, 192])'''
@@ -95,8 +98,8 @@ class MLPBlock(nn.Module):
         )
     
     def forward(self, x):
-        x = self.fc(x)  # Output shape: torch.Size([1, 1, 1300*numStock, 1])
-        x = x.view(1, 1300*self.numStock, 52)  # Reshape the output to the desired shape
+        x = self.fc(x)  # Output shape: torch.Size([1, 1, train_days*bin_size*numStock, 1])
+        x = x.view(1, train_days*bin_size*self.numStock, 52)  # Reshape the output to the desired shape
         return x
 
 
