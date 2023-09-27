@@ -249,7 +249,7 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
     '''
     
     bin_size = 26
-    train_days = 50
+    train_days = 80
     
     assert regulator == "Inception"
     import torch.nn as nn
@@ -403,7 +403,7 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0002, epochs=50, batch_size=483)
             # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0005, epochs=1000, batch_size=483)
             # stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1000, batch_size=483)
-            stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=3000, batch_size=483)
+            stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1000, batch_size=483)
             
             # choice 1
             stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model.double()) # wrap your model in DataParallel
