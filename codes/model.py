@@ -413,7 +413,7 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
             
             start = time.time()
             stock_prediction_model.train(X_train_tensor_window, y_train_tensor_window) 
-            print(f"Bin {bin} train time taken: ", time.time()-start)
+            print(f"Bin {i} train time taken: ", time.time()-start)
             # Prepare the test data for prediction
             X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
             
