@@ -25,7 +25,14 @@ def get_r2df(num,regulator,df):
     # num_processes = multiprocessing.cpu_count()  # on local machine
     # num_processes = multiprocessing.cpu_count() -10 # on flair-node-03
     # num_processes = 1 # Number of available CPU cores
-
+    
+    config = {
+        "num":num,
+        "regulator":regulator,
+        "bin_size": bin_size,
+        "train_days":train_size//bin_size,
+    }
+    
     start = time.time()
     # with multiprocessing.Pool(processes=num_processes) as pool:
     r2results = [];oneday_dfs=[]

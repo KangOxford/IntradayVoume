@@ -1,6 +1,6 @@
 def param_define(df,num):
     bin_size = 26
-    train_days = 5
+    train_days = 10
     # train_days = 50
     # train_days = 20
     # train_days = 10

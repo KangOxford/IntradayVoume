@@ -3,7 +3,7 @@ import torch.nn as nn
 import time
 
 bin_size = 26
-train_days = 5
+train_days = 10
 
 class LSTMBlock(nn.Module):
     def __init__(self,numStock):
