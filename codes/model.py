@@ -144,6 +144,9 @@ def normalize_data(X, y):
     return X_scaled, y_scaled, scaler_X, scaler_y
 
 def regularity_nn(X_train, y_train, X_test,y_test, regulator,num):
+    bin_size = 26
+    train_days = 5
+    
     assert regulator == "CNN", regulator
     from codes.nn import NNPredictionModel
     import torch
@@ -175,10 +178,10 @@ def regularity_nn(X_train, y_train, X_test,y_test, regulator,num):
 
     def train_and_predict_with_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device):
         last_preds = []
-        for i in range(0, 26):
+        for i in range(0, bin_size):
             # Update the training data to include data up to day i
-            X_train_window = X_scaled[i:1300+i, :]
-            y_train_window = y_scaled[i:1300+i]
+            X_train_window = X_scaled[i:train_days*bin_size+i, :]
+            y_train_window = y_scaled[i:train_days*bin_size+i]
             print(X_train_window.shape, y_train_window.shape)
 
             # Convert to Torch tensors and Reshape
@@ -191,8 +194,8 @@ def regularity_nn(X_train, y_train, X_test,y_test, regulator,num):
 
             # Prepare the test data for prediction
     
-            X_test_window = X_scaled[i+1:1300 + i+1, :]
-            y_test_window = y_scaled[i+1:1300 + i+1]
+            X_test_window = X_scaled[i+1:train_days*bin_size + i+1, :]
+            y_test_window = y_scaled[i+1:train_days*bin_size + i+1]
             X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
 
             # Make a prediction using the updated model
@@ -240,9 +243,12 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
     y_train take the last 1 day of y_train as y_train_new
     one day include 26bins(26rows) of data
     the nn file is also in need of modification to forecast 
-    from 1,1,1300,52 X 1, 1300,1
+    from 1,1,train_days*bin_size,52 X 1, train_days*bin_size,1
     to   1,1,1274,52 X 1,   26,1   
     '''
+    
+    bin_size = 26
+    train_days = 5
     
     assert regulator == "Inception"
     import torch.nn as nn
@@ -332,14 +338,14 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
                 1 bins of stock2 of day50, end to index 2 (not included)
         ''' 
         if num_stock ==1 :
-            X_train_window=X_scaled[i:1300+i, :]
-            y_train_window=y_scaled[i:1300+i,:]
-            X_test_window=X_scaled[i+1:1300+i+1, :]
+            X_train_window=X_scaled[i:train_days*bin_size+i, :]
+            y_train_window=y_scaled[i:train_days*bin_size+i,:]
+            X_test_window=X_scaled[i+1:train_days*bin_size+i+1, :]
             return X_train_window, y_train_window, X_test_window
         else:
             '''It include the situation of num_stock to be 1'''
-            num_bins_per_day = 26  # Number of bins for each stock each day
-            num_days = 50  # Number of days you want to consider
+            num_bins_per_day = bin_size  # Number of bins for each stock each day
+            num_days = train_days  # Number of days you want to consider
             # Number of bins for 'num_stock' stocks for 'num_days' days
             total_bins = num_bins_per_day * num_stock * num_days
             
@@ -371,13 +377,13 @@ def model_nn(X_train, y_train, X_test, y_test, regulator,num):
 
     def train_and_predict_with_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device):
         first_preds = []
-        for i in range(0, 26):
+        for i in range(0, bin_size):
             # Update the training data to include data up to bin i
             print("bin: ",i)
             
-            # X_train_window=X_scaled[i:1300+i, :]
-            # y_train_window=y_scaled[i:1300+i,:]
-            # X_test_window=X_scaled[i+1:1300+i+1, :]
+            # X_train_window=X_scaled[i:train_days*bin_size+i, :]
+            # y_train_window=y_scaled[i:train_days*bin_size+i,:]
+            # X_test_window=X_scaled[i+1:train_days*bin_size+i+1, :]
             # check_GPU_memory()
             
             X_train_window,y_train_window,X_test_window=slice_and_stack(X_scaled, y_scaled, num_stock, i)
