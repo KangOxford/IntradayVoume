@@ -6,7 +6,7 @@ class LSTMBlock(nn.Module):
     def __init__(self,numStock):
         super(LSTMBlock, self).__init__()
         self.numStock = numStock
-        self.lstm = nn.LSTM(52,26,num_layers=4,batch_first=True) # TODO reduce 192 to lower !!!
+        self.lstm = nn.LSTM(52,26,num_layers=2,batch_first=True) # TODO reduce 192 to lower !!!
         self.fc = nn.Linear(26, 1)
     def forward(self, x):
         out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
@@ -115,10 +115,10 @@ class CNNLSTM(nn.Module):
         # print("self.inception(x)",x.shape)
         start1 = time.time()
         x = self.mlp(x)
-        print(f"mlp_time : {time.time()-start1:.4f}s")
+        # print(f"mlp_time : {time.time()-start1:.4f}s")
         start2 = time.time()
         x = self.lstm_block(x)
-        print(f"lstm_time: {time.time()-start2:.4f}s")
+        # print(f"lstm_time: {time.time()-start2:.4f}s")
         # print("self.lstm_block",x.shape)
         return x
 
@@ -127,17 +127,17 @@ def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
     
-if __name__=="__main__":
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Detect if CUDA is available
-    numStock = 483
-    model = CNNLSTM(numStock).to(device)  # Move the model to the CUDA device
-    input_tensor = torch.rand((1, 1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
-    output_tensor = model(input_tensor)
-    print("Output shape:", output_tensor.shape)
-    print(f"MLPBlock: {count_parameters(MLPBlock(numStock))}".rjust(30))
-    print(f"LSTMBlock:{count_parameters(LSTMBlock(numStock))}".rjust(30))
+# if __name__=="__main__":
+#     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Detect if CUDA is available
+#     numStock = 483
+#     model = CNNLSTM(numStock).to(device)  # Move the model to the CUDA device
+#     input_tensor = torch.rand((1, 1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
+#     output_tensor = model(input_tensor)
+#     print("Output shape:", output_tensor.shape)
+#     print(f"MLPBlock: {count_parameters(MLPBlock(numStock))}".rjust(30))
+#     print(f"LSTMBlock:{count_parameters(LSTMBlock(numStock))}".rjust(30))
 
-'''
+# '''
 
 import torch
 import torch.optim as optim
