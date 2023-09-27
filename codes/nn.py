@@ -88,15 +88,11 @@ class MLPBlock(nn.Module):
         super().__init__()
         self.numStock = numStock
         self.fc = nn.Sequential(
-            nn.Flatten(start_dim=2, end_dim=-1),  # Flattens the last two dimensions; shape becomes (1, 1, 627900*52)
-            nn.Linear(1300*numStock * 52, 32),  # Fully connected layer; shape becomes (1, 1, 512)
-            nn.ReLU(),  # Activation function
-            nn.Linear(32, 1300*numStock),  # Fully connected layer; shape becomes (1, 1, 627900)
-            nn.Sigmoid()  # Activation function to ensure output is between 0 and 1
+            nn.Linear(52, 1),
         )
     
     def forward(self, x):
-        x = self.fc(x)
+        x = self.fc(x) # torch.Size([1, 1, 1300*self.numStock, 1])
         x = x.view(1, 1300*self.numStock, 1)  # Reshape the output to the desired shape
         return x
 
@@ -123,6 +119,9 @@ class CNNLSTM(nn.Module):
         # print("self.lstm_block",x.shape)
         return x
 
+# Count parameters for the updated LSTM block
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
     
 if __name__=="__main__":
@@ -132,8 +131,11 @@ if __name__=="__main__":
     input_tensor = torch.rand((1, 1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
     output_tensor = model(input_tensor)
     print("Output shape:", output_tensor.shape)
+    print(count_parameters(MLPBlock(numStock)))
+    print(count_parameters(LSTMBlock(numStock)))
 
 '''
+
 import torch
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
@@ -173,14 +175,11 @@ class NNPredictionModel:
             predictions = self.model(X_test)
         return predictions.cpu()
     
-# Count parameters for the updated LSTM block
-def count_parameters(model):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
 if __name__ == "__main__":
     numStock=483
-    print(count_parameters(ConvBlock(numStock)))
-    print(count_parameters(InceptionBlock(numStock)))
+    # print(count_parameters(ConvBlock(numStock)))
+    # print(count_parameters(InceptionBlock(numStock)))
+    print(count_parameters(MLPBlock(numStock)))
     print(count_parameters(LSTMBlock(numStock)))
     
     # 124124
