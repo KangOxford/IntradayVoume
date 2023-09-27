@@ -4,7 +4,6 @@ import os;os.sys.path.append(os.path.expanduser('~') + "/cmem/codes/")
 import os;os.sys.path.append(os.path.expanduser('~') + "/cmem/")
 import os;os.sys.path.append("/homes/80/kang/cmem/")
 import os;os.sys.path.append("/homes/80/kang/cmem/codes/")
-from params import *
 from trainPred import *
 import time
 
