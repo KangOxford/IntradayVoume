@@ -173,7 +173,7 @@ class NNPredictionModel:
                 loss.backward()
                 self.optimizer.step()
             print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-start:.4f}s")
-    
+
     def predict(self, X_test):
         self.model.eval()
         X_test = X_test.to(self.device)
