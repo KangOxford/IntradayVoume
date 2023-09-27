@@ -6,8 +6,8 @@ class LSTMBlock(nn.Module):
     def __init__(self,numStock):
         super(LSTMBlock, self).__init__()
         self.numStock = numStock
-        self.lstm = nn.LSTM(24,26, batch_first=True) # TODO reduce 192 to lower !!!
-        self.fc = nn.Linear(26, 1)
+        self.lstm = nn.LSTM(1,1, batch_first=True) # TODO reduce 192 to lower !!!
+        self.fc = nn.Linear(1, 1)
     def forward(self, x):
         out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
         # out = out[:, -1, :]  # Now out has shape (batch_size, 64)
@@ -89,9 +89,9 @@ class MLPBlock(nn.Module):
         self.numStock = numStock
         self.fc = nn.Sequential(
             nn.Flatten(start_dim=2, end_dim=-1),  # Flattens the last two dimensions; shape becomes (1, 1, 627900*52)
-            nn.Linear(1300*numStock * 52, 512),  # Fully connected layer; shape becomes (1, 1, 512)
+            nn.Linear(1300*numStock * 52, 32),  # Fully connected layer; shape becomes (1, 1, 512)
             nn.ReLU(),  # Activation function
-            nn.Linear(512, 1300*numStock),  # Fully connected layer; shape becomes (1, 1, 627900)
+            nn.Linear(32, 1300*numStock),  # Fully connected layer; shape becomes (1, 1, 627900)
             nn.Sigmoid()  # Activation function to ensure output is between 0 and 1
         )
     
@@ -116,10 +116,10 @@ class CNNLSTM(nn.Module):
         # print("self.inception(x)",x.shape)
         start1 = time.time()
         x = self.mlp(x)
-        print(f"mlp_time: {time.time()-start1:.4f}s")
+        print(f"mlp_time : {time.time()-start1:.4f}s")
         start2 = time.time()
         x = self.lstm_block(x)
-        print(f"mlp_time: {time.time()-start2:.4f}s")
+        print(f"lstm_time: {time.time()-start2:.4f}s")
         # print("self.lstm_block",x.shape)
         return x
 
