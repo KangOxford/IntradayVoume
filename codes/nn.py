@@ -166,11 +166,11 @@ class NNPredictionModel:
         for epoch in range(self.epochs):
             start = time.time()
             self.model.train()
-            if epoch==0: startLoss = loss.item()
             for batch_idx, (X_batch, y_batch) in enumerate(train_loader):
                 self.optimizer.zero_grad()
                 outputs = self.model(X_batch)
                 loss = self.criterion(outputs, y_batch)
+                if epoch==0: startLoss = loss.item()
                 loss.backward()
                 self.optimizer.step()
             print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-start:.4f}s")
