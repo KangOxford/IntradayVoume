@@ -7,18 +7,20 @@ bin_size = 26
 train_days = 50
 
 class LSTMBlock(nn.Module):
-    def __init__(self,numStock):
+    def __init__(self, numStock, device):
         super(LSTMBlock, self).__init__()
         self.numStock = numStock
-        self.lstm = nn.LSTM(52,bin_size,num_layers=1,batch_first=True) # TODO reduce 192 to lower !!!
-        self.fc1 = nn.Linear(bin_size, 1)
-        self.sigmoid = nn.Sigmoid()
+        self.device = device  # Store the device
+        self.lstm = nn.LSTM(52, bin_size, num_layers=1, batch_first=True).to(device)  # Move to device
+        self.fc1 = nn.Linear(bin_size, 1).to(device)  # Move to device
+        self.sigmoid = nn.Sigmoid().to(device)  # Move to device
+
     def forward(self, x):
-        out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
-        # out = out[:, -1, :]  # Now out has shape (batch_size, 64)
-        self.sigmoid(out)  # Activation function
-        out = self.fc1(out)  # Now out has shape (batch_size, 10)
-        out = out.reshape(1,train_days*bin_size*self.numStock,1)
+        x = x.to(self.device)  # Ensure input is on the correct device
+        out, _ = self.lstm(x)
+        self.sigmoid(out)
+        out = self.fc1(out)
+        out = out.reshape(1, train_days*bin_size*self.numStock, 1)
         return out
 
 
@@ -107,12 +109,12 @@ class MLPBlock(nn.Module):
 
 
 class CNNLSTM(nn.Module):
-    def __init__(self,numStock):
+    def __init__(self,numStock,device):
         super(CNNLSTM, self).__init__()
         self.mlp = MLPBlock(numStock)
         # self.conv = ConvBlock(numStock)
         # self.inception = InceptionBlock(numStock)
-        self.lstm_block = LSTMBlock(numStock)
+        self.lstm_block = LSTMBlock(numStock, device)
     def forward(self, x):
         # TODO the input,x is wrong, should be with shape 1,1,1300*483,52
         # x = self.conv(x) # ([7, 8, 1300, 1])
@@ -136,13 +138,13 @@ def count_parameters(model):
 if __name__=="__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Detect if CUDA is available
     numStock = 1
-    model = CNNLSTM(numStock).to(device)  # Move the model to the CUDA device
+    model = CNNLSTM(numStock,device).to(device)  # Move the model to the CUDA device
     input_tensor = torch.rand((1, 1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
     lstm_input_tensor = torch.rand((1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
     output_tensor = model(input_tensor)
     print("Output shape:", output_tensor.shape)
     print(f"MLPBlock: {count_parameters(MLPBlock(numStock))}".rjust(30))
-    print(f"LSTMBlock:{count_parameters(LSTMBlock(numStock))}".rjust(30))
+    print(f"LSTMBlock:{count_parameters(LSTMBlock(numStock,device))}".rjust(30))
     
     # Check device
     device = next(model.parameters()).device
