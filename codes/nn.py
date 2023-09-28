@@ -130,17 +130,17 @@ def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
     
-# if __name__=="__main__":
-#     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Detect if CUDA is available
-#     numStock = 483
-#     model = CNNLSTM(numStock).to(device)  # Move the model to the CUDA device
-#     input_tensor = torch.rand((1, 1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
-#     output_tensor = model(input_tensor)
-#     print("Output shape:", output_tensor.shape)
-#     print(f"MLPBlock: {count_parameters(MLPBlock(numStock))}".rjust(30))
-#     print(f"LSTMBlock:{count_parameters(LSTMBlock(numStock))}".rjust(30))
+if __name__=="__main__":
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Detect if CUDA is available
+    numStock = 1
+    model = CNNLSTM(numStock).to(device)  # Move the model to the CUDA device
+    input_tensor = torch.rand((1, 1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
+    output_tensor = model(input_tensor)
+    print("Output shape:", output_tensor.shape)
+    print(f"MLPBlock: {count_parameters(MLPBlock(numStock))}".rjust(30))
+    print(f"LSTMBlock:{count_parameters(LSTMBlock(numStock))}".rjust(30))
 
-# '''
+'''
 
 import torch
 import torch.optim as optim
