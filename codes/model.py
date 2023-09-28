@@ -331,14 +331,13 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         return np.array(first_preds).reshape(-1, 1)
     
 
-
     def train_and_predict_without_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device):
         '''
         only train one model from 0 to bin_size*train_days
         then predict from bin_size*train_days to bin_size*train_days+bin_size
         '''
-        # Get the training and testing data using the slice_and_stack function
-        X_train_window, y_train_window, X_test_window = slice_and_stack(X_scaled, y_scaled, num_stock, 0)  # Assuming i=0 as it's a single window
+        # Get the training data using the slice_and_stack function
+        X_train_window, y_train_window, _ = slice_and_stack(X_scaled, y_scaled, num_stock, 0)  # Assuming i=0 as it's a single window
 
         # Convert to Torch tensors and Reshape
         X_train_tensor_window, y_train_tensor_window = to_torch_tensors(X_train_window, y_train_window, device)
@@ -354,22 +353,20 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         start = time.time()
         stock_prediction_model.train(X_train_tensor_window, y_train_tensor_window)
         print(f"Training time taken: ", time.time()-start)        
-        
-        # Prepare the test data for prediction
-        X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
-        <this line is wrong, you should use the slice and stack for 26 times to get the right X_test_window >
-        
-        
+            
         # List to hold the last element of each prediction
         last_elements = []
         
-        # Iterate over the test data, making a prediction on each iteration
+        # Iterate over the bins, making a prediction on each iteration
         for i in range(26):
-            # Update the input tensor to use the current bin
-            current_bin_tensor = X_test_tensor_window[:, i:i+1, :, :] <adjust this, as the X_test_tensor_window is rolling adjusted outside>
+            # Obtain the test data for the current bin using the slice_and_stack function
+            _, _, X_test_window = slice_and_stack(X_scaled, y_scaled, num_stock, i)
+            
+            # Convert the test data to Torch tensor and Reshape
+            X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
             
             # Make a prediction using the trained model
-            y_pred_normalized = stock_prediction_model.predict(current_bin_tensor)
+            y_pred_normalized = stock_prediction_model.predict(X_test_tensor_window)
             
             # Extract the last element of the prediction and append it to the list
             last_element = y_pred_normalized[0, -1, 0].item()
