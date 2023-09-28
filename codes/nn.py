@@ -151,7 +151,6 @@ if __name__=="__main__":
     with torch.profiler.profile(profile_memory=True, record_shapes=True) as prof:
         with torch.profiler.record_function("LSTM_block_forward"):
             output_tensor = model.lstm_block(lstm_input_tensor.to(device))
-    
     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
 
 '''
