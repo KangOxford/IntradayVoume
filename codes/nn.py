@@ -138,7 +138,7 @@ import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
 class NNPredictionModel:
-    def __init__(self, numStock, learning_rate=0.001, epochs=10, batch_size=32,):
+    def __init__(self, numStock, learning_rate=0.001, epochs=10, batch_size=32, debug=False):
         self.model = CNNLSTM(numStock)
         self.learning_rate = learning_rate
         self.epochs = epochs
@@ -146,6 +146,7 @@ class NNPredictionModel:
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
         self.criterion = nn.MSELoss()  # Assuming a regression task
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.debug = debug  # 添加debug标志
         
     def train(self, X_train, y_train):
         self.model.to(self.device)
@@ -178,13 +179,14 @@ class NNPredictionModel:
                 self.optimizer.step()
                 param_update_time = time.time() - param_update_start
                 
-                if batch_idx == len(train_loader) - 1:  # print times at the end of the last batch
+                if self.debug and batch_idx == len(train_loader) - 1:  # 检查debug标志
                     print(f">>> 1 Forward Propagation: {forward_time*1000:.3f}ms")
                     print(f">>> 2 Loss Calculation: {loss_calc_time*1000:.3f}ms")
                     print(f">>> 3 Backward Propagation: {backward_time*1000:.3f}ms")
                     print(f">>> 4 Parameter Update: {param_update_time*1000:.3f}ms")
             
-            print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
+            if self.debug:  # 检查debug标志
+                print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
         
     def predict(self, X_test):
         self.model.eval()
@@ -192,7 +194,7 @@ class NNPredictionModel:
         with torch.no_grad():
             predictions = self.model(X_test)
         return predictions.cpu()
- 
+
     
 if __name__=="__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Detect if CUDA is available
@@ -204,46 +206,3 @@ if __name__=="__main__":
     print("Output shape:", output_tensor.shape)
     print(f"MLPBlock: {count_parameters(MLPBlock(numStock))}".rjust(30))
     print(f"LSTMBlock:{count_parameters(LSTMBlock(numStock))}".rjust(30))
-    
-    # # Check device
-    # torch.set_default_dtype(torch.double)
-    # device = next(model.parameters()).device
-    # print(f'Model is on: {device}')
-    # from torch.utils.data import TensorDataset, DataLoader
-    # import torch.optim as optim
-    # import torch.nn as nn
-    # model = CNNLSTM(numStock).to(device)
-    # loss_fn = nn.MSELoss() 
-    # optimizer = optim.Adam(model.parameters(), lr=0.001)  
-    # X_train_tensor = torch.randn((1, 1, 1300, 52)).double().to(device)  
-    # y_train_tensor = torch.randn((1, 1300, 1)).double().to(device)  
-    # train_data = TensorDataset(X_train_tensor, y_train_tensor)
-    # data_loader = DataLoader(train_data, batch_size=483, shuffle=True)  
-    # # Profiling
-    # import torch.autograd.profiler as profiler
-    # with profiler.profile(profile_memory=True, record_shapes=True) as prof:
-    #     for inputs, targets in data_loader:
-    #         # Move data to the appropriate device
-    #         inputs, targets = inputs.to(device), targets.to(device)
-
-    #         # Forward Propagation
-    #         with profiler.record_function("forward"):
-    #             outputs = model(inputs)
-
-    #         # Loss Calculation
-    #         with profiler.record_function("loss_calculation"):
-    #             loss = loss_fn(outputs, targets)
-
-    #         # Backward Propagation
-    #         with profiler.record_function("backward"):
-    #             optimizer.zero_grad()  # Zero the gradients
-    #             loss.backward()  # Compute gradients
-
-    #         # Parameter Update
-    #         with profiler.record_function("parameter_update"):
-    #             optimizer.step()  # Update the parameters
-
-    # # Print the profiling results
-    # print(prof.key_averages().table(sort_by="self_cpu_time_total"))
-
-
