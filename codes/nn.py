@@ -9,12 +9,14 @@ class LSTMBlock(nn.Module):
     def __init__(self,numStock):
         super(LSTMBlock, self).__init__()
         self.numStock = numStock
-        self.lstm = nn.LSTM(52,bin_size,num_layers=2,batch_first=True) # TODO reduce 192 to lower !!!
-        self.fc = nn.Linear(bin_size, 1)
+        self.lstm = nn.LSTM(52,bin_size,num_layers=1,batch_first=True) # TODO reduce 192 to lower !!!
+        self.fc1 = nn.Linear(bin_size, 1)
+        self.sigmoid = nn.Sigmoid()
     def forward(self, x):
         out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
         # out = out[:, -1, :]  # Now out has shape (batch_size, 64)
-        out = self.fc(out)  # Now out has shape (batch_size, 10)
+        self.sigmoid(out)  # Activation function
+        out = self.fc1(out)  # Now out has shape (batch_size, 10)
         out = out.reshape(1,train_days*bin_size*self.numStock,1)
         return out
 
@@ -91,9 +93,9 @@ class MLPBlock(nn.Module):
         super().__init__()
         self.numStock = numStock
         self.fc = nn.Sequential(
-            nn.Linear(52, 52),  # Input layer: 52 input features, 128 output features
+            nn.Linear(52, 130),  # Input layer: 52 input features, 128 output features
             nn.ReLU(),  # Activation function
-            nn.Linear(52, 52),  # Hidden layer: 128 input features, 64 output features
+            nn.Linear(130, 52),  # Hidden layer: 128 input features, 64 output features
             nn.Sigmoid()  # Activation function to ensure output is between 0 and 1
         )
     
