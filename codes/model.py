@@ -146,100 +146,7 @@ def normalize_data(X, y):
     return X_scaled, y_scaled, scaler_X, scaler_y
 
 def regularity_nn(X_train, y_train, X_test,y_test, config):
-    bin_size = config["bin_size"]
-    train_days = config["train_days"]
-    regulator = config["regulator"]
-    
-    assert regulator == "CNN", regulator
-    from codes.nn import NNPredictionModel
-    import torch
-    import numpy as np
-
-    def to_torch_tensors(X_train, y_train, device):
-        X_train_tensor = torch.tensor(X_train, dtype=torch.float64).to(device)
-        y_train_tensor = torch.tensor(y_train, dtype=torch.float64).to(device)
-        return X_train_tensor, y_train_tensor
-
-    def denormalize_predictions(y_pred_normalized, scaler_y):
-        y_pred_normalized = y_pred_normalized.reshape(-1, 1)
-        y_pred = scaler_y.inverse_transform(y_pred_normalized)
-        y_pred = y_pred.reshape(-1)
-        return y_pred
-
-    def reshape_tensors(X_train_tensor, y_train_tensor, num_stock, num_feature):
-        X_train_tensor = X_train_tensor.reshape(num_stock, -1, num_feature).unsqueeze(1)
-        y_train_tensor = y_train_tensor.reshape(num_stock, -1, 1)
-        return X_train_tensor, y_train_tensor
-
-    def train_model(X_train_tensor, y_train_tensor, device):
-        stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=1200, batch_size=483)
-        # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=12, batch_size=483)
-        stock_prediction_model.model.double().to(device)
-        stock_prediction_model.train(X_train_tensor, y_train_tensor)
-        return stock_prediction_model
-
-
-    def train_and_predict_with_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device):
-        last_preds = []
-        for i in range(0, bin_size):
-            # Update the training data to include data up to day i
-            X_train_window = X_scaled[i:train_days*bin_size+i, :]
-            y_train_window = y_scaled[i:train_days*bin_size+i]
-            print(X_train_window.shape, y_train_window.shape)
-
-            # Convert to Torch tensors and Reshape
-            X_train_tensor_window, y_train_tensor_window = to_torch_tensors(X_train_window, y_train_window, device)
-            X_train_tensor_window, y_train_tensor_window = reshape_tensors(X_train_tensor_window, y_train_tensor_window, num_stock, num_feature)
-            
-            print(X_train_tensor_window.shape, y_train_tensor_window.shape)
-            # Train the model with the new data
-            model = train_model(X_train_tensor_window, y_train_tensor_window, device)
-
-            # Prepare the test data for prediction
-    
-            X_test_window = X_scaled[i+1:train_days*bin_size + i+1, :]
-            y_test_window = y_scaled[i+1:train_days*bin_size + i+1]
-            X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
-
-            # Make a prediction using the updated model
-            y_pred_normalized = model.predict(X_test_tensor_window)
-            last_pred = y_pred_normalized[0, -1, 0].item()
-            last_preds.append(last_pred)
-
-        return np.array(last_preds).reshape(-1, 1)
-
-    def pred(X_train, y_train, X_test, y_test):
-        # Ensure inputs are NumPy arrays
-        X_train, y_train, X_test = np.array(X_train), np.array(y_train), np.array(X_test)
-        
-        # Concatenate training and test data for scaling
-        X = np.concatenate([X_train, X_test])
-        y = np.concatenate([y_train, y_test])
-        
-        # Normalize data and get scalers
-        X_scaled, y_scaled, scaler_X, scaler_y = normalize_data(X, y)
-        
-        # Device configuration
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        
-        # Constants for reshaping and sliding window
-        NUM_STOCK = 1
-        NUM_FEATURE = 52
-        
-        # Train model and predict with sliding window
-        # check_GPU_memory()
-        last_preds = train_and_predict_with_sliding_window(X_scaled, y_scaled, NUM_STOCK, NUM_FEATURE, device)
-        # check_GPU_memory()
-        
-        
-        # Denormalize predictions
-        last_preds_denorm = denormalize_predictions(last_preds, scaler_y)
-        
-        return last_preds_denorm
-    
-    # Call pred function with appropriate data
-    last_preds_denorm = pred(X_train, y_train, X_test,y_test)
-    return  last_preds_denorm
+    pass
 
 def model_nn(X_train, y_train, X_test, y_test, config):
     '''take the first 9 days of X_train as X_train_new
@@ -426,6 +333,38 @@ def model_nn(X_train, y_train, X_test, y_test, config):
             first_preds.append(first_pred)
 
         return np.array(first_preds).reshape(-1, 1)
+    
+
+
+    def train_and_predict_without_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device):
+        # Prepare the training data for the entire range from 0 to 1300
+        X_train_tensor, y_train_tensor = to_torch_tensors(X_scaled[:1300, :], y_scaled[:1300], device)
+        X_train_tensor = X_train_tensor.reshape(1, -1, num_feature).unsqueeze(1)
+        y_train_tensor = y_train_tensor.reshape(1, -1, 1)
+        
+        # Initialize and train the model
+        stock_prediction_model = NNPredictionModel(num_stock, learning_rate=0.002, epochs=1000, batch_size=483)
+        stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model.double())
+        stock_prediction_model.model.to(device)
+        
+        start = time.time()
+        stock_prediction_model.train(X_train_tensor, y_train_tensor)
+        print(f"Training time taken: ", time.time()-start)
+        
+        first_preds = []
+        
+        for i in range(26):  # Assuming you want to collect 26 predicted values
+            # Prepare the rolling test data for prediction
+            X_test_window = X_scaled[1300+i:1300+i+1, :]
+            X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
+            
+            # Make a prediction using the trained model
+            y_pred_normalized = stock_prediction_model.predict(X_test_tensor_window)
+            first_pred = y_pred_normalized[0, -1, 0].item()  # Assuming the last prediction is what you need
+            first_preds.append(first_pred)
+            
+        return np.array(first_preds).reshape(-1, 1)
+
 
     # Ensure inputs are NumPy arrays
     # X_train, y_train, X_test, y_test = np.array(X_train), np.array(y_train), np.array(X_test), np.array(y_test)
@@ -450,7 +389,8 @@ def model_nn(X_train, y_train, X_test, y_test, config):
     
     # check_GPU_memory()
     # Train model and predict with sliding window
-    last_preds = train_and_predict_with_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device)
+    # last_preds = train_and_predict_with_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device)
+    last_preds = train_and_predict_without_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device)
     
     # Denormalize predictions
     last_preds_denorm = denormalize_predictions(last_preds, scaler_y)
