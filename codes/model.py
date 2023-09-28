@@ -292,10 +292,6 @@ def model_nn(X_train, y_train, X_test, y_test, config):
             # Update the training data to include data up to bin i
             print("bin: ",i)
             
-            # X_train_window=X_scaled[i:train_days*bin_size+i, :]
-            # y_train_window=y_scaled[i:train_days*bin_size+i,:]
-            # X_test_window=X_scaled[i+1:train_days*bin_size+i+1, :]
-            # check_GPU_memory()
             
             X_train_window,y_train_window,X_test_window=slice_and_stack(X_scaled, y_scaled, num_stock, i)
             
@@ -337,33 +333,51 @@ def model_nn(X_train, y_train, X_test, y_test, config):
 
 
     def train_and_predict_without_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device):
-        # Prepare the training data for the entire range from 0 to 1300
-        X_train_tensor, y_train_tensor = to_torch_tensors(X_scaled[:1300, :], y_scaled[:1300], device)
-        X_train_tensor = X_train_tensor.reshape(1, -1, num_feature).unsqueeze(1)
-        y_train_tensor = y_train_tensor.reshape(1, -1, 1)
-        
-        # Initialize and train the model
-        stock_prediction_model = NNPredictionModel(num_stock, learning_rate=0.002, epochs=1000, batch_size=483)
-        stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model.double())
-        stock_prediction_model.model.to(device)
-        
+        '''
+        only train one model from 0 to bin_size*train_days
+        then predict from bin_size*train_days to bin_size*train_days+bin_size
+        '''
+        # Get the training and testing data using the slice_and_stack function
+        X_train_window, y_train_window, X_test_window = slice_and_stack(X_scaled, y_scaled, num_stock, 0)  # Assuming i=0 as it's a single window
+
+        # Convert to Torch tensors and Reshape
+        X_train_tensor_window, y_train_tensor_window = to_torch_tensors(X_train_window, y_train_window, device)
+        X_train_tensor_window = X_train_tensor_window.reshape(1, -1, num_feature).unsqueeze(1)
+        y_train_tensor_window = y_train_tensor_window.reshape(1, -1, 1)
+
+        # Train the model with the training data
+        stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1000, batch_size=483)  # Adjust hyperparameters as needed
+        stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model.double())  # wrap your model in DataParallel
+        stock_prediction_model.model.to(device)  # send it to the device
+
+        # Train the model
         start = time.time()
-        stock_prediction_model.train(X_train_tensor, y_train_tensor)
-        print(f"Training time taken: ", time.time()-start)
+        stock_prediction_model.train(X_train_tensor_window, y_train_tensor_window)
+        print(f"Training time taken: ", time.time()-start)        
         
-        first_preds = []
+        # Prepare the test data for prediction
+        X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
+        <this line is wrong, you should use the slice and stack for 26 times to get the right X_test_window >
         
-        for i in range(26):  # Assuming you want to collect 26 predicted values
-            # Prepare the rolling test data for prediction
-            X_test_window = X_scaled[1300+i:1300+i+1, :]
-            X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
+        
+        # List to hold the last element of each prediction
+        last_elements = []
+        
+        # Iterate over the test data, making a prediction on each iteration
+        for i in range(26):
+            # Update the input tensor to use the current bin
+            current_bin_tensor = X_test_tensor_window[:, i:i+1, :, :] <adjust this, as the X_test_tensor_window is rolling adjusted outside>
             
             # Make a prediction using the trained model
-            y_pred_normalized = stock_prediction_model.predict(X_test_tensor_window)
-            first_pred = y_pred_normalized[0, -1, 0].item()  # Assuming the last prediction is what you need
-            first_preds.append(first_pred)
+            y_pred_normalized = stock_prediction_model.predict(current_bin_tensor)
             
-        return np.array(first_preds).reshape(-1, 1)
+            # Extract the last element of the prediction and append it to the list
+            last_element = y_pred_normalized[0, -1, 0].item()
+            last_elements.append(last_element)
+        
+        # Convert the list of last elements to a numpy array and return it
+        return np.array(last_elements).reshape(-1, 1)
+
 
 
     # Ensure inputs are NumPy arrays
