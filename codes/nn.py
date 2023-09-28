@@ -132,28 +132,6 @@ class CNNLSTM(nn.Module):
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-    
-if __name__=="__main__":
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Detect if CUDA is available
-    numStock = 1
-    model = CNNLSTM(numStock).to(device)  # Move the model to the CUDA device
-    input_tensor = torch.rand((1, 1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
-    lstm_input_tensor = torch.rand((1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
-    output_tensor = model(input_tensor)
-    print("Output shape:", output_tensor.shape)
-    print(f"MLPBlock: {count_parameters(MLPBlock(numStock))}".rjust(30))
-    print(f"LSTMBlock:{count_parameters(LSTMBlock(numStock))}".rjust(30))
-    
-    # Check device
-    device = next(model.parameters()).device
-    print(f'Model is on: {device}')
-    # Profiling
-    with torch.profiler.profile(profile_memory=True, record_shapes=True) as prof:
-        with torch.profiler.record_function("LSTM_block_forward"):
-            output_tensor = model.lstm_block(lstm_input_tensor.to(device))
-    print(prof.key_averages().table(sort_by="self_cpu_time_total"))
-
-'''
 
 import torch
 import torch.optim as optim
@@ -195,40 +173,58 @@ class NNPredictionModel:
         with torch.no_grad():
             predictions = self.model(X_test)
         return predictions.cpu()
+ 
     
-if __name__ == "__main__":
-    numStock=483
-    # print(count_parameters(ConvBlock(numStock)))
-    # print(count_parameters(InceptionBlock(numStock)))
-    print(count_parameters(MLPBlock(numStock)))
-    print(count_parameters(LSTMBlock(numStock)))
+if __name__=="__main__":
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Detect if CUDA is available
+    numStock = 1
+    model = CNNLSTM(numStock).to(device)  # Move the model to the CUDA device
+    input_tensor = torch.rand((1, 1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
+    lstm_input_tensor = torch.rand((1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
+    output_tensor = model(input_tensor)
+    print("Output shape:", output_tensor.shape)
+    print(f"MLPBlock: {count_parameters(MLPBlock(numStock))}".rjust(30))
+    print(f"LSTMBlock:{count_parameters(LSTMBlock(numStock))}".rjust(30))
     
-    # 124124
-    # 262808
-    # 5435
-    
-    # # Create an instance of the model
-    # # breakpoint()
-    # # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=100, batch_size=483)
-    # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=2, batch_size=483)
-    # # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=32)
-    # # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=2, batch_size=483)
-    # # stock_prediction_model = NNPredictionModel(learning_rate=0.001, epochs=10, batch_size=32)
-    # stock_prediction_model.model = stock_prediction_model.model.double()
-    #
-    # # Assume X_train_tensor, y_train_tensor, X_test_tensor are already created and converted to tensor
-    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    # stock_prediction_model.model.to(device)
-    #
-    # X_train_tensor = torch.randn((1, 1, 1274, 52)).double()
-    # y_train_tensor = torch.randn((1, 26, 1)).double()
-    # X_test_tensor = torch.randn((1, 1, 1274, 52)).double()
-    #
-    #
-    # # Train and predict
-    # stock_prediction_model.train(X_train_tensor, y_train_tensor)
-    # y_pred_normalized = stock_prediction_model.predict(X_test_tensor)
-    # print(y_pred_normalized.shape)
-# '''
+    # Check device
+    torch.set_default_dtype(torch.double)
+    device = next(model.parameters()).device
+    print(f'Model is on: {device}')
+    from torch.utils.data import TensorDataset, DataLoader
+    import torch.optim as optim
+    import torch.nn as nn
+    model = CNNLSTM(numStock).to(device)
+    loss_fn = nn.MSELoss() 
+    optimizer = optim.Adam(model.parameters(), lr=0.001)  
+    X_train_tensor = torch.randn((1, 1, 1300, 52)).double().to(device)  
+    y_train_tensor = torch.randn((1, 1300, 1)).double().to(device)  
+    train_data = TensorDataset(X_train_tensor, y_train_tensor)
+    data_loader = DataLoader(train_data, batch_size=483, shuffle=True)  
+    # Profiling
+    import torch.autograd.profiler as profiler
+    with profiler.profile(profile_memory=True, record_shapes=True) as prof:
+        for inputs, targets in data_loader:
+            # Move data to the appropriate device
+            inputs, targets = inputs.to(device), targets.to(device)
+
+            # Forward Propagation
+            with profiler.record_function("forward"):
+                outputs = model(inputs)
+
+            # Loss Calculation
+            with profiler.record_function("loss_calculation"):
+                loss = loss_fn(outputs, targets)
+
+            # Backward Propagation
+            with profiler.record_function("backward"):
+                optimizer.zero_grad()  # Zero the gradients
+                loss.backward()  # Compute gradients
+
+            # Parameter Update
+            with profiler.record_function("parameter_update"):
+                optimizer.step()  # Update the parameters
+
+    # Print the profiling results
+    print(prof.key_averages().table(sort_by="self_cpu_time_total"))
 
 
