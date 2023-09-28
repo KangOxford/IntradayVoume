@@ -186,45 +186,45 @@ if __name__=="__main__":
     print(f"MLPBlock: {count_parameters(MLPBlock(numStock))}".rjust(30))
     print(f"LSTMBlock:{count_parameters(LSTMBlock(numStock))}".rjust(30))
     
-    # Check device
-    torch.set_default_dtype(torch.double)
-    device = next(model.parameters()).device
-    print(f'Model is on: {device}')
-    from torch.utils.data import TensorDataset, DataLoader
-    import torch.optim as optim
-    import torch.nn as nn
-    model = CNNLSTM(numStock).to(device)
-    loss_fn = nn.MSELoss() 
-    optimizer = optim.Adam(model.parameters(), lr=0.001)  
-    X_train_tensor = torch.randn((1, 1, 1300, 52)).double().to(device)  
-    y_train_tensor = torch.randn((1, 1300, 1)).double().to(device)  
-    train_data = TensorDataset(X_train_tensor, y_train_tensor)
-    data_loader = DataLoader(train_data, batch_size=483, shuffle=True)  
-    # Profiling
-    import torch.autograd.profiler as profiler
-    with profiler.profile(profile_memory=True, record_shapes=True) as prof:
-        for inputs, targets in data_loader:
-            # Move data to the appropriate device
-            inputs, targets = inputs.to(device), targets.to(device)
+    # # Check device
+    # torch.set_default_dtype(torch.double)
+    # device = next(model.parameters()).device
+    # print(f'Model is on: {device}')
+    # from torch.utils.data import TensorDataset, DataLoader
+    # import torch.optim as optim
+    # import torch.nn as nn
+    # model = CNNLSTM(numStock).to(device)
+    # loss_fn = nn.MSELoss() 
+    # optimizer = optim.Adam(model.parameters(), lr=0.001)  
+    # X_train_tensor = torch.randn((1, 1, 1300, 52)).double().to(device)  
+    # y_train_tensor = torch.randn((1, 1300, 1)).double().to(device)  
+    # train_data = TensorDataset(X_train_tensor, y_train_tensor)
+    # data_loader = DataLoader(train_data, batch_size=483, shuffle=True)  
+    # # Profiling
+    # import torch.autograd.profiler as profiler
+    # with profiler.profile(profile_memory=True, record_shapes=True) as prof:
+    #     for inputs, targets in data_loader:
+    #         # Move data to the appropriate device
+    #         inputs, targets = inputs.to(device), targets.to(device)
 
-            # Forward Propagation
-            with profiler.record_function("forward"):
-                outputs = model(inputs)
+    #         # Forward Propagation
+    #         with profiler.record_function("forward"):
+    #             outputs = model(inputs)
 
-            # Loss Calculation
-            with profiler.record_function("loss_calculation"):
-                loss = loss_fn(outputs, targets)
+    #         # Loss Calculation
+    #         with profiler.record_function("loss_calculation"):
+    #             loss = loss_fn(outputs, targets)
 
-            # Backward Propagation
-            with profiler.record_function("backward"):
-                optimizer.zero_grad()  # Zero the gradients
-                loss.backward()  # Compute gradients
+    #         # Backward Propagation
+    #         with profiler.record_function("backward"):
+    #             optimizer.zero_grad()  # Zero the gradients
+    #             loss.backward()  # Compute gradients
 
-            # Parameter Update
-            with profiler.record_function("parameter_update"):
-                optimizer.step()  # Update the parameters
+    #         # Parameter Update
+    #         with profiler.record_function("parameter_update"):
+    #             optimizer.step()  # Update the parameters
 
-    # Print the profiling results
-    print(prof.key_averages().table(sort_by="self_cpu_time_total"))
+    # # Print the profiling results
+    # print(prof.key_averages().table(sort_by="self_cpu_time_total"))
 
 
