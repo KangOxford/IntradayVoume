@@ -155,17 +155,36 @@ class NNPredictionModel:
         train_loader = DataLoader(train_data, batch_size=self.batch_size, shuffle=True)
         
         for epoch in range(self.epochs):
-            start = time.time()
+            epoch_start = time.time()
             self.model.train()
             for batch_idx, (X_batch, y_batch) in enumerate(train_loader):
+                batch_start = time.time()
+                
                 self.optimizer.zero_grad()
+                
+                forward_start = time.time()
                 outputs = self.model(X_batch)
+                forward_time = time.time() - forward_start
+                
+                loss_calc_start = time.time()
                 loss = self.criterion(outputs, y_batch)
-                if epoch==0: startLoss = loss.item()
+                loss_calc_time = time.time() - loss_calc_start
+                
+                backward_start = time.time()
                 loss.backward()
+                backward_time = time.time() - backward_start
+                
+                param_update_start = time.time()
                 self.optimizer.step()
-            print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-start:.4f}s")
-        print(f"Loss Reduced from {startLoss:.20f} to {loss.item():.20f}")
+                param_update_time = time.time() - param_update_start
+                
+                if batch_idx == len(train_loader) - 1:  # print times at the end of the last batch
+                    print(f">>> 1 Forward Propagation: {forward_time*1000:.3f}ms")
+                    print(f">>> 2 Loss Calculation: {loss_calc_time*1000:.3f}ms")
+                    print(f">>> 3 Backward Propagation: {backward_time*1000:.3f}ms")
+                    print(f">>> 4 Parameter Update: {param_update_time*1000:.3f}ms")
+            
+            print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
         
     def predict(self, X_test):
         self.model.eval()
