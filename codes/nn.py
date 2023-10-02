@@ -4,7 +4,8 @@ import torch.nn as nn
 import torch.profiler
 
 bin_size = 26
-train_days = 50
+# train_days = 50
+train_days = 10
 
 class LSTMBlock(nn.Module):
     def __init__(self,numStock):
