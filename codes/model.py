@@ -231,7 +231,7 @@ def model_nn(X_train, y_train, X_test, y_test, config):
                 25 bins of stock1 of day1, start from index 1 (included)
                 25 bins of stock2 of day1, start from index 1 (included)
                 26 bins of stock1 of day1
-                26 bins of stock2 of day2
+                26 bins of stock2 of day1
                 ...
                 26 bins of stock1 of day50
                 26 bins of stock2 of day50
@@ -241,7 +241,7 @@ def model_nn(X_train, y_train, X_test, y_test, config):
                 25 bins of stock1 of day1, start from index 2 (included)
                 25 bins of stock2 of day1, start from index 2 (included)
                 26 bins of stock1 of day1
-                26 bins of stock2 of day2
+                26 bins of stock2 of day1
                 ...
                 26 bins of stock1 of day50
                 26 bins of stock2 of day50
@@ -286,19 +286,64 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         
     def slice_and_stack_batch(X_scaled, y_scaled, num_stock, i):
         X_train_window, y_train_window, _ = slice_and_stack(X_scaled, y_scaled, num_stock, i)
+        num_bins_per_day = bin_size  # Number of bins for each stock each day
+        num_days = train_days  # Number of days you want to consider
+        # Number of bins for 'num_stock' stocks for 'num_days' days
+        total_bins = num_bins_per_day * num_stock * num_days
+        '''
+        25 bins of stock1 of day1, start from index 1 (included)
+        25 bins of stock2 of day1, start from index 1 (included)
+        26 bins of stock1 of day1
+        26 bins of stock2 of day1
+        ...
+        26 bins of stock1 of day50
+        26 bins of stock2 of day50
+        1 bins of stock1 of day50, end to index 1 (not included)
+        1 bins of stock2 of day50, end to index 1 (not included)
+        '''
         
-        # Total number of bins is the length of X_train_window
-        total_bins = X_train_window.shape[0]
+
+        def reshape_X_2Dinto3D(X, bin_size_):
+            # Calculate the slice size
+            slice_size = bin_size_ * num_stock
+            # Determine the number of slices
+            num_slices = X.shape[0] // slice_size
+            # Perform the slicing and stacking in one line
+            X_3D = X[:num_slices * slice_size, :].reshape(num_slices, slice_size, -1)
+            # (num_days, bin_size_ * num_stock, num_features)
+            return X_3D
+        def reshape_y_2Dinto3D(y, bin_size_):
+            # Calculate the slice size
+            slice_size = bin_size_ * num_stock
+            # Determine the number of slices
+            num_slices = X.shape[0] // slice_size
+            # Perform the slicing and stacking in one line
+            X_3D = X[:num_slices * slice_size, :].reshape(num_slices, slice_size, -1)
+            # (num_days, bin_size_ * num_stock, num_features)
+            return X_3D
+        X_train_window_reshaped = reshape_X_2Dinto3D(X_train_window,bin_size_=bin_size)
+        y_train_window_reshaped=reshape_y_2Dinto3D(y, bin_size_=bin_size)
         
-        # Number of bins per stock (in this example 1300)
-        bins_per_stock = total_bins // num_stock
-        
-        # Reshape the data into the required format
-        X_train_reshaped = X_train_window.reshape(num_stock, bins_per_stock, -1)
-        y_train_reshaped = y_train_window.reshape(num_stock, bins_per_stock, -1)
-        
-        # Now X_train_reshaped and y_train_reshaped are in the shape (483, 1300, 52)
-        
+        # if i ==0 or i ==26:
+        #     '''
+        #     only this is needed
+        #     '''
+        #     X_train_window_reshaped = reshapeX2Dinto3D(X_train_window,bin_size=bin_size)
+        # else:
+        #     '''
+        #     no longer in need for this situation 
+        #     as the train only happens once per day
+            
+        #     X_train_window_head = X_train_window[:num_stock * (26-i), :]
+        #     X_train_window_body = X_train_window[num_stock * (26-i):-num_stock * i, :] if i != 0 else X_train_window[:, :]
+        #     X_train_window_tail = X_train_window[-num_stock * i:, :] if i != 0 else X_train_window[-num_stock * i:, :]
+            
+        #     X_train_window_head_reshaped = reshapeX2Dinto3D(X_train_window_head,bin_size_=bin_size-i)
+        #     X_train_window_body_reshaped = reshapeX2Dinto3D(X_train_window_body,bin_size=bin_size)
+        #     X_train_window_tail_reshaped = reshapeX2Dinto3D(X_train_window_tail,bin_size=i)
+        #     ''''
+            
+
         return X_train_reshaped, y_train_reshaped
         
     # def slice_and_stack_batch(X_scaled, y_scaled, num_stock,i):
@@ -345,7 +390,7 @@ def model_nn(X_train, y_train, X_test, y_test, config):
 
     def train_and_predict_with_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device):
         first_preds = []
-        for i in range(0, bin_size):
+        for i in range(0, bin_size): # TODO shoud i start from 0 or 1?
             # Update the training data to include data up to bin i
             print("bin: ",i)
             
