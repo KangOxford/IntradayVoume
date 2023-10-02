@@ -146,7 +146,7 @@ class NNPredictionModel:
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
         self.criterion = nn.MSELoss()  # Assuming a regression task
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.debug = debug  # 添加debug标志
+        self.debug = debug
         
     def train(self, X_train, y_train):
         self.model.to(self.device)

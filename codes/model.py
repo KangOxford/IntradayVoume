@@ -283,7 +283,64 @@ def model_nn(X_train, y_train, X_test, y_test, config):
                     X_test_window[out_start_idx:out_end_idx, :] = X_scaled[start_idx + 1:end_idx + 1, :]
             
             return X_train_window, y_train_window, X_test_window
-
+        
+    def slice_and_stack_batch(X_scaled, y_scaled, num_stock, i):
+        X_train_window, y_train_window, _ = slice_and_stack(X_scaled, y_scaled, num_stock, i)
+        
+        # Total number of bins is the length of X_train_window
+        total_bins = X_train_window.shape[0]
+        
+        # Number of bins per stock (in this example 1300)
+        bins_per_stock = total_bins // num_stock
+        
+        # Reshape the data into the required format
+        X_train_reshaped = X_train_window.reshape(num_stock, bins_per_stock, -1)
+        y_train_reshaped = y_train_window.reshape(num_stock, bins_per_stock, -1)
+        
+        # Now X_train_reshaped and y_train_reshaped are in the shape (483, 1300, 52)
+        
+        return X_train_reshaped, y_train_reshaped
+        
+    # def slice_and_stack_batch(X_scaled, y_scaled, num_stock,i):
+    #     X_train_window, y_train_window, X_test_window = slice_and_stack(X_scaled, y_scaled, num_stock,i)
+    #     <X_train_window.shape (627900, 52)
+    #     convert into (483,1300,52) and the first dimension 483 means 483 stocks, 
+    #     so one (1300,52) matrix must be the data for the same stock
+    #     the (627900,52) matrix is stacked in this way:
+    #     '''
+    #     if num_stock == 2:
+    #     X_scaled is stacked by:  
+    #         26 bins of stock1 of day1
+    #         26 bins of stock2 of day1
+    #         26 bins of stock1 of day2
+    #         26 bins of stock2 of day2
+    #         ...
+    #         26 bins of stock1 of daym
+    #         26 bins of stock2 of daym
+    #         if i == 1, then we expect to take
+    #             25 bins of stock1 of day1, start from index 1 (included)
+    #             25 bins of stock2 of day1, start from index 1 (included)
+    #             26 bins of stock1 of day1
+    #             26 bins of stock2 of day2
+    #             ...
+    #             26 bins of stock1 of day50
+    #             26 bins of stock2 of day50
+    #             1 bins of stock1 of day50, end to index 1 (not included)
+    #             1 bins of stock2 of day50, end to index 1 (not included)
+    #             at this point, the X_test is expected to be one element difference from X_train:
+    #             25 bins of stock1 of day1, start from index 2 (included)
+    #             25 bins of stock2 of day1, start from index 2 (included)
+    #             26 bins of stock1 of day1
+    #             26 bins of stock2 of day2
+    #             ...
+    #             26 bins of stock1 of day50
+    #             26 bins of stock2 of day50
+    #             1 bins of stock1 of day50, end to index 2 (not included)
+    #             1 bins of stock2 of day50, end to index 2 (not included)
+    #     '''
+    #     generate the code here
+    #     >
+    #     return X_train_window, y_train_window, X_test_window
 
 
     def train_and_predict_with_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device):
