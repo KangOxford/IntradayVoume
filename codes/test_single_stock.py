@@ -72,14 +72,14 @@ if __name__=="__main__":
 
     # regulator = "cnnLstm"
     # regulator = "CNN"
-    regulator = "Inception"
+    # regulator = "Inception"
     # regulator = "OLS"
     # regulator = "Ridge"
-    # regulator = "CMEM"
+    regulator = "CMEM"
     
 
-    trainType = "universal"
-    # trainType = "single"
+    # trainType = "universal"
+    trainType = "single"
 
     dfs,num_of_stacked_stocks = getSingleDfs(trainType)
     # for idex,df in enumerate(dfs):
@@ -115,8 +115,10 @@ if __name__=="__main__":
     # r2_score(df33_.true,df33_.pred)
     df33_.stock_index=np.tile(np.arange(483).repeat(26),61)
     df33_.reset_index(drop=True)
-    df3_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+".csv", mode = 'w')
-    df33_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+".csv", mode = 'w')
+    from datetime import datetime
+    current_datetime = datetime.now().strftime("%Y%m%d%H%M%S")
+    df3_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+"_{current_datetime}"+".csv", mode = 'w')
+    df33_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+"{current_datetime}"+".csv", mode = 'w')
 
 # # %%
 # import  pandas as pd
