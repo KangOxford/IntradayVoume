@@ -4,13 +4,24 @@ import torch.nn as nn
 import torch.profiler
 
 bin_size = 26
-train_days = 50
+train_days = 50 
+
+# 130 5 days
+# 1300
+
+# 1,1, 1300/130 bins, 52 features 
+
+# 0.45 / 0.00
+
+# mlp, lstm
+# mlp => lstm 
 
 class LSTMBlock(nn.Module):
     def __init__(self,numStock):
         super(LSTMBlock, self).__init__()
         self.numStock = numStock
         self.lstm = nn.LSTM(52,bin_size,num_layers=1,batch_first=True) # TODO reduce 192 to lower !!!
+        
         self.fc1 = nn.Linear(bin_size, 1)
         self.sigmoid = nn.Sigmoid()
     def forward(self, x):
@@ -18,6 +29,8 @@ class LSTMBlock(nn.Module):
         # out = out[:, -1, :]  # Now out has shape (batch_size, 64)
         self.sigmoid(out)  # Activation function
         out = self.fc1(out)  # Now out has shape (batch_size, 10)
+        # self.sigmoid(out)  # Activation function
+        # out = self.fc2(out)  # Now out has shape (batch_size, 10)
         out = out.reshape(1,train_days*bin_size*self.numStock,1)
         return out
 
