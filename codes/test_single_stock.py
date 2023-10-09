@@ -117,8 +117,8 @@ if __name__=="__main__":
     df33_.reset_index(drop=True)
     from datetime import datetime
     current_datetime = datetime.now().strftime("%Y%m%d%H%M%S")
-    df3_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+"_{current_datetime}"+".csv", mode = 'w')
-    df33_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+"{current_datetime}"+".csv", mode = 'w')
+    df3_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+f"_{current_datetime}"+".csv", mode = 'w')
+    df33_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+f"{current_datetime}"+".csv", mode = 'w')
 
 # # %%
 # import  pandas as pd
