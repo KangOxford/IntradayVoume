@@ -318,51 +318,6 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         return X_train_reshaped, y_train_reshaped, X_test_reshaped
 
 
-    def train_and_predict_with_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device):
-        first_preds = []
-        for i in range(0, bin_size): # TODO shoud i start from 0 or 1?
-            # Update the training data to include data up to bin i
-            print("bin: ",i)
-            
-            
-            X_train_window,y_train_window,X_test_window=slice_and_stack(X_scaled, y_scaled, num_stock, i)
-            
-            # Convert to Torch tensors and Reshape
-            X_train_tensor_window, y_train_tensor_window = to_torch_tensors(X_train_window, y_train_window, device)
-            X_train_tensor_window = X_train_tensor_window.reshape(1, -1, num_feature).unsqueeze(1)
-            y_train_tensor_window = y_train_tensor_window.reshape(1, -1, 1)
-            
-            # Train the model with the new data
-            # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=2, batch_size=483)
-            # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=200, batch_size=483)
-            # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=400, batch_size=483)
-            # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0002, epochs=1200, batch_size=483)
-            # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0002, epochs=200, batch_size=483)
-            # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0002, epochs=50, batch_size=483)
-            # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0005, epochs=1000, batch_size=483)
-            # stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1000, batch_size=483)
-            stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1000, batch_size=483)
-            
-            # choice 1
-            stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model.double()) # wrap your model in DataParallel
-            stock_prediction_model.model.to(device) # send it to the device
-            # choice 2
-            # stock_prediction_model.model.double().to(device)
-            
-            start = time.time()
-            stock_prediction_model.train(X_train_tensor_window, y_train_tensor_window) 
-            print(f"Bin {i} train time taken: ", time.time()-start)
-            # Prepare the test data for prediction
-            X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
-            
-            # Make a prediction using the updated model
-            y_pred_normalized = stock_prediction_model.predict(X_test_tensor_window)
-            first_pred = y_pred_normalized[0, -1, 0].item()
-            first_preds.append(first_pred)
-
-        return np.array(first_preds).reshape(-1, 1)
-    
-
     def train_and_predict_without_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device):
         '''
         only train one model from 0 to bin_size*train_days

@@ -42,7 +42,6 @@ def get_r2df(num,regulator,df):
         r2result,oneday_df = train_and_pred(index,df,config)     
         r2results.append(r2result)
         oneday_dfs.append(oneday_df)
-        print()
         # print(r2results)
         # print(oneday_dfs)
     end = time.time()
