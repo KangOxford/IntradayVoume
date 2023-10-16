@@ -98,9 +98,16 @@ if __name__=="__main__":
     
     # num_stock=len(dfs)
     df3_ = pd.concat(df3s,axis=1)
-    # df3_.columns=np.arange(num_stock)
+    # df3_.columns=np.arange(num_sto ck)
     # pd.set_option('display.max_rows', None) 
     print(df3_.mean(axis=0))
+    # Reload the list from the text file
+    file_path = 'stock_names.txt'
+    reloaded_stock_names = []
+    with open(file_path, 'r') as f:
+        reloaded_stock_names = [line.strip() for line in f.readlines()]
+    reloaded_stock_names
+    df3_.columns = reloaded_stock_names
     
     
     '''

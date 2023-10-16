@@ -38,13 +38,11 @@ def get_r2df(num,regulator,df):
     # with multiprocessing.Pool(processes=num_processes) as pool:
     r2results = [];oneday_dfs=[]
     print("total_test_days",total_test_days)
-    for index in range(total_test_days):
-        print(f"+ {index} in {total_test_days}")
-        print(f"C_{index}")        
-        r2result,oneday_df = train_and_pred(index,df,config)
-        print(f"D_{index}")        
+    for index in range(total_test_days):     
+        r2result,oneday_df = train_and_pred(index,df,config)     
         r2results.append(r2result)
         oneday_dfs.append(oneday_df)
+        print()
         # print(r2results)
         # print(oneday_dfs)
     end = time.time()

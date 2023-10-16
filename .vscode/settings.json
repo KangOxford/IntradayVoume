@@ -5,4 +5,5 @@
         "titleBar.activeForeground": "#FDFAFE"
     },
     "terminal.integrated.wordWrap": "off",
+    "debug.console.wordWrap": false,
 }

@@ -42,7 +42,8 @@ def train_and_pred(index,df,config):
     min_limit, max_limit = map(broadcast, [min_limit, max_limit])
     y_pred_clipped = np.clip(y_pred, min_limit, max_limit)
     if any('log' in x for x in x_list):
-        y_pred_clipped = np.exp(y_pred_clipped)
+        y_pred_clipped = np.exp(y_pred)
+        # y_pred_clipped = np.exp(y_pred_clipped) # TODO caution 
     test_date = df.date.iloc[train_end_index]
     '''prob in the y_pred shapes'''
 
