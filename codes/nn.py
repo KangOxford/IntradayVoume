@@ -25,14 +25,23 @@ class LSTMBlock(nn.Module):
         self.fc1 = nn.Linear(bin_size, 1)
         self.sigmoid = nn.Sigmoid()
     def forward(self, x):
-        out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
-        # out = out[:, -1, :]  # Now out has shape (batch_size, 64)
+        out, _ = self.lstm(x)  # Output torch.Size([483, 1300, 26])
+        # out = out[:, -1, :]  # '''I guess it should be used to get the last predcited bin value'''
         self.sigmoid(out)  # Activation function
-        out = self.fc1(out)  # Now out has shape (batch_size, 10)
+        out = self.fc1(out)  # Now out has shape torch.Size([483, 1300, 1])
         # self.sigmoid(out)  # Activation function
         # out = self.fc2(out)  # Now out has shape (batch_size, 10)
-        out = out.reshape(1,train_days*bin_size*self.numStock,1)
+        out = out.reshape(self.numStock,train_days*bin_size,1) # result is torch.Size([483, 1300, 1])
         return out
+    # def forward(self, x):
+    #     out, _ = self.lstm(x)  # Output will have shape (batch_size, 100, 64)
+    #     # out = out[:, -1, :]  # Now out has shape (batch_size, 64)
+    #     self.sigmoid(out)  # Activation function
+    #     out = self.fc1(out)  # Now out has shape (batch_size, 10)
+    #     # self.sigmoid(out)  # Activation function
+    #     # out = self.fc2(out)  # Now out has shape (batch_size, 10)
+    #     out = out.reshape(1,train_days*bin_size*self.numStock,1)
+    #     return out
 
 
 # Define the inception block
@@ -114,8 +123,8 @@ class MLPBlock(nn.Module):
         )
     
     def forward(self, x):
-        x = self.fc(x)  # Output shape: torch.Size([1, 1, train_days*bin_size*numStock, 1])
-        x = x.view(1, train_days*bin_size*self.numStock, 52)  # Reshape the output to the desired shape
+        x = self.fc(x)  # Output shape: torch.Size([numStock, 1, train_days*bin_size, num_features])
+        x = x.view(self.numStock, train_days*bin_size, 52)  # torch.Size([numStock, train_days*bin_size, num_features])
         return x
 
 
@@ -192,13 +201,13 @@ class NNPredictionModel:
                 self.optimizer.step()
                 param_update_time = time.time() - param_update_start
                 
-                if self.debug and batch_idx == len(train_loader) - 1:  # 检查debug标志
+                if self.debug and batch_idx == len(train_loader) - 1:  
                     print(f">>> 1 Forward Propagation: {forward_time*1000:.3f}ms")
                     print(f">>> 2 Loss Calculation: {loss_calc_time*1000:.3f}ms")
                     print(f">>> 3 Backward Propagation: {backward_time*1000:.3f}ms")
                     print(f">>> 4 Parameter Update: {param_update_time*1000:.3f}ms")
             
-            if self.debug:  # 检查debug标志
+            if self.debug:  
                 print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
         
     def predict(self, X_test):
@@ -211,10 +220,12 @@ class NNPredictionModel:
     
 if __name__=="__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Detect if CUDA is available
-    numStock = 1
+    numStock = 483
     model = CNNLSTM(numStock).to(device)  # Move the model to the CUDA device
-    input_tensor = torch.rand((1, 1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
-    lstm_input_tensor = torch.rand((1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
+    # input_tensor = torch.rand((1, 1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
+    # lstm_input_tensor = torch.rand((1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
+    input_tensor = torch.rand((numStock, 1, 1300, 52)).to(device)  # Move the input tensor to the CUDA device
+    lstm_input_tensor = torch.rand((numStock, 1300, 52)).to(device)  # Move the input tensor to the CUDA device
     output_tensor = model(input_tensor)
     print("Output shape:", output_tensor.shape)
     print(f"MLPBlock: {count_parameters(MLPBlock(numStock))}".rjust(30))
