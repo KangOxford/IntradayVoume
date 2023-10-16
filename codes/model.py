@@ -284,16 +284,18 @@ def model_nn(X_train, y_train, X_test, y_test, config):
             
             return X_train_window, y_train_window, X_test_window
         
-    def slice_and_stack_batch(X_scaled, y_scaled, num_stock, i):
-        '''i is not used here'''
+    def slice_and_stack_batch(X_scaled, y_scaled, num_stock, idx):
+        '''idx is not used here'''
         X_train_window, y_train_window, _ = slice_and_stack(X_scaled, y_scaled, num_stock, 0)
-        _, _, X_test_window = slice_and_stack(X_scaled, y_scaled, num_stock, i)
+        '''idx is used here'''
+        _, _, X_test_window = slice_and_stack(X_scaled, y_scaled, num_stock, idx)
+        
         num_bins_per_day = bin_size  # Number of bins for each stock each day
         num_days = train_days  # Number of days you want to consider
         # Number of bins for 'num_stock' stocks for 'num_days' days
         total_bins = num_bins_per_day * num_stock * num_days
         '''
-        only one model trained and the X_train is sliding window 
+        >>> Only one model trained and the X_train is sliding window 
         26 bins of stock1 of day1
         26 bins of stock2 of day1
         26 bins of stock1 of day2
@@ -302,7 +304,7 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         26 bins of stock1 of day50
         26 bins of stock2 of day50
         
-        for the X_test, the sliding window is perfomed as follows
+        >>> For the X_test, the sliding window is perfomed as follows
         25 bins of stock1 of day1, start from index 1 (included)
         25 bins of stock2 of day1, start from index 1 (included)
         26 bins of stock1 of day1
@@ -313,18 +315,32 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         1 bins of stock1 of day50, end to index 1 (not included)
         1 bins of stock2 of day50, end to index 1 (not included)
         '''
-        def reshape_X_2Dinto3D_V2(X):
+        def reshape_X_2Dinto3D_V2(X,num_days_):
             num_feature = X.shape[1]
-            X_3D = np.zeros((num_stock, bin_size * num_days, num_feature))
-            for i in range(num_days):
+            X_3D = np.zeros((num_stock, bin_size * num_days_, num_feature))
+            for i in range(num_days_):
                 for j in range(num_stock):
                     sliced = X[i*bin_size*num_stock+j*bin_size:i*bin_size*num_stock+(j+1)*bin_size,:]
                     # Insert sliced data into the right position in the big_array
                     X_3D[j, i * bin_size:(i + 1) * bin_size, :] = sliced #(num_stock, bin_size*num_days, num_features)
             return X_3D
-        X_train_reshaped = reshape_X_2Dinto3D_V2(X_train_window)
-        y_train_reshaped = reshape_X_2Dinto3D_V2(y_train_window) # TODO reamain to be tested
-        X_test_reshaped  = reshape_X_2Dinto3D_V2(X_test_window) # TODO reamain to be tested
+        X_train_reshaped = reshape_X_2Dinto3D_V2(X_train_window,num_days_=num_days)
+        y_train_reshaped = reshape_X_2Dinto3D_V2(y_train_window,num_days_=num_days)
+        def reshape_X_test2Dinto3D_V2(X,idx):
+            if idx ==0:
+                return reshape_X_2Dinto3D_V2(X,num_days_=num_days)
+            else:
+                first_index = (bin_size-idx)*num_stock
+                end_index = -1*idx*num_stock
+                X1 = X[:first_index,:]
+                X2 = X[first_index:idx,end_index:]
+                X3 = X[end_index:,:]
+                X1_3D=reshape_X_2Dinto3D_V2(X1,num_days_=1) #（483,25,52）
+                X2_3D=reshape_X_2Dinto3D_V2(X2,num_days_=num_days-2) #（483,1274,52）
+                X3_3D=reshape_X_2Dinto3D_V2(X3,num_days_=1) #（483,1,52）
+                X_3D = np.concatenate((X1_3D, X2_3D, X3_3D), axis=1) # stack by second dimension:（483,1300,52）
+                return X_3D
+        X_test_reshaped  = reshape_X_test2Dinto3D_V2(X_test_window,idx) # TODO reamain to be tested
         return X_train_reshaped, y_train_reshaped, X_test_reshaped
     
     # def slice_and_stack_single_distribution(X_scaled, y_scaled, num_stock, i):
