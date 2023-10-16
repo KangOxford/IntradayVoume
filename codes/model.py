@@ -293,6 +293,16 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         # Number of bins for 'num_stock' stocks for 'num_days' days
         total_bins = num_bins_per_day * num_stock * num_days
         '''
+        only one model trained and the X_train is sliding window 
+        26 bins of stock1 of day1
+        26 bins of stock2 of day1
+        26 bins of stock1 of day2
+        26 bins of stock2 of day2
+        ...
+        26 bins of stock1 of day50
+        26 bins of stock2 of day50
+        
+        for the X_test, the sliding window is perfomed as follows
         25 bins of stock1 of day1, start from index 1 (included)
         25 bins of stock2 of day1, start from index 1 (included)
         26 bins of stock1 of day1
@@ -303,19 +313,22 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         1 bins of stock1 of day50, end to index 1 (not included)
         1 bins of stock2 of day50, end to index 1 (not included)
         '''
-        def reshape_X_2Dinto3D(X, bin_size_):
-            # Calculate the slice size
-            slice_size = bin_size_ * num_stock
-            # Determine the number of slices
-            num_slices = X.shape[0] // slice_size
-            # Perform the slicing and stacking in one line
-            X_3D = X[:num_slices * slice_size, :].reshape(num_slices, slice_size, -1)
-            # (num_days, bin_size_ * num_stock, num_features)
+        def reshape_X_2Dinto3D_V2(X):
+            num_feature = X.shape[1]
+            X_3D = np.zeros((num_stock, bin_size * num_days, num_feature))
+            for i in range(num_days):
+                for j in range(num_stock):
+                    sliced = X[i*bin_size*num_stock+j*bin_size:i*bin_size*num_stock+(j+1)*bin_size,:]
+                    # Insert sliced data into the right position in the big_array
+                    X_3D[j, i * bin_size:(i + 1) * bin_size, :] = sliced #(num_stock, bin_size*num_days, num_features)
             return X_3D
-        X_train_reshaped = reshape_X_2Dinto3D(X_train_window,bin_size_=bin_size)
-        y_train_reshaped = reshape_X_2Dinto3D(y_train_window, bin_size_=bin_size)
-        X_test_reshaped  = reshape_X_2Dinto3D(X_test_window, bin_size_=bin_size)
+        X_train_reshaped = reshape_X_2Dinto3D_V2(X_train_window)
+        y_train_reshaped = reshape_X_2Dinto3D_V2(y_train_window) # TODO reamain to be tested
+        X_test_reshaped  = reshape_X_2Dinto3D_V2(X_test_window) # TODO reamain to be tested
         return X_train_reshaped, y_train_reshaped, X_test_reshaped
+    
+    # def slice_and_stack_single_distribution(X_scaled, y_scaled, num_stock, i):
+        
 
 
     def train_and_predict_without_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device):

@@ -6,15 +6,6 @@ import torch.profiler
 bin_size = 26
 train_days = 50 
 
-# 130 5 days
-# 1300
-
-# 1,1, 1300/130 bins, 52 features 
-
-# 0.45 / 0.00
-
-# mlp, lstm
-# mlp => lstm 
 
 class LSTMBlock(nn.Module):
     def __init__(self,numStock):

@@ -70,12 +70,10 @@ if __name__=="__main__":
     # regulator = "Lasso"
     # regulator = "XGB"
 
-    # regulator = "cnnLstm"
-    # regulator = "CNN"
-    # regulator = "Inception"
+    regulator = "Inception"
     # regulator = "OLS"
     # regulator = "Ridge"
-    regulator = "CMEM"
+    # regulator = "CMEM"
     
 
     trainType = "universal"
