@@ -1,6 +1,8 @@
-path11 = '/home/kanli/cmem/data/01.1_raw/'
-path12 = '/home/kanli/cmem/data/02.2_data_r_input_kf/'
 
+path11 = '/home/kanli/cmem/data/01.1_raw_fraction/'
+path12 = '/home/kanli/cmem/data/02.2_data_r_input_kf/'
+# path11 = '/home/kanli/cmem/data/01.1_raw/'
+# path12 = '/home/kanli/cmem/data/02.2_data_r_input_kf/'
 # path11 = '/Users/kang/CMEM/data/01.1_raw/'
 # path12 = '/Users/kang/CMEM/data/02.2_data_r_input_kf/'
 import pandas as pd
@@ -12,7 +14,8 @@ files11 = files(path11)
 for i in range(len(files11)):
     name = files11[i][:-4]
     df = pd.read_pickle(path11+files11[i])
-    resampled_df = df[['date','timeHMs','qty']]
+    resampled_df = df[['date','timeHMs','qty_notional']]
+    # resampled_df = df[['date','timeHMs','qty']]
 
     # Step 2: Pivot the DataFrame to get the desired format
     pivot_df = resampled_df.pivot_table(index=resampled_df.index.time, columns=resampled_df.index.date, values='qty')

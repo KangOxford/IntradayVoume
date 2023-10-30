@@ -14,7 +14,9 @@
 # load("/Users/kang/intradayModel/data/volume_aapl.rda")
 # home_path <- path.expand("~")
 home_path <- "/homes/80/kang"
-dir_path <- paste0(home_path,'/cmem/data_notional/02.2_data_r_input_k_remained/')
+dir_path <- paste0(home_path,'/cmem/data_minmax/02.2_data_r_input_kf_minmax/')
+# dir_path <- paste0(home_path,'/cmem/data_notional/02.2_data_r_input_kf/')
+# dir_path <- paste0(home_path,'/cmem/data_notional/02.2_data_r_input_k_remained/')
 # dir_path <- paste0(home_path,'/cmem/data/02.2_data_r_input_k_remained/')
 # dir_path <- '/home/kanli/cmem/data/02.2_data_r_input_kf/'
 # dir_path <- '/Users/kang/CMEM/data/02.2_data_r_input_kf/'
@@ -40,45 +42,18 @@ source(paste0(home_path,"/intradayModel/R/auxiliary_tools.R"))
 
 # Install the 'xts' package if it's not already installed
 .libPaths("/homes/80/kang/my_R_lib")
-library(zoo)
-install.packages('lattice', lib='/homes/80/kang/my_R_lib', repos='http://cran.rstudio.com/')
-library(lattice)
-install.packages('zoo', lib='/homes/80/kang/my_R_lib', repos='http://cran.rstudio.com/')
-library(zoo)
-install.packages('xts', lib='/homes/80/kang/my_R_lib', repos='http://cran.rstudio.com/')
+# library(zoo)
+# install.packages('lattice', lib='/homes/80/kang/my_R_lib', repos='http://cran.rstudio.com/')
+# library(lattice)
+# install.packages('zoo', lib='/homes/80/kang/my_R_lib', repos='http://cran.rstudio.com/')
+# library(zoo)
+# install.packages('xts', lib='/homes/80/kang/my_R_lib', repos='http://cran.rstudio.com/')
 # Now you can load the 'xts' package
 library(xts)
 
 
 
 
-
-
-
-
-
-
-# for (i in seq_along(file_names)[100:199])
-# for (i in seq_along(file_names)[200:299])
-# for (i in seq_along(file_names)[300:399])
-# for (i in seq_along(file_names)[400:length(file_names)])
-# for (i in seq_along(file_names)[1:99])
-# for (i in seq_along(file_names)[50:99])
-# for (i in seq_along(file_names)[150:199])
-# for (i in seq_along(file_names)[250:299])
-# for (i in seq_along(file_names)[350:399])
-# for (i in seq_along(file_names)[450:499])
-# for (i in seq_along(file_names)[475:499])
-# for (i in seq_along(file_names)[375:399])
-# for (i in seq_along(file_names)[275:299])
-# for (i in seq_along(file_names)[175:199])
-# for (i in seq_along(file_names)[75:99])
-# for (i in seq_along(file_names)[425:450])
-# for (i in seq_along(file_names)[325:350])
-# for (i in seq_along(file_names)[225:250])
-# for (i in seq_along(file_names)[125:150])
-# for (i in seq_along(file_names)[25:50])
-# for (i in seq_along(file_names))
 
 
 process_and_write_data <- function(i)
@@ -112,8 +87,8 @@ process_and_write_data <- function(i)
 
 
   # traing_len <- 26
-  traing_len <- 10*26
-  # traing_len <- 10
+  # traing_len <- 10*26
+  traing_len <- 10
   test_len_with_one_dummy <- 2
 
 
@@ -196,7 +171,7 @@ process_and_write_data <- function(i)
     # Adding a column for the bins from 1 to 26
     df$bins <- 1:26
     df$date <- date
-    df$r2 <- cor(original_signal, forecast_signal)^2
+    df$r2   <- cor(original_signal, forecast_signal)^2
     # Printing the data frame
     # print(df)
     lst[[date_index]] <- df
@@ -204,36 +179,30 @@ process_and_write_data <- function(i)
   }
 
   dff <- do.call(rbind, lst)
-  out_dir_path <- paste0(home_path,'/cmem/output/0400_r_kl_output_raw_data_notional/')
+  out_dir_path <- paste0(home_path,'/cmem/output/0400_r_kl_output_raw_data_minmax/')
+  #  out_dir_path <- paste0(home_path,'/cmem/output/0400_r_kl_output_raw_data_fractional/')
+  # out_dir_path <- paste0(home_path,'/cmem/output/0400_r_kl_output_raw_data_notional/')
   # out_dir_path <- '/Users/kang/CMEM/r_output/0400_r_kl_output_raw_data/'
   filename <- paste0(out_dir_path,file_names[i])
   write.csv(dff, file = filename, row.names = FALSE)
+
 }
 
 
 
-for (i in seq_along(file_names)){
+
+# for (i in 1:25) {
+#   process_and_write_data(i)
+# } # fn01
+
+# for (i in 26:50) {
+#   process_and_write_data(i)
+# } # fn02
+
+# for (i in 51:75) {
+#   process_and_write_data(i)
+# } # fn03
+
+for (i in 76:100) {
   process_and_write_data(i)
-}
-
-
-# library(parallel)
-
-
-# # Get the number of available CPU cores
-# num_cores <- detectCores()
-
-# # Output the number of cores
-# cat("Number of CPU cores:", num_cores, "\n")
-
-# # Get the list of indices (1 to length of file_names)
-# indices <- seq_along(file_names)
-
-# # Perform the processing in parallel using mclapply
-# results <-process_and_write_data(1)
-
-# results <- mclapply(indices, process_and_write_data, mc.cores = num_cores)
-
-# 'results' will contain the return value of the function (which is NULL in this case)
-# Since the function doesn't have an explicit return statement, it returns NULL by default
-
+} # fn04

@@ -6,6 +6,14 @@ import torch.profiler
 bin_size = 26
 train_days = 50 
 
+X.shape:
+
+zeros 
+
+
+483,1,1300,52
+
+1,1,1300,52
 
 class LSTMBlock(nn.Module):
     def __init__(self,numStock):

@@ -145,6 +145,11 @@ def normalize_data(X, y):
     y_scaled = scaler_y.fit_transform(y.reshape(-1, 1))
     return X_scaled, y_scaled, scaler_X, scaler_y
 
+
+# 130 5
+# 1300 50
+
+
 def regularity_nn(X_train, y_train, X_test,y_test, config):
     pass
 
@@ -358,8 +363,8 @@ def model_nn(X_train, y_train, X_test, y_test, config):
 
         # Convert to Torch tensors and Reshape
         X_train_tensor_window, y_train_tensor_window = to_torch_tensors(X_train_window, y_train_window, device)
-        X_train_tensor_window = X_train_tensor_window.reshape(1, -1, num_feature).unsqueeze(1)
-        y_train_tensor_window = y_train_tensor_window.reshape(1, -1, 1)
+        # X_train_tensor_window = X_train_tensor_window.reshape(1, -1, num_feature).unsqueeze(1)
+        # y_train_tensor_window = y_train_tensor_window.reshape(1, -1, 1)
 
         # Train the model with the training data
         stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1000, batch_size=483)  # Adjust hyperparameters as needed
