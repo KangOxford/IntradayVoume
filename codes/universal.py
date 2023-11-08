@@ -19,7 +19,8 @@ from dates import *
 import multiprocessing
 import time
 
-path060000Files = readFromPath(path060000)
+path060000Files = readFromPath(path060000_fractional_shares)
+# path060000Files = readFromPath(path060000)
 print(len(path060000Files))
 
 def get_df_list(start_index, num):
@@ -96,12 +97,18 @@ def get_universal_df(start_index, num):
 #     df.to_pickle(path0700+"universal.pkl")
 def main1():
     df = get_universal_df(start_index=0, num=len(path060000Files))
+    # breakpoint()
+    print("len(path060000Files):",len(path060000Files))
     tryMkdir(path0701)
+    print("path0701:",path0701)
     df.to_csv(path0701+"one_file.csv")
     df.to_pickle(path0701+"one_file.pkl")
 def main2():
     dfs,_ = get_df_list(start_index=0, num=len(path060000Files))
+    print("len(path060000Files):",len(path060000Files))
     tryMkdir(path0702)
+    print("path0702:",path0702)
+    # breakpoint()
     # for idx,df in enumerate(dfs):
     for idx, df in tqdm(enumerate(dfs), desc="Processing files", total=len(dfs)):
         df.to_csv(path0702 + path060000Files[idx][:-4] + ".csv")

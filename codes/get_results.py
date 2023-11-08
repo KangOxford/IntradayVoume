@@ -53,9 +53,9 @@ def get_r2df(num,regulator,df):
         # assert np.unique(df1['stock_index']).shape == (len(path060000Files),)
         df2 = df1.pivot(index="test_date", columns="stock_index", values="r2")
         return df2
-    check_GPU_memory()
+    # check_GPU_memory()
     df2 = get_r2df_from_results(r2results)
-    check_GPU_memory()
+    # check_GPU_memory()
     df22 =pd.concat(oneday_dfs,axis=0)
 
     print(df2)

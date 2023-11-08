@@ -30,7 +30,8 @@ def check_GPU_memory():
         print(f"Device: {device.id}, Free Memory: {device.memoryFree}MB, Used Memory: {device.memoryUsed}MB")
 
 
-path060000Files = readFromPath(path060000)
+path060000Files = readFromPath(path060000_fractional_shares)
+# path060000Files = readFromPath(path060000)
 print(len(path060000Files))
 
 path0702Files = readFromPath(path0702)
@@ -43,7 +44,8 @@ def getSingleDfs(trainType):
     if trainType=="universal":
         df = pd.read_pickle(path0700+"universal.pkl")
         dfs=[df]
-        num_of_stacked_stocks = 483
+        num_of_stacked_stocks = 100
+        # num_of_stacked_stocks = 483
         return dfs, num_of_stacked_stocks
     
     elif trainType=="single":
@@ -56,9 +58,6 @@ def getSingleDfs(trainType):
         num_of_stacked_stocks = 1
         return dfs, num_of_stacked_stocks
     else: raise NotImplementedError
-        
-    # return pd.read_pickle(path0701+"one_file.pkl")
-    # return dfs
 
 def print_mean(df3):
     print(f">>>> stock mean: \n",df3.mean(axis=0))  # stock
@@ -70,18 +69,17 @@ if __name__=="__main__":
     # regulator = "Lasso"
     # regulator = "XGB"
 
-    regulator = "Inception"
+    # regulator = "Inception"
     # regulator = "OLS"
     # regulator = "Ridge"
-    # regulator = "CMEM"
+    regulator = "CMEM"
     
 
-    trainType = "universal"
-    # trainType = "single"
+    # trainType = "universal"
+    trainType = "single"
 
     dfs,num_of_stacked_stocks = getSingleDfs(trainType)
-    # for idex,df in enumerate(dfs):
-    # check_GPU_memory()
+    print("dfs,num_of_stacked_stocks:",len(dfs),num_of_stacked_stocks)
     
     df3s=[];df33s=[]
     for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs)):
@@ -98,32 +96,35 @@ if __name__=="__main__":
     df3_ = pd.concat(df3s,axis=1)
     # df3_.columns=np.arange(num_sto ck)
     # pd.set_option('display.max_rows', None) 
-    print(df3_.mean(axis=0))
+    print("df3_.mean(axis=0):",df3_.mean(axis=0))
     # Reload the list from the text file
-    file_path = 'stock_names.txt'
-    reloaded_stock_names = []
-    with open(file_path, 'r') as f:
-        reloaded_stock_names = [line.strip() for line in f.readlines()]
-    reloaded_stock_names
-    df3_.columns = reloaded_stock_names
     
-    
-    '''
-    df3_.mean(axis=0)[df3_.mean(axis=0)>df3_.mean(axis=0).quantile(q=0.25)].mean()
-    0.3993333265521051 the result is same to the previous research
-    means that there is no error in the codes
-    '''
-    
-    print(df3_.mean(axis=1).mean())
-    df33_ = pd.concat(df33s,axis=0)
-    print(df33_.mean(axis=1).mean())
-    # r2_score(df33_.true,df33_.pred)
-    df33_.stock_index=np.tile(np.arange(483).repeat(26),61)
-    df33_.reset_index(drop=True)
-    from datetime import datetime
-    current_datetime = datetime.now().strftime("%Y%m%d%H%M%S")
-    df3_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+f"_{current_datetime}"+".csv", mode = 'w')
-    df33_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+f"{current_datetime}"+".csv", mode = 'w')
+    def give_name_and_save_file():
+        file_path = 'stock_names.txt'
+        reloaded_stock_names = []
+        with open(file_path, 'r') as f:
+            reloaded_stock_names = [line.strip() for line in f.readlines()]
+        reloaded_stock_names
+        df3_.columns = reloaded_stock_names
+        
+        
+        '''
+        df3_.mean(axis=0)[df3_.mean(axis=0)>df3_.mean(axis=0).quantile(q=0.25)].mean()
+        0.3993333265521051 the result is same to the previous research
+        means that there is no error in the codes
+        '''
+        
+        print(df3_.mean(axis=1).mean())
+        df33_ = pd.concat(df33s,axis=0)
+        print(df33_.mean(axis=1).mean())
+        # r2_score(df33_.true,df33_.pred)
+        df33_.stock_index=np.tile(np.arange(100).repeat(26),61)
+        # df33_.stock_index=np.tile(np.arange(483).repeat(26),61)
+        df33_.reset_index(drop=True)
+        from datetime import datetime
+        current_datetime = datetime.now().strftime("%Y%m%d%H%M%S")
+        df3_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+f"_{current_datetime}"+".csv", mode = 'w')
+        df33_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+f"{current_datetime}"+".csv", mode = 'w')
 
 # # %%
 # import  pandas as pd

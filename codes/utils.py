@@ -18,11 +18,17 @@ path0500 = path00 + "r_output/0500_r_output_raw_pkl/"
 path06 = path00 + "r_output/06_r_output_raw_pkl/"
 path0600 = path00 + "r_output/0600_r_output_raw_pkl/"
 path060000 = path00 + "output/06_r_output_raw_csv/"
+
+path060000_fractional_shares = path00 + "output/0600_r_output_with_features_csv_fractional_shares_clipped/"
 path0600_1 = path00+'output/0600_1_r_output_raw_csv/'
 path0600_1_22 = path00+'output/0600_1_22_r_output_raw_csv/'
-path0700 = path00+"output/0700_universal/"
-path0701 = path00+"output/0701_one_file/"
-path0702 = path00+"output/0702_single/" 
+
+path0700 = path00+"output/0700_universal_fractional_shares_clipped/"
+path0701 = path00+"output/0701_one_file_fractional_shares_clipped/"
+path0702 = path00+"output/0702_single_fractional_shares_clipped/" 
+# path0700 = path00+"output/0700_universal/"
+# path0701 = path00+"output/0701_one_file/"
+# path0702 = path00+"output/0702_single/" 
 
 '''used as the input of the get_results 7=>8'''
 
