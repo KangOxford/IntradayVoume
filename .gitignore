@@ -21,3 +21,6 @@
 
 
 ApIQ
+**.ckpt
+wandb/**
+results_file**
