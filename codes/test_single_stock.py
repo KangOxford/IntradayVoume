@@ -29,7 +29,6 @@ def check_GPU_memory():
     for device in devices:
         print(f"Device: {device.id}, Free Memory: {device.memoryFree}MB, Used Memory: {device.memoryUsed}MB")
 
-
 path060000Files = readFromPath(path060000_fractional_shares)
 # path060000Files = readFromPath(path060000)
 print(len(path060000Files))
@@ -42,6 +41,7 @@ print(len(path0702Files_filtered))
 def getSingleDfs(trainType):
     
     if trainType=="universal":
+        print("getSingleDfs trainType:",trainType)
         df = pd.read_pickle(path0700+"universal.pkl")
         dfs=[df]
         num_of_stacked_stocks = 100
@@ -49,6 +49,7 @@ def getSingleDfs(trainType):
         return dfs, num_of_stacked_stocks
     
     elif trainType=="single":
+        print("getSingleDfs trainType:",trainType)
         dfs=[]
         for i in tqdm(range(len(path0702Files_filtered))):
             # print(f">>> {i}")
@@ -71,8 +72,8 @@ if __name__=="__main__":
 
     # regulator = "Inception"
     # regulator = "OLS"
-    # regulator = "Ridge"
-    regulator = "CMEM"
+    regulator = "Ridge"
+    # regulator = "CMEM"
     
 
     # trainType = "universal"
@@ -97,6 +98,7 @@ if __name__=="__main__":
     # df3_.columns=np.arange(num_sto ck)
     # pd.set_option('display.max_rows', None) 
     print("df3_.mean(axis=0):",df3_.mean(axis=0))
+    print("df3_.mean(axis=0).mean():",df3_.mean(axis=0).mean())
     # Reload the list from the text file
     
     def give_name_and_save_file():
@@ -104,8 +106,8 @@ if __name__=="__main__":
         reloaded_stock_names = []
         with open(file_path, 'r') as f:
             reloaded_stock_names = [line.strip() for line in f.readlines()]
-        reloaded_stock_names
-        df3_.columns = reloaded_stock_names
+        reloaded_stock_names_truncated = reloaded_stock_names[:df3_.shape[1]]
+        df3_.columns = reloaded_stock_names_truncated
         
         
         '''
@@ -114,17 +116,18 @@ if __name__=="__main__":
         means that there is no error in the codes
         '''
         
-        print(df3_.mean(axis=1).mean())
         df33_ = pd.concat(df33s,axis=0)
-        print(df33_.mean(axis=1).mean())
-        # r2_score(df33_.true,df33_.pred)
-        df33_.stock_index=np.tile(np.arange(100).repeat(26),61)
-        # df33_.stock_index=np.tile(np.arange(483).repeat(26),61)
+        df33_.stock_index=np.tile(np.array(reloaded_stock_names_truncated).repeat(26),61)
+        # df33_.stock_index=np.tile(np.arange(df3_.shape[1]).repeat(26),61)
         df33_.reset_index(drop=True)
         from datetime import datetime
         current_datetime = datetime.now().strftime("%Y%m%d%H%M%S")
-        df3_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+f"_{current_datetime}"+".csv", mode = 'w')
-        df33_.to_csv(path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+f"{current_datetime}"+".csv", mode = 'w')
+        df3_path = path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+f"_{current_datetime}"+".csv"
+        print("df3_path:",df3_path)
+        df3_.to_csv(df3_path, mode = 'w')
+        df33_path = path00 + "0802_r2df_"+trainType+"_day_"+str(num_of_stacked_stocks)+"_"+regulator+"_"+str(total_r2)[:6]+'_values_'+f"{current_datetime}"+".csv"
+        print("df33_path:",df33_path)
+        df33_.to_csv(df33_path, mode = 'w')
 
 # # %%
 # import  pandas as pd

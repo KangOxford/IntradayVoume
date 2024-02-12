@@ -30,6 +30,9 @@ path0702 = path00+"output/0702_single_fractional_shares_clipped/"
 # path0701 = path00+"output/0701_one_file/"
 # path0702 = path00+"output/0702_single/" 
 
+# NOTE path060000_fractional_shares should be the latest output file 20th Nov, but only 100 stocks are computed
+
+
 '''used as the input of the get_results 7=>8'''
 
 ''''

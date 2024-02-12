@@ -65,6 +65,28 @@ def regularity_ols(X_train, y_train, X_test, config):
             from sklearn.linear_model import Ridge
             reg = Ridge(alpha=best_regularity_alpha, max_iter=10000000, tol=1e-2)
         reg.fit(X_train, y_train)
+        
+        def feature_importance():
+            print(regulator)
+            # Get feature names if you have them
+            # feature_names = ['Feature1', 'Feature2', ...] or
+            feature_names = X_train.columns if isinstance(X_train, pd.DataFrame) else [f'Feature{i}' for i in range(X_train.shape[1])]
+
+            # Get feature importance (absolute value of coefficients for Lasso/Ridge)
+            feature_importance = np.abs(reg.coef_)
+
+            # Create a DataFrame for easy visualization
+            importance_df = pd.DataFrame({
+                'Feature': feature_names,
+                'Importance': feature_importance[0]
+            })
+
+            # Sort the DataFrame by importance
+            importance_df = importance_df.sort_values(by='Importance', ascending=False)
+
+            # Display the feature importance
+            print(importance_df)
+
         # X = pd.DataFrame(X_test).T
         # y_pred = reg.predict(X)
         y_pred = reg.predict(X_test)

@@ -15,7 +15,7 @@ import os;os.sys.path.append("/homes/80/kang/cmem/")
 import os;os.sys.path.append("/homes/80/kang/cmem/codes/")
 from utils import *
 from model import *
-from params import *
+# from params import *
 from trainPred import *
 from get_results import get_r2df
 import multiprocessing
@@ -36,12 +36,12 @@ def print_mean(df3):
     print(f">>>> aggregate mean: \n",df3.mean(axis=1).mean())
 
 if __name__=="__main__":
-    # regulator = "Lasso"
+    regulator = "Lasso"
     # regulator = "XGB"
 
     # regulator = "cnnLstm"
     # regulator = "CNN"
-    regulator = "OLS"
+    # regulator = "OLS"
     # regulator = "Ridge"
     # regulator = "None"
     
