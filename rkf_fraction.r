@@ -203,6 +203,44 @@ process_and_write_data <- function(i)
 #   process_and_write_data(i)
 # } # fn03
 
-for (i in 76:100) {
+# for (i in 76:100) {
+#   process_and_write_data(i)
+# } # fn04
+
+
+# for (i in 101:125) {
+#   process_and_write_data(i)
+# } # fn01 12feb for vwap testing reason
+# for (i in 106:110) {
+#   process_and_write_data(i)
+# } # fn01 12feb for vwap testing reason
+
+# for (i in 110:110) {
+#   process_and_write_data(i)
+# } # not finished yet # done
+
+
+# for (i in 111:115) {
+#   process_and_write_data(i)
+# } # fn01 12feb for vwap testing reason
+# for (i in 116:120) {
+#   process_and_write_data(i)
+# } # fn01 12feb for vwap testing reason
+# for (i in 121:125) {
+#   process_and_write_data(i)
+# } # fn01 12feb for vwap testing reason
+# Vector of specific numbers to iterate over
+# numbers <- c(174, 196, 199)
+# for (i in numbers) {
+#   process_and_write_data(i)
+# } # fn01 12feb for vwap testing reason
+
+# for (i in 126:500) {
+#   process_and_write_data(i)
+# } # fn01 12feb for vwap testing reason
+
+for (i in 300:500) {
   process_and_write_data(i)
-} # fn04
+} # fn01 12feb for vwap testing reason
+
+
