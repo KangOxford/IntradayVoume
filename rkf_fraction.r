@@ -14,7 +14,9 @@
 # load("/Users/kang/intradayModel/data/volume_aapl.rda")
 # home_path <- path.expand("~")
 home_path <- "/homes/80/kang"
-dir_path <- paste0(home_path,'/cmem/data_minmax/02.2_data_r_input_kf_minmax/')
+dir_path <- paste0(home_path,'/cmem/data_fraction/02.2_data_r_input_kf_fraction/')
+# dir_path <- paste0(home_path,'/cmem/data_fraction/02.2_data_r_input_kf/')
+# dir_path <- paste0(home_path,'/cmem/data_minmax/02.2_data_r_input_kf_minmax/')
 # dir_path <- paste0(home_path,'/cmem/data_notional/02.2_data_r_input_kf/')
 # dir_path <- paste0(home_path,'/cmem/data_notional/02.2_data_r_input_k_remained/')
 # dir_path <- paste0(home_path,'/cmem/data/02.2_data_r_input_k_remained/')
@@ -179,8 +181,8 @@ process_and_write_data <- function(i)
   }
 
   dff <- do.call(rbind, lst)
-  out_dir_path <- paste0(home_path,'/cmem/output/0400_r_kl_output_raw_data_minmax/')
-  #  out_dir_path <- paste0(home_path,'/cmem/output/0400_r_kl_output_raw_data_fractional/')
+  # out_dir_path <- paste0(home_path,'/cmem/output/0400_r_kl_output_raw_data_minmax/')
+   out_dir_path <- paste0(home_path,'/cmem/output/0400_r_kl_output_raw_data_fractional/')
   # out_dir_path <- paste0(home_path,'/cmem/output/0400_r_kl_output_raw_data_notional/')
   # out_dir_path <- '/Users/kang/CMEM/r_output/0400_r_kl_output_raw_data/'
   filename <- paste0(out_dir_path,file_names[i])
@@ -235,12 +237,30 @@ process_and_write_data <- function(i)
 #   process_and_write_data(i)
 # } # fn01 12feb for vwap testing reason
 
-# for (i in 126:500) {
+# for (i in 100:250) {
 #   process_and_write_data(i)
 # } # fn01 12feb for vwap testing reason
 
-for (i in 300:500) {
+# for (i in 250:375) {
+#   process_and_write_data(i)
+# } # fn01 12feb for vwap testing reason
+
+# for (i in 375:500) {
+#   process_and_write_data(i)
+# } # fn01 12feb for vwap testing reason
+# only finish the 375-384
+
+# for (i in 385:385) {
+#   process_and_write_data(i)
+# } # fn01 12feb for vwap testing reason
+for (i in 386:400) {
   process_and_write_data(i)
 } # fn01 12feb for vwap testing reason
+# for (i in 400:425) {
+#   process_and_write_data(i)
+# } # fn01 12feb for vwap testing reason
+# for (i in 425:450) {
+#   process_and_write_data(i)
+# } # fn01 12feb for vwap testing reason
 
 
