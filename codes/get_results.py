@@ -39,9 +39,11 @@ def get_r2df(num,regulator,df):
     r2results = [];oneday_dfs=[]
     print("total_test_days",total_test_days)
     for index in range(total_test_days):     
-        r2result,oneday_df = train_and_pred(index,df,config)     
-        r2results.append(r2result)
-        oneday_dfs.append(oneday_df)
+        try:
+            r2result,oneday_df = train_and_pred(index,df,config)     
+            r2results.append(r2result)
+            oneday_dfs.append(oneday_df)
+        except:pass
         # print(r2results)
         # print(oneday_dfs)
     end = time.time()

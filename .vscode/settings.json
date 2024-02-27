@@ -1,9 +1,11 @@
 {
     "workbench.colorCustomizations": {
-        "activityBar.background": "#491658",
-        "titleBar.activeBackground": "#661F7B",
+        "activityBar.background": "#0d080f",
+        "titleBar.activeBackground": "#151415",
         "titleBar.activeForeground": "#FDFAFE"
     },
-    "terminal.integrated.wordWrap": "off",
-    "debug.console.wordWrap": false,
+
+    "terminal.integrated.wordWrap": "on",
+    "debug.console.wordWrap": "on",
+    "editor.wordWrap": "on",
 }

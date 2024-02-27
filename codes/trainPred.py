@@ -3,8 +3,23 @@ import pandas as pd
 from sklearn.metrics import r2_score
 
 def train_and_pred(index,df,config):
+    g=df.groupby('date')
+    lst =[]
+    for idx, itm in g:
+        lst.append(itm.iloc[-2:,:])
+    df = pd.concat(lst)
+    df = df.reset_index(drop=True)
+    bin_size = 2
+    
+    
     num,regulator = config["num"],config["regulator"]
+    
+    
     def get_X_train_y_train_X_test_original_images(df,num):
+        
+
+        
+        
         train_start_index = (index * bin_size) * num
         train_end_index = (index * bin_size + train_size) * num
         test_start_index = train_end_index
@@ -27,8 +42,11 @@ def train_and_pred(index,df,config):
         original_images = df.loc[:, original_space].iloc[train_end_index:test_end_index, :]
         return X_train,y_train,X_test,y_test,original_images,train_end_index
     total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df,num)
+    
+    bin_size = 2
+    
+    
     X_train,y_train,X_test,y_test,original_images,train_end_index=get_X_train_y_train_X_test_original_images(df,num)
-
     # breakpoint()
     # print(regulator)
     if regulator == "Inception":
@@ -55,15 +73,18 @@ def train_and_pred(index,df,config):
 
     original_images['date'] = test_date
     # stock_index = np.tile(tile_array, 26) # original [[bin,483] 26]
-    stock_index = np.arange(num).repeat(26)
+    stock_index = np.arange(num).repeat(bin_size)
     original_images['stock_index'] = stock_index
     oneday_df = pd.concat([original_images, y_pred_clipped], axis=1)[['date','stock_index','true','pred']]
     lst = []
     g = oneday_df.groupby(stock_index)
     for stock, item in g:
         pass
-        r2value = r2_score(item['true'], item['pred'])
-        lst.append([test_date, stock, r2value])
+        try:
+            r2value = r2_score(item['true'], item['pred'])
+            lst.append([test_date, stock, r2value])
+        except:
+            print()
     test_df = pd.DataFrame(lst,columns=["test_date", "stock", "r2value"])
     test_df = test_df.pivot(index='test_date',columns='stock')
     print(test_df)
@@ -90,13 +111,15 @@ def train_and_pred(index,df,config):
 
 
 def param_define(df,num):
-    bin_size = 26
-    train_days = 50
+    # bin_size = 26
+    bin_size = 2
+    train_days = 20
+    # train_days = 50
     # train_days = 50
     # train_days = 20
     # train_days = 10
-    train_size = train_days * 26
-    test_size = 1 * 26
+    train_size = train_days * bin_size
+    test_size = 1 * bin_size
     # breakpoint()
     if type(df) == list:
         total_test_days = df[0].shape[0]//bin_size - train_days
