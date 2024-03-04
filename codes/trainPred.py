@@ -2,24 +2,23 @@ from model import *
 import pandas as pd
 from sklearn.metrics import r2_score
 
+BIN_SIZE = 2
+TRAIN_DAYS = 50
+
 def train_and_pred(index,df,config):
-    g=df.groupby('date')
-    lst =[]
-    for idx, itm in g:
-        lst.append(itm.iloc[-2:,:])
-    df = pd.concat(lst)
-    df = df.reset_index(drop=True)
-    bin_size = 2
+
     
     
     num,regulator = config["num"],config["regulator"]
     
     
-    def get_X_train_y_train_X_test_original_images(df,num):
-        
 
-        
-        
+    total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df,num) # here already wrong, need to check the codes
+    
+    bin_size = BIN_SIZE
+    
+
+    def get_X_train_y_train_X_test_original_images(df,num):
         train_start_index = (index * bin_size) * num
         train_end_index = (index * bin_size + train_size) * num
         test_start_index = train_end_index
@@ -41,12 +40,11 @@ def train_and_pred(index,df,config):
         X_test, y_test = get_testData(df)
         original_images = df.loc[:, original_space].iloc[train_end_index:test_end_index, :]
         return X_train,y_train,X_test,y_test,original_images,train_end_index
-    total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df,num)
-    
-    bin_size = 2
-    
-    
     X_train,y_train,X_test,y_test,original_images,train_end_index=get_X_train_y_train_X_test_original_images(df,num)
+
+    # already wrong at this stage, as the X_test is empty
+
+
     # breakpoint()
     # print(regulator)
     if regulator == "Inception":
@@ -110,10 +108,13 @@ def train_and_pred(index,df,config):
     return lst,oneday_df
 
 
+
 def param_define(df,num):
     # bin_size = 26
-    bin_size = 2
-    train_days = 20
+    bin_size = BIN_SIZE
+    train_days = TRAIN_DAYS
+    # bin_size = 2
+    # train_days = 20
     # train_days = 50
     # train_days = 50
     # train_days = 20

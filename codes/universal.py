@@ -1,5 +1,5 @@
-from tqdm import tqdm
 import numpy as np
+from tqdm import tqdm
 import pandas as pd
 from os import listdir;
 from os.path import isfile, join;
@@ -16,6 +16,7 @@ import os;os.sys.path.append("/homes/80/kang/cmem/codes/")
 from utils import *
 from model import *
 from dates import *
+from trainPred import BIN_SIZE, TRAIN_DAYS
 import multiprocessing
 import time
 
@@ -60,12 +61,18 @@ def get_universal_df(start_index, num):
     new_dflst_lst,dflst_filtered = get_df_list(start_index, num)
     gs=[[df for date, df in list(dflst.groupby("date") )] for dflst in new_dflst_lst]
     dff = []
-    num_days = dflst_filtered.shape[0]//26
+    def truncate_df_wrt_bin_size(dflst_filtered):
+        dflst_filtered = pd.concat([itm.iloc[-BIN_SIZE:,:] for idx,itm in dflst_filtered.groupby('date')])
+        return dflst_filtered
+    dflst_filtered =  truncate_df_wrt_bin_size(dflst_filtered)
+    num_days = dflst_filtered.shape[0]//BIN_SIZE
+    assert dflst_filtered.shape[0]//BIN_SIZE == dflst_filtered.shape[0]/BIN_SIZE
+    # num_days = dflst_filtered.shape[0]//26
     num_stocks = len(new_dflst_lst)
     # for i in tqdm(range(num_days+1)):
     for i in tqdm(range(num_days)):
         for j in range(num_stocks):
-            group = gs[j][i]    
+            group = gs[j][i].iloc[-BIN_SIZE:,:]    
             dff.append(group)
     df = pd.concat(dff, axis=0)
     df.reset_index(inplace=True, drop=True)
@@ -116,8 +123,8 @@ def main2():
 
 
 if __name__=="__main__":    
-    # main1()
-    main2()
+    main1()
+    # main2()
     
     
     

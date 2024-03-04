@@ -42,11 +42,18 @@ def getSingleDfs(trainType):
     
     if trainType=="universal":
         print("getSingleDfs trainType:",trainType)
-        df = pd.read_pickle(path0700+"universal.pkl")
+        df = pd.read_pickle(path0701+"one_file.pkl")
         dfs=[df]
-        num_of_stacked_stocks = 100
-        # num_of_stacked_stocks = 483
+        # num_of_stacked_stocks = 100
+        num_of_stacked_stocks = 481
         return dfs, num_of_stacked_stocks
+    # if trainType=="universal":
+    #     print("getSingleDfs trainType:",trainType)
+    #     df = pd.read_pickle(path0700+"universal.pkl")
+    #     dfs=[df]
+    #     # num_of_stacked_stocks = 100
+    #     num_of_stacked_stocks = 483
+    #     return dfs, num_of_stacked_stocks
     
     elif trainType=="single":
         print("getSingleDfs trainType:",trainType)
@@ -57,7 +64,13 @@ def getSingleDfs(trainType):
             df=df.reset_index(drop=True)
             dfs.append(df)
         num_of_stacked_stocks = 1
-        return dfs, num_of_stacked_stocks
+
+        def truncate_by_bin_size(df):
+            df = pd.concat([itm.iloc[-BIN_SIZE:,:] for idx, itm in df.groupby('date')]).reset_index(drop=True)
+            return df
+        dfs_truncated = [truncate_by_bin_size(df) for df in tqdm(dfs)]
+
+        return dfs_truncated, num_of_stacked_stocks
     else: raise NotImplementedError
 
 def print_mean(df3):
@@ -66,7 +79,7 @@ def print_mean(df3):
     print(f">>>> aggregate mean: \n",df3.mean(axis=1).mean())
 
 if __name__=="__main__":
-    
+    # /homes/80/kang/anaconda3/bin/python /homes/80/kang/cmem/codes/test_single_stock.py
     regulator = "Lasso"
     # regulator = "XGB"
 
@@ -100,6 +113,18 @@ if __name__=="__main__":
     print("df3_.mean(axis=0):",df3_.mean(axis=0))
     print("df3_.mean(axis=0).mean():",df3_.mean(axis=0).mean())
     # Reload the list from the text file
+    
+    def get_df33_r2_close_interval(df33):
+        r2_cross_dates=df33.groupby('date').apply(lambda x:r2_score(x.true,x.pred))
+        r2_cross_dates.mean()
+        '''
+        how is the performance, should save to csv and then
+        compare with the df33 results comes from the single params
+        '''
+        path = '/homes/80/kang/cmem/output/df33s/'
+        import os;os.system(f'mkdir {path}')
+        df33.to_csv(path+'df33_universal_close_interval_481_lasso.csv')
+        r2_cross_dates.to_csv(path+'r2_cross_dates_universal_close_interval_481_lasso.csv')
     
     def give_name_and_save_file():
         file_path = 'stock_names.txt'
