@@ -15,6 +15,11 @@ def check_GPU_memory():
     for device in devices:
         print(f"Device: {device.id}, Free Memory: {device.memoryFree}MB, Used Memory: {device.memoryUsed}MB")
 
+import ray
+# @ray.remote(num_cpus=64)
+@ray.remote
+def get_r2df_ray(num,regulator,df):
+    return get_r2df(num,regulator,df)
 
 def get_r2df(num,regulator,df):
     

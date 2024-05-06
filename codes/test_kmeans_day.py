@@ -11,7 +11,7 @@ import os;os.sys.path.append("/homes/80/kang/cmem/")
 import os;os.sys.path.append("/homes/80/kang/cmem/codes/")
 from utils import *
 from model import *
-from params import *
+# from params import *
 from kmeans import *
 from universal import *
 from trainPred import *
@@ -97,7 +97,8 @@ if __name__ == '__main__':
     import time
     from tqdm import tqdm
     # regulator = "OLS"
-    regulator = "XGB"
+    # regulator = "XGB"
+    regulator = "LASSO"
     # n_clusters = 2
     # n_clusters = 5
     n_clusters = 10

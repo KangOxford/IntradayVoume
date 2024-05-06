@@ -25,3 +25,6 @@ wandb/**
 results_file**
 notes2024.md
 tstex_modules/_api.ts
+
+**.ipynb
+codes/note.md

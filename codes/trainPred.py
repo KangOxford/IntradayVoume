@@ -2,7 +2,8 @@ from model import *
 import pandas as pd
 from sklearn.metrics import r2_score
 
-BIN_SIZE = 2
+BIN_SIZE = 26
+# BIN_SIZE = 2
 TRAIN_DAYS = 50
 
 def train_and_pred(index,df,config):
