@@ -20,9 +20,12 @@ from trainPred import BIN_SIZE, TRAIN_DAYS
 import multiprocessing
 import time
 
-path060000Files = readFromPath(path060000_fractional_shares)
-# path060000Files = readFromPath(path060000)
-print(len(path060000Files))
+
+
+
+path0702Files = readFromPath(path0702)
+print(len(path0702Files))
+path0702Files_filtered = list(filter(lambda x: x.endswith('.pkl'), path0702Files))
 
 def get_df_list(start_index, num):
     df_lst = []
@@ -30,7 +33,9 @@ def get_df_list(start_index, num):
     
     from tqdm import tqdm
     for i in tqdm(range(start_index, start_index + num)):  # on mac4
-        df = pd.read_csv(path060000 + path060000Files[i], index_col=0)
+        df = pd.read_pickle(path0702+path0702Files_filtered[i])
+        df=df.reset_index(drop=True)
+        # df = pd.read_csv(path060000 + path060000Files[i], index_col=0)
         df_lst.append(df)
 
     d = generate_unusual_date(year=2017)
@@ -102,7 +107,7 @@ def get_universal_df(start_index, num):
 #     tryMkdir(path0700)
 #     df.to_csv(path0700+"universal.csv")
 #     df.to_pickle(path0700+"universal.pkl")
-def main1():
+def main1(path060000Files):
     df = get_universal_df(start_index=0, num=len(path060000Files))
     # breakpoint()
     print("len(path060000Files):",len(path060000Files))
@@ -110,7 +115,7 @@ def main1():
     print("path0701:",path0701)
     df.to_csv(path0701+"one_file.csv")
     df.to_pickle(path0701+"one_file.pkl")
-def main2():
+def main2(path060000Files):
     dfs,_ = get_df_list(start_index=0, num=len(path060000Files))
     print("len(path060000Files):",len(path060000Files))
     tryMkdir(path0702)
@@ -122,9 +127,12 @@ def main2():
         df.to_pickle(path0702 + path060000Files[idx][:-4] + ".pkl")
 
 
-if __name__=="__main__":    
-    # main1()
-    main2()
+if __name__=="__main__":   
+    path060000Files = readFromPath(path060000_fractional_shares)
+    # path060000Files = readFromPath(path060000)
+    print(len(path060000Files)) 
+    # main1(path060000Files)
+    main2(path060000Files)
     
     
     

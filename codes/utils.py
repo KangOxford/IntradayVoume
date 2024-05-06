@@ -64,3 +64,26 @@ readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile
 #     map(readFromPath, [path01, path01_1, path02, path04, path0500, path0600])
 
 
+
+def get_git_hash():
+    import subprocess
+    try:
+        # Execute the command to get the latest commit hash
+        git_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip().decode('utf-8')
+
+        # Slice the first 4 characters
+        short_hash = git_hash[:4]
+
+        return short_hash
+
+    except subprocess.CalledProcessError:
+        print("An error occurred while fetching the Git hash.")
+        return None
+    
+def check_GPU_memory():
+    import GPUtil
+    # Get the list of GPU devices
+    devices = GPUtil.getGPUs()
+    # Loop through devices and print their memory usage
+    for device in devices:
+        print(f"Device: {device.id}, Free Memory: {device.memoryFree}MB, Used Memory: {device.memoryUsed}MB")    

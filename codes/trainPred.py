@@ -4,7 +4,8 @@ from sklearn.metrics import r2_score
 
 BIN_SIZE = 26
 # BIN_SIZE = 2
-TRAIN_DAYS = 50
+TRAIN_DAYS = 10
+# TRAIN_DAYS = 50
 
 def train_and_pred(index,df,config):
 
@@ -14,7 +15,8 @@ def train_and_pred(index,df,config):
     
     
 
-    total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df,num) # here already wrong, need to check the codes
+    total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df,num) 
+    # here already wrong, need to check the codes
     
     bin_size = BIN_SIZE
     

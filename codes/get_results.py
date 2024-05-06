@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import pandas as pd
 import os;os.sys.path.append(os.path.expanduser('~') + "/cmem/codes/")
@@ -5,15 +6,8 @@ import os;os.sys.path.append(os.path.expanduser('~') + "/cmem/")
 import os;os.sys.path.append("/homes/80/kang/cmem/")
 import os;os.sys.path.append("/homes/80/kang/cmem/codes/")
 from trainPred import *
-import time
+from utils import check_GPU_memory
 
-def check_GPU_memory():
-    import GPUtil
-    # Get the list of GPU devices
-    devices = GPUtil.getGPUs()
-    # Loop through devices and print their memory usage
-    for device in devices:
-        print(f"Device: {device.id}, Free Memory: {device.memoryFree}MB, Used Memory: {device.memoryUsed}MB")
 
 import ray
 # @ray.remote(num_cpus=64)
@@ -86,3 +80,6 @@ def get_git_hash():
     except subprocess.CalledProcessError:
         print("An error occurred while fetching the Git hash.")
         return None
+    
+    
+    

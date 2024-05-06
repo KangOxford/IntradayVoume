@@ -88,6 +88,14 @@ def get_labels_byPCA(corr_matrix,ratio_cumsum,n_components,n_clusters):
     # pca=PCA(n_components=100)
     # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.9999))
     # pca=PCA(n_components=np.argmax(ratio.cumsum() >= 0.99))
+    def provide_eigen_values(pca):
+        # Get the eigenvalues
+        eigenvalues = pca.explained_variance_
+        with open('/homes/80/kang/cmem/output/eigenvalues_features.txt', 'a') as f:
+            f.write(', '.join(map(str, eigenvalues.tolist())))
+            f.write('\n')
+    provide_eigen_values(pca)
+    
     if ratio_cumsum == 1.00:
         pca = PCA(n_components=n_components)
         print("n_components 100")
@@ -96,9 +104,11 @@ def get_labels_byPCA(corr_matrix,ratio_cumsum,n_components,n_clusters):
         print(f"n_components {np.argmax(ratio.cumsum() >= ratio_cumsum)}")
     pca.fit(corr_matrix)
     scores_pca = pca.transform(corr_matrix)
+    print(f'the shape of the scores_pca is {scores_pca.shape}')
 
     from sklearn.cluster import KMeans
     kmeans_pca = KMeans(n_clusters=n_clusters, init="k-means++",random_state=42)
+    
     kmeans_pca.fit(scores_pca)
     assert kmeans_pca.labels_.shape == (n_components,)
     labels = kmeans_pca.labels_
