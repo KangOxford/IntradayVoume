@@ -131,8 +131,8 @@ if __name__=="__main__":
     path060000Files = readFromPath(path060000_fractional_shares)
     # path060000Files = readFromPath(path060000)
     print(len(path060000Files)) 
-    # main1(path060000Files)
-    main2(path060000Files)
+    main1(path060000Files)
+    # main2(path060000Files)
     
     
     

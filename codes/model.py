@@ -183,6 +183,7 @@ def model_nn(X_train, y_train, X_test, y_test, config):
     from 1,1,train_days*bin_size,52 X 1, train_days*bin_size,1
     to   1,1,1274,52 X 1,   26,1   
     '''
+
     regulator = config["regulator"]
     num = config["num"]
     bin_size = config["bin_size"]
@@ -389,7 +390,7 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         # y_train_tensor_window = y_train_tensor_window.reshape(1, -1, 1)
 
         # Train the model with the training data
-        stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1000, batch_size=483)  # Adjust hyperparameters as needed
+        stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1000, batch_size=481)  # Adjust hyperparameters as needed
         stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model.double())  # wrap your model in DataParallel
         stock_prediction_model.model.to(device)  # send it to the device
 

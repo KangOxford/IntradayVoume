@@ -4,8 +4,8 @@ from sklearn.metrics import r2_score
 
 BIN_SIZE = 26
 # BIN_SIZE = 2
-TRAIN_DAYS = 10
-# TRAIN_DAYS = 50
+# TRAIN_DAYS = 10
+TRAIN_DAYS = 50
 
 def train_and_pred(index,df,config):
 

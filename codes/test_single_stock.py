@@ -80,10 +80,10 @@ def print_mean(df3):
 
 if __name__=="__main__":
     # /homes/80/kang/anaconda3/bin/python /homes/80/kang/cmem/codes/test_single_stock.py
-    regulator = "Lasso"
+    # regulator = "Lasso"
     # regulator = "XGB"
 
-    # regulator = "Inception"
+    regulator = "Inception"
     # regulator = "OLS"
     # regulator = "Ridge"
     # regulator = "CMEM"
@@ -110,6 +110,7 @@ if __name__=="__main__":
         df33s_=pd.concat(df33s,axis=0)
     elif trainType=="universal":
         df3s=[];df33s=[]
+        # idx=0;df=dfs[0];num=num_of_stacked_stocks
         for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs)):
             df3,df33 = get_r2df(num=num_of_stacked_stocks,regulator=regulator,df=df)
             total_r2 = df3.mean(axis=1).mean()

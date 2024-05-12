@@ -6,14 +6,14 @@ import torch.profiler
 bin_size = 26
 train_days = 50 
 
-X.shape:
+# X.shape:
 
-zeros 
+# zeros 
 
 
-483,1,1300,52
+# 483,1,1300,52
 
-1,1,1300,52
+# 1,1,1300,52
 
 class LSTMBlock(nn.Module):
     def __init__(self,numStock):
@@ -159,7 +159,8 @@ import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
 class NNPredictionModel:
-    def __init__(self, numStock, learning_rate=0.001, epochs=10, batch_size=32, debug=False):
+    def __init__(self, numStock, learning_rate=0.001, epochs=10, batch_size=32, debug=True):
+    # def __init__(self, numStock, learning_rate=0.001, epochs=10, batch_size=32, debug=False):
         self.model = CNNLSTM(numStock)
         self.learning_rate = learning_rate
         self.epochs = epochs
@@ -185,7 +186,7 @@ class NNPredictionModel:
                 self.optimizer.zero_grad()
                 
                 forward_start = time.time()
-                outputs = self.model(X_batch)
+                outputs = self.model(X_batch) # TODO debug
                 forward_time = time.time() - forward_start
                 
                 loss_calc_start = time.time()
@@ -208,6 +209,8 @@ class NNPredictionModel:
             
             if self.debug:  
                 print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
+            print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
+        print("Train completed")
         
     def predict(self, X_test):
         self.model.eval()
@@ -219,7 +222,7 @@ class NNPredictionModel:
     
 if __name__=="__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Detect if CUDA is available
-    numStock = 483
+    numStock = 481
     model = CNNLSTM(numStock).to(device)  # Move the model to the CUDA device
     # input_tensor = torch.rand((1, 1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
     # lstm_input_tensor = torch.rand((1, 1300*numStock, 52)).to(device)  # Move the input tensor to the CUDA device
