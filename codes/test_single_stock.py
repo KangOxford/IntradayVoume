@@ -6,9 +6,7 @@ from os.path import isfile, join;
 from sklearn.metrics import r2_score
 
 
-import numpy as np
-import pandas as pd
-from tqdm import tqdm
+
 import os;os.sys.path.append(os.path.expanduser('~') + "/cmem/codes/")
 import os;os.sys.path.append(os.path.expanduser('~') + "/cmem/")
 import os;os.sys.path.append("/homes/80/kang/cmem/")
@@ -89,18 +87,25 @@ if __name__=="__main__":
     # regulator = "CMEM"
     
 
-    trainType = "universal"
-    # trainType = "single"
+    # trainType = "universal"
+    trainType = "single"
 
     dfs,num_of_stacked_stocks = getSingleDfs(trainType)
     print("dfs,num_of_stacked_stocks:",len(dfs),num_of_stacked_stocks)
     
     if trainType=="single":
-        import ray
-        ray.shutdown()
-        ray.init(num_cpus=64,object_store_memory=40 * 1e9)    
-        ids = [get_r2df_ray.remote(num=num_of_stacked_stocks,regulator=regulator,df=df) for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs))]
-        results = [ray.get(id_) for id_ in tqdm(ids)]
+        rayOn = False
+        if rayOn:
+            import ray
+            ray.shutdown()
+            ray.init(num_cpus=64,object_store_memory=40 * 1e9)    
+            ids = [get_r2df_ray.remote(num=num_of_stacked_stocks,regulator=regulator,df=df) for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs))]
+            results = [ray.get(id_) for id_ in tqdm(ids)]
+        else: 
+            results=[]
+            for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs)):
+                result = get_r2df(num=num_of_stacked_stocks,regulator=regulator,df=df)
+                results.append(result)
         df3s,df33s=zip(*results)
         
         names = [name[:-4] for name in path0702Files_filtered]
