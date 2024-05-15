@@ -391,7 +391,7 @@ def model_nn(X_train, y_train, X_test, y_test, config):
 
         # Train the model with the training data
         stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1000, batch_size=481)  # Adjust hyperparameters as needed
-        stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model.double())  # wrap your model in DataParallel
+        # stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model.double())  # wrap your model in DataParallel
         stock_prediction_model.model.to(device)  # send it to the device
 
         # Train the model
@@ -436,7 +436,8 @@ def model_nn(X_train, y_train, X_test, y_test, config):
     X_scaled, y_scaled, scaler_X, scaler_y = normalize_data(X, y)
     
     # Device configuration
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cpu")
+    # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
     # Constants for reshaping and sliding window
     num_stock = num
