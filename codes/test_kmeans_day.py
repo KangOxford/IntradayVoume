@@ -50,7 +50,15 @@ def return_lst(list_, date_index,regulator):
     index=date_index
     result=train_and_pred(index,df,config)
     # result=train_and_pred(index,df,num,regulator,tile_array=list_)
-    return result
+    def update_stock_index(result, list_):
+        summary,details=result
+        stock_indicies = np.repeat(np.array(list_), BIN_SIZE)
+        details.stock_index = stock_indicies
+        for i in range(len(summary)):
+            summary[i][1]=list_[i]
+        return [summary,details]
+    updated_result = update_stock_index(result, list_)
+    return updated_result
 
 # date_index=0;n_components=len(path0702Files_filtered)
 
@@ -64,7 +72,7 @@ def process_data(date_index,regulator,ratio_cumsum,n_clusters,features):
     corr_matrix = get_corr_matrix(train_start_Index, train_end_Index, features)
     labels =get_labels_byPCA(corr_matrix,ratio_cumsum,n_components=len(path0702Files_filtered),n_clusters=n_clusters)
     # The labels used to indicate how to group.
-    return None
+    # return None
 
     v = pd.DataFrame({"a":labels,"b": np.arange(len(path0702Files_filtered))})
     g =v.groupby("a")
@@ -76,9 +84,11 @@ def process_data(date_index,regulator,ratio_cumsum,n_clusters,features):
     # index2, list_ =  lst2[0]
     for i2, list_ in tqdm(lst2):
         lst = return_lst(list_, date_index,regulator)
-        sub_r2_list+=lst
-
-    return sub_r2_list
+        sub_r2_list.append(lst)
+    summaries = pd.DataFrame(np.concatenate([np.array(lst[0]) for lst in sub_r2_list]),columns=['date','stock_index','r2']).sort_values('stock_index')
+    details_list = [lst[1] for lst in sub_r2_list]
+    details = pd.concat(details_list).sort_values('stock_index')
+    return summaries,details
 
 # def multiprocessing():
 #     import multiprocessing
@@ -94,6 +104,7 @@ def get_r2df(num,n_clusters,ratio_cumsum,regulator):
 
     start = time.time()
     results = []
+    # for i in tqdm(range(2)): # for debug only
     for i in tqdm(range(total_test_days)):
         result = process_data(i,regulator,ratio_cumsum,n_clusters,features)
         results.append(result)
@@ -102,18 +113,20 @@ def get_r2df(num,n_clusters,ratio_cumsum,regulator):
     print(f"time {(end-start)/60}")
 
     # TODO still exists bugs here
-    r2arr = np.array(results).reshape(-1,3)
-    df1 = pd.DataFrame(r2arr)
+    summaries_list = [result[0] for result in results]
+    details_list = [result[1] for result in results]
+    details_df = pd.concat(details_list)
+    df1 = pd.concat(summaries_list)
     df1.columns = ['test_date','stock_index','r2']
     assert np.unique(df1.stock_index).shape == (len(path0702Files_filtered),)
     df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
-    return df2
+    return df2, details_df
 
 if __name__ == '__main__':
 
-    # regulator = "OLS"
+    regulator = "OLS"
     # regulator = "XGB"
-    regulator = "Lasso"
+    # regulator = "Lasso"
     # n_clusters = 2
     # n_clusters = 5
     n_clusters = 10
@@ -137,7 +150,7 @@ if __name__ == '__main__':
     # features = get_features(new_dflst_lst,x_list,type="features")
     print(features.shape)
     
-    df2 = get_r2df(num=len(path0702Files_filtered),n_clusters=n_clusters,ratio_cumsum=ratio_cumsum,regulator=regulator)
+    df2, details_df = get_r2df(num=len(path0702Files_filtered),n_clusters=n_clusters,ratio_cumsum=ratio_cumsum,regulator=regulator)
     
 
     print(df2)
@@ -147,6 +160,9 @@ if __name__ == '__main__':
     df2.mean(axis=1) # date
     print(df2.mean(axis=1).mean())
 
-    filename = "07_2_kmeans_day_compare_test.py_"+str(len(df2.index))+'_'+str(int(df2.index[0]))+"_"+str(int(df2.index[-1]))+"_"+str(int(time.time()))+"_.csv"
-    df2.to_csv(filename)
+    filename_df2 = "07_2_kmeans_day_compare_test.py_"+str(len(df2.index))+'_'+str(int(df2.index[0]))+"_"+str(int(df2.index[-1]))+"_"+str(int(time.time()))+"_.csv"
+    df2.to_csv(filename_df2)
+    
+    filename_details_df = "07_2_kmeans_day_compare_test.py_"+str(len(df2.index))+'_'+str(int(df2.index[0]))+"_"+str(int(df2.index[-1]))+"_"+str(int(time.time()))+"_all_values_.csv"
+    details_df.to_csv(filename_details_df)
 
