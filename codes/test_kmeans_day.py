@@ -20,6 +20,7 @@ from universal import *
 from universal import get_df_list
 from trainPred import *
 # import multiprocessing
+import ray
 
 readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f)) and f != '.DS_Store'])
 
@@ -30,9 +31,10 @@ print(len(path0702Files_filtered))
 
 ONE_STOCK_SHAPE = 111*26 # 2886
 
-def return_lst(list_, date_index,regulator):
+def return_lst(list_, date_index,regulator,new_dflst_lst):
     # print(f"\n+++@ return_lst() called\n")
     # This function is used to stack the feature matrices of clustered models.
+    groupped_dfs = [new_dflst_lst[i] for i in list_]
     groupped_dfs = [new_dflst_lst[i] for i in list_]
     gs = [dflst.iterrows() for dflst in groupped_dfs]
     dff = []
@@ -62,8 +64,8 @@ def return_lst(list_, date_index,regulator):
 
 # date_index=0;n_components=len(path0702Files_filtered)
 
-def process_data(date_index,regulator,ratio_cumsum,n_clusters,features):
-    print(f"+++ index, {date_index}")
+def process_data(date_index,regulator,ratio_cumsum,n_clusters,features,new_dflst_lst):
+    print(f">>> index BEGIN, {date_index}")
     
     # def classifyStocks(features):
     train_start_Index = (date_index * bin_size ) # for classification of stocks
@@ -83,11 +85,12 @@ def process_data(date_index,regulator,ratio_cumsum,n_clusters,features):
     sub_r2_list = []
     # index2, list_ =  lst2[0]
     for i2, list_ in tqdm(lst2):
-        lst = return_lst(list_, date_index,regulator)
+        lst = return_lst(list_, date_index,regulator,new_dflst_lst)
         sub_r2_list.append(lst)
     summaries = pd.DataFrame(np.concatenate([np.array(lst[0]) for lst in sub_r2_list]),columns=['date','stock_index','r2']).sort_values('stock_index')
     details_list = [lst[1] for lst in sub_r2_list]
     details = pd.concat(details_list).sort_values('stock_index')
+    print(f"+++ index FINISH, {date_index}")
     return summaries,details
 
 # def multiprocessing():
@@ -100,19 +103,27 @@ def process_data(date_index,regulator,ratio_cumsum,n_clusters,features):
 #         results = pool.map(process_data,range(total_test_days))
 
 
-def get_r2df(num,n_clusters,ratio_cumsum,regulator):
+def get_r2df(num,n_clusters,ratio_cumsum,regulator,new_dflst_lst):
 
+    # # in sequential
+    # start = time.time()
+    # results = []
+    # # for i in tqdm(range(2)): # for debug only
+    # for i in tqdm(range(total_test_days)):
+    #     result = process_data(i,regulator,ratio_cumsum,n_clusters,features)
+    #     results.append(result)
+    #     # results.append(process_data(i,regulator))
+    # end = time.time()
+    # print(f"time {(end-start)/60}")
+    
+    
+    # in parrallel
     start = time.time()
-    results = []
-    # for i in tqdm(range(2)): # for debug only
-    for i in tqdm(range(total_test_days)):
-        result = process_data(i,regulator,ratio_cumsum,n_clusters,features)
-        results.append(result)
-        # results.append(process_data(i,regulator))
+    ids=[process_data_ray.remote(i,regulator,ratio_cumsum,n_clusters,features,new_dflst_lst) for i in tqdm(range(total_test_days))]
+    results = [ray.get(id_) for id_ in ids]
     end = time.time()
     print(f"time {(end-start)/60}")
 
-    # TODO still exists bugs here
     summaries_list = [result[0] for result in results]
     details_list = [result[1] for result in results]
     details_df = pd.concat(details_list)
@@ -122,7 +133,15 @@ def get_r2df(num,n_clusters,ratio_cumsum,regulator):
     df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
     return df2, details_df
 
+
+@ray.remote
+def process_data_ray(i,regulator,ratio_cumsum,n_clusters,features,new_dflst_lst):
+    return process_data(i,regulator,ratio_cumsum,n_clusters,features,new_dflst_lst)
+
 if __name__ == '__main__':
+
+    ray.shutdown()
+    ray.init(num_cpus=80,object_store_memory=40*1e9)
 
     regulator = "OLS"
     # regulator = "XGB"
@@ -150,7 +169,7 @@ if __name__ == '__main__':
     # features = get_features(new_dflst_lst,x_list,type="features")
     print(features.shape)
     
-    df2, details_df = get_r2df(num=len(path0702Files_filtered),n_clusters=n_clusters,ratio_cumsum=ratio_cumsum,regulator=regulator)
+    df2, details_df = get_r2df(num=len(path0702Files_filtered),n_clusters=n_clusters,ratio_cumsum=ratio_cumsum,regulator=regulator,new_dflst_lst=new_dflst_lst)
     
 
     print(df2)

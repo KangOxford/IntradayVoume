@@ -17,6 +17,13 @@ import ray
 def get_r2df_ray(num,regulator,df):
     return get_r2df(num,regulator,df)
 
+@ray.remote
+def train_and_pred_ray(index,df,config):
+    print(f">>> date index BEGIN: {index}")
+    result = train_and_pred(index,df,config)
+    print(f"+++ date index COMPLETE: {index}")
+    return result
+
 def get_r2df(num,regulator,df):
     
     print("universal data loaded")
@@ -53,16 +60,12 @@ def get_r2df(num,regulator,df):
     
     # in parallel
     start = time.time()
-    ray.shutdown()
-    ray.init(num_cpus=64,object_store_memory=40*1e9)
-    @ray.remote
-    def train_and_pred_ray(index,df,config):
-        print(f"+++ date index: {index}")
-        return train_and_pred(index,df,config)
-    ids=[train_and_pred_ray.remote(index,df,config) for index in tqdm(3)]
-    # ids=[train_and_pred_ray.remote(index,df,config) for index in tqdm(range(total_test_days))]
+    # ids=[train_and_pred_ray.remote(index,df,config) for index in tqdm(3)]
+    ids=[train_and_pred_ray.remote(index,df,config) for index in tqdm(range(total_test_days))]
     results = [ray.get(id_) for id_ in tqdm(ids)]
-    r2results,oneday_dfs=zip(*results)
+    r2results  = [result[0] for result in results]
+    oneday_dfs = [result[1] for result in results]
+    # r2results,oneday_dfs=zip(*results)
     end = time.time()
     print(f"get r2results,oneday_dfs time taken {end-start}")
     breakpoint()

@@ -17,6 +17,7 @@ from trainPred import *
 from get_results import get_r2df, get_r2df_ray
 import multiprocessing
 import time
+import ray
 
 
 def check_GPU_memory():
@@ -77,6 +78,10 @@ def print_mean(df3):
     print(f">>>> aggregate mean: \n",df3.mean(axis=1).mean())
 
 if __name__=="__main__":
+    rayOn = True
+    if rayOn:
+        ray.shutdown()
+        ray.init(num_cpus=64,object_store_memory=40*1e9)
     # /homes/80/kang/anaconda3/bin/python /homes/80/kang/cmem/codes/test_single_stock.py
     # regulator = "Lasso"
     # regulator = "XGB"
@@ -96,7 +101,7 @@ if __name__=="__main__":
     if trainType=="single":
         rayOn = False
         if rayOn:
-            import ray
+
             ray.shutdown()
             ray.init(num_cpus=64,object_store_memory=40 * 1e9)    
             ids = [get_r2df_ray.remote(num=num_of_stacked_stocks,regulator=regulator,df=df) for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs))]
