@@ -39,7 +39,6 @@ def return_lst(list_, date_index,regulator,new_dflst_lst):
     gs = [dflst.iterrows() for dflst in groupped_dfs]
     dff = []
     for i in range(ONE_STOCK_SHAPE):
-    # for i in tqdm(range(one_stock_shape)):
         for g in gs:
             elem = next(g)[1].T
             dff.append(elem)
@@ -48,7 +47,6 @@ def return_lst(list_, date_index,regulator,new_dflst_lst):
     # print(df.shape)
 
     config={'num':len(groupped_dfs), 'regulator':regulator,'short_hash':get_git_hash()}
-    # config={'num':len(groupped_dfs), 'regulator':regulator}
     index=date_index
     result=train_and_pred(index,df,config)
     # result=train_and_pred(index,df,num,regulator,tile_array=list_)
@@ -74,33 +72,17 @@ def process_data(date_index,regulator,ratio_cumsum,n_clusters,features,new_dflst
     corr_matrix = get_corr_matrix(train_start_Index, train_end_Index, features)
     labels =get_labels_byPCA(corr_matrix,ratio_cumsum,n_components=len(path0702Files_filtered),n_clusters=n_clusters)
     # The labels used to indicate how to group.
-    # return None
 
     v = pd.DataFrame({"a":labels,"b": np.arange(len(path0702Files_filtered))})
-    g =v.groupby("a")
-    lst2 = []
-    for i1,item in tqdm(g):
-        lst2.append([i1,item.b.values])
+    lst2 = [[i1,item.b.values] for i1,item in tqdm(v.groupby("a"))]    
+    sub_r2_list = [return_lst(list_, date_index,regulator,new_dflst_lst) for _, list_ in tqdm(lst2)]
 
-    sub_r2_list = []
-    # index2, list_ =  lst2[0]
-    for i2, list_ in tqdm(lst2):
-        lst = return_lst(list_, date_index,regulator,new_dflst_lst)
-        sub_r2_list.append(lst)
     summaries = pd.DataFrame(np.concatenate([np.array(lst[0]) for lst in sub_r2_list]),columns=['date','stock_index','r2']).sort_values('stock_index')
     details_list = [lst[1] for lst in sub_r2_list]
     details = pd.concat(details_list).sort_values('stock_index')
     print(f"+++ index FINISH, {date_index}")
     return summaries,details
 
-# def multiprocessing():
-#     import multiprocessing
-#     num_processes = multiprocessing.cpu_count()  # Get the number of available CPU cores
-#     import os; home = os.path.expanduser("~")
-#     if home == '/homes/80/kang':
-#         num_processes = 112
-#     with multiprocessing.Pool(processes=num_processes) as pool:
-#         results = pool.map(process_data,range(total_test_days))
 
 
 def get_r2df(num,n_clusters,ratio_cumsum,regulator,new_dflst_lst):
@@ -110,7 +92,7 @@ def get_r2df(num,n_clusters,ratio_cumsum,regulator,new_dflst_lst):
     # results = []
     # # for i in tqdm(range(2)): # for debug only
     # for i in tqdm(range(total_test_days)):
-    #     result = process_data(i,regulator,ratio_cumsum,n_clusters,features)
+    #     result = process_data(i,regulator,ratio_cumsum,n_clusters,features,new_dflst_lst)
     #     results.append(result)
     #     # results.append(process_data(i,regulator))
     # end = time.time()
@@ -143,20 +125,21 @@ if __name__ == '__main__':
     ray.shutdown()
     ray.init(num_cpus=80,object_store_memory=40*1e9)
 
-    regulator = "OLS"
+    # regulator = "OLS"
     # regulator = "XGB"
-    # regulator = "Lasso"
+    regulator = "Lasso"
     # n_clusters = 2
     # n_clusters = 5
-    n_clusters = 10
+    n_clusters = 1
+    # n_clusters = 10
     # n_clusters = 20
     # n_clusters = 50
 
 
-    ratio_cumsum = 0.80
+    # ratio_cumsum = 0.80
     # ratio_cumsum = 0.99
     # ratio_cumsum = 0.9999
-    # ratio_cumsum = 1.00
+    ratio_cumsum = 1.00
     
     new_dflst_lst,dflst = get_df_list(start_index=0, num = 481)
     total_num_stocks = len(new_dflst_lst)
@@ -179,9 +162,11 @@ if __name__ == '__main__':
     df2.mean(axis=1) # date
     print(df2.mean(axis=1).mean())
 
-    filename_df2 = "07_2_kmeans_day_compare_test.py_"+str(len(df2.index))+'_'+str(int(df2.index[0]))+"_"+str(int(df2.index[-1]))+"_"+str(int(time.time()))+"_.csv"
+    current_datetime = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    filename_df2 = "07_2_kmeans_day_compare_test.py_" + str(len(df2.index)) + '_' + str(int(df2.index[0])) + "_" + str(int(df2.index[-1])) + "_" + current_datetime + "_.csv"
     df2.to_csv(filename_df2)
-    
-    filename_details_df = "07_2_kmeans_day_compare_test.py_"+str(len(df2.index))+'_'+str(int(df2.index[0]))+"_"+str(int(df2.index[-1]))+"_"+str(int(time.time()))+"_all_values_.csv"
+
+    filename_details_df = "07_2_kmeans_day_compare_test.py_" + str(len(df2.index)) + '_' + str(int(df2.index[0])) + "_" + str(int(df2.index[-1])) + "_" + current_datetime + "_all_values_.csv"
     details_df.to_csv(filename_details_df)
 

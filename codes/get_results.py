@@ -42,33 +42,40 @@ def get_r2df(num,regulator,df):
         "short_hash":get_git_hash()
     }
     
-    # # suquentially
-    # start = time.time()
-    # # with multiprocessing.Pool(processes=num_processes) as pool:
-    # r2results = [];oneday_dfs=[]
-    # print("total_test_days",total_test_days)
-    # # index=0
-    # for index in range(total_test_days):     
-    #     try:
-    #         r2result,oneday_df = train_and_pred(index,df,config)     
-    #         r2results.append(r2result)
-    #         oneday_dfs.append(oneday_df)
-    #     except:pass
-    #     # print(r2results)
-    #     # print(oneday_dfs)
-    # end = time.time()
-    
-    # in parallel
+    # suquentially
     start = time.time()
-    # ids=[train_and_pred_ray.remote(index,df,config) for index in tqdm(3)]
-    ids=[train_and_pred_ray.remote(index,df,config) for index in tqdm(range(total_test_days))]
-    results = [ray.get(id_) for id_ in tqdm(ids)]
-    r2results  = [result[0] for result in results]
-    oneday_dfs = [result[1] for result in results]
-    # r2results,oneday_dfs=zip(*results)
+    # with multiprocessing.Pool(processes=num_processes) as pool:
+    r2results = [];oneday_dfs=[]
+    print("total_test_days",total_test_days)
+    # index=0
+    for index in range(total_test_days):     
+        # try:
+        #     r2result,oneday_df = train_and_pred(index,df,config)     
+        #     r2results.append(r2result)
+        #     oneday_dfs.append(oneday_df)
+        # except Exception as e:
+        #     print(f"An error occurred: {e}")
+        
+        r2result,oneday_df = train_and_pred(index,df,config)     
+        r2results.append(r2result)
+        oneday_dfs.append(oneday_df)
+
+        
+        # print(r2results)
+        # print(oneday_dfs)
     end = time.time()
-    print(f"get r2results,oneday_dfs time taken {end-start}")
-    breakpoint()
+    
+    # # in parallel
+    # start = time.time()
+    # # ids=[train_and_pred_ray.remote(index,df,config) for index in tqdm(3)]
+    # ids=[train_and_pred_ray.remote(index,df,config) for index in tqdm(range(total_test_days))]
+    # results = [ray.get(id_) for id_ in tqdm(ids)]
+    # r2results  = [result[0] for result in results]
+    # oneday_dfs = [result[1] for result in results]
+    # # r2results,oneday_dfs=zip(*results)
+    # end = time.time()
+    # print(f"get r2results,oneday_dfs time taken {end-start}")
+    # # breakpoint()
     
     
     def get_r2df_from_results(r2results):

@@ -147,7 +147,7 @@ def regularity_ols(X_train, y_train, X_test, config):
         # # Initialize the model
         # stock_prediction_model = NNPredictionModel(learning_rate=0.0002, epochs=1200, batch_size=483)
         # # Convert the model's parameters to Double
-        # stock_prediction_model.model.double().to(device)
+        # stock_prediction_model.model  .to(device)
         # # Train and predict
         # stock_prediction_model.train(X_train_tensor, y_train_tensor)
         # y_pred_normalized = stock_prediction_model.predict(X_test_tensor)
@@ -194,8 +194,10 @@ def model_nn(X_train, y_train, X_test, y_test, config):
     from codes.nn import NNPredictionModel
 
     def to_torch_tensors(X_train, y_train, device):
-        X_train_tensor = torch.tensor(X_train, dtype=torch.float64).to(device)
-        y_train_tensor = torch.tensor(y_train, dtype=torch.float64).to(device)
+        X_train_tensor = torch.tensor(X_train, dtype=torch.float32).to(device)
+        y_train_tensor = torch.tensor(y_train, dtype=torch.float32).to(device)
+        # X_train_tensor = torch.tensor(X_train, dtype=torch.float64).to(device)
+        # y_train_tensor = torch.tensor(y_train, dtype=torch.float64).to(device)
         return X_train_tensor, y_train_tensor
     def denormalize_predictions(y_pred_normalized, scaler_y):
         y_pred_normalized = y_pred_normalized.reshape(-1, 1)
@@ -380,6 +382,9 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         only train one model from 0 to bin_size*train_days
         then predict from bin_size*train_days to bin_size*train_days+bin_size
         '''
+        
+        X_scaled, y_scaled = X_scaled.astype(np.float32), y_scaled.astype(np.float32)
+        
         # Get the training data using the slice_and_stack function
         X_train_window, y_train_window, _ = slice_and_stack_batch(X_scaled, y_scaled, num_stock, 0)  # Assuming i=0 as it's a single window
         # X_train_window, y_train_window, _ = slice_and_stack(X_scaled, y_scaled, num_stock, 0)  # Assuming i=0 as it's a single window
@@ -390,8 +395,11 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         # y_train_tensor_window = y_train_tensor_window.reshape(1, -1, 1)
 
         # Train the model with the training data
-        stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1000, batch_size=481)  # Adjust hyperparameters as needed
-        # stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model.double())  # wrap your model in DataParallel
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=200, batch_size=481)  # Adjust hyperparameters as needed
+        stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1500, batch_size=1)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1500, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1000, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model  )  # wrap your model in DataParallel
         stock_prediction_model.model.to(device)  # send it to the device
 
         # Train the model
@@ -408,7 +416,8 @@ def model_nn(X_train, y_train, X_test, y_test, config):
             _, _, X_test_window = slice_and_stack(X_scaled, y_scaled, num_stock, i)
             
             # Convert the test data to Torch tensor and Reshape
-            X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
+            X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float32).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
+            # X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
             
             # Make a prediction using the trained model
             y_pred_normalized = stock_prediction_model.predict(X_test_tensor_window)
