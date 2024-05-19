@@ -209,7 +209,7 @@ class NNPredictionModel:
                 
             # if self.debug:  
             #     print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
-            # print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
+            print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
         print("Train completed")
         
     def predict(self, X_test):

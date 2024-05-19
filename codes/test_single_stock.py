@@ -54,7 +54,7 @@ def getSingleDfs(trainType):
     #     num_of_stacked_stocks = 483
     #     return dfs, num_of_stacked_stocks
     
-    elif trainType=="single":
+    elif trainType=="single" or trainType=='clustered':
         print("getSingleDfs trainType:",trainType)
         dfs=[]
         for i in tqdm(range(len(path0702Files_filtered))):
@@ -83,17 +83,21 @@ if __name__=="__main__":
         ray.shutdown()
         ray.init(num_cpus=64,object_store_memory=40*1e9)
     # /homes/80/kang/anaconda3/bin/python /homes/80/kang/cmem/codes/test_single_stock.py
-    # regulator = "Lasso"
+    regulator = "Lasso"
     # regulator = "XGB"
 
-    regulator = "Inception"
+    # regulator = "Inception"
     # regulator = "OLS"
     # regulator = "Ridge"
     # regulator = "CMEM"
     
 
-    # trainType = "universal"
-    trainType = "single"
+    trainType = "universal"
+    # trainType = "single"
+    # trainType = "clustered"
+    
+    print(f'trainType {trainType}, regulator {regulator}')
+    
 
     dfs,num_of_stacked_stocks = getSingleDfs(trainType)
     print("dfs,num_of_stacked_stocks:",len(dfs),num_of_stacked_stocks)
@@ -111,13 +115,16 @@ if __name__=="__main__":
             for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs)):
                 result = get_r2df(num=num_of_stacked_stocks,regulator=regulator,df=df)
                 results.append(result)
-        df3s,df33s=zip(*results)
-        
+        df3s=[result[0] for result in results]
+        df33s=[result[1] for result in results]
+
         names = [name[:-4] for name in path0702Files_filtered]
         df3s_=pd.concat(df3s,axis=1)
         df3s_.columns = names
         for i in range(len(df33s)):df33s[i].stock_index = names[i] 
         df33s_=pd.concat(df33s,axis=0)
+        print("df3_.mean(axis=0):",df3s_.mean(axis=0))
+        print("df3_.mean(axis=0).mean():",df3s_.mean(axis=0).mean())
     elif trainType=="universal":
         df3s=[];df33s=[]
         # idx=0;df=dfs[0];num=num_of_stacked_stocks
@@ -133,9 +140,16 @@ if __name__=="__main__":
         # pd.set_option('display.max_rows', None) 
         print("df3_.mean(axis=0):",df3_.mean(axis=0))
         print("df3_.mean(axis=0).mean():",df3_.mean(axis=0).mean())
+
         # Reload the list from the text file
+    # elif trainType=='clustered':
+        
     else: raise NotImplementedError
         
+        
+    
+    # breakpoint()
+    # print()
     
     # def get_df33_r2_close_interval_single_clipped_from26bin(df33s_):
     #     g=df33s_.groupby(['date','stock_index'])
