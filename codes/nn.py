@@ -61,6 +61,11 @@ class InceptionBlock(nn.Module):
             nn.Conv2d(4, 4, kernel_size=(bin_size*numStock, 1),padding=((bin_size * numStock - 1) // 2+1,0)) ,
             nn.Conv2d(4, 4, kernel_size=(2*numStock, 1),padding=((2 * numStock - 1) // 2,0)) ,
         )
+        
+        self.fc = nn.Sequential(
+            nn.Linear(24, 52),
+            nn.ReLU(),
+        )
 
     def forward(self, x):
         # x1 = self.subblock1(x)
@@ -73,8 +78,12 @@ class InceptionBlock(nn.Module):
         stacked = torch.stack((x2, x3), dim=4)
         # breakpoint()
         # permuted = stacked.permute(0, 2, 1, 3, 4)
-        reshaped = stacked.reshape(1, train_days*bin_size*self.numStock, 24)
-        return reshaped
+        # reshaped = stacked.reshape(1, train_days*bin_size*self.numStock, 24)
+        reshaped = stacked.reshape(self.numStock, train_days*bin_size, 24)
+        # output = self.fc(24,52)
+        output = self.fc(reshaped)
+        return output
+        # return reshaped
 
         #'''Output reshaped shape: torch.Size([1, 1274, 192])'''
 
@@ -113,11 +122,19 @@ class MLPBlock(nn.Module):
             nn.Linear(130, 52) ,  # Hidden layer: 128 input features, 64 output features
             nn.Sigmoid()  # Activation function to ensure output is between 0 and 1
         )
+        self.fc2=nn.Sequential(
+            nn.Linear(52,26),
+            nn.ReLU(),
+            nn.Linear(26,1),
+            nn.ReLU(),
+        )
     
     def forward(self, x):
-        x = self.fc(x)  # Output shape: torch.Size([numStock, 1, train_days*bin_size, num_features])
-        x = x.view(self.numStock, train_days*bin_size, 52)  # torch.Size([numStock, train_days*bin_size, num_features])
-        return x
+        x2 = self.fc(x)  # Output shape: torch.Size([numStock, 1, train_days*bin_size, num_features])
+        x3 = x2.view(self.numStock, train_days*bin_size, 52)  # torch.Size([numStock, train_days*bin_size, num_features])
+        # x4 = self.fc2(x3)
+        # x5 = x4.view(self.numStock, 1, train_days*bin_size, 1)  
+        return x3
 
 
 class CNNLSTM(nn.Module):
@@ -134,6 +151,7 @@ class CNNLSTM(nn.Module):
         # x = self.inception(x)
         # print("self.inception(x)",x.shape)
         x = self.mlp(x)
+        # x = self.mlp2(x)
         # print(f"mlp_time : {time.time()-start1:.4f}s")
         x = self.lstm_block(x)
         # print(f"lstm_time: {time.time()-start2:.4f}s")
@@ -189,8 +207,8 @@ class NNPredictionModel:
                 self.optimizer.step()
                 if self.debug: param_update_time = time.time() - param_update_start
                 
-            if self.debug:  
-                print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
+            # if self.debug:  
+            #     print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
             # print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
         print("Train completed")
         
@@ -215,7 +233,7 @@ if __name__ == "__main__":
     print(f"LSTMBlock: {count_parameters(LSTMBlock(numStock))}".rjust(30))
     
     # Train the model with the training data
-    stock_prediction_model = NNPredictionModel(numStock, learning_rate=0.002, epochs=1000, batch_size=481)
+    stock_prediction_model = NNPredictionModel(numStock, learning_rate=0.001, epochs=1000, batch_size=481)
     # stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model)  # Because wrapping the model in DataParallel
     stock_prediction_model.model.to(device)  # Because sending the model to the device
     input_tensor_y = torch.rand((numStock, 1, 1300, 1)).to(device)   # Because generating target tensor, moving to CUDA device, 

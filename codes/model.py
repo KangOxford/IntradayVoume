@@ -395,8 +395,12 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         # y_train_tensor_window = y_train_tensor_window.reshape(1, -1, 1)
 
         # Train the model with the training data
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=2500, batch_size=481)  # Adjust hyperparameters as needed
+        stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=500, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=200, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=1000, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=200, batch_size=481)  # Adjust hyperparameters as needed
-        stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1500, batch_size=1)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1500, batch_size=1)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1500, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=1000, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model  )  # wrap your model in DataParallel
