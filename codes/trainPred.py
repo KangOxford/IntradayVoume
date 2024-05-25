@@ -4,6 +4,8 @@ from sklearn.metrics import r2_score
 
 BIN_SIZE = 26
 # BIN_SIZE = 2
+# TRAIN_DAYS = 2
+# TRAIN_DAYS = 5
 # TRAIN_DAYS = 10
 TRAIN_DAYS = 50
 
@@ -73,18 +75,19 @@ def train_and_pred(index,df,config):
     stock_index = np.arange(num).repeat(bin_size)
     original_images['stock_index'] = stock_index
     oneday_df = pd.concat([original_images, y_pred_clipped], axis=1)[['date','stock_index','true','pred']]
+    
     lst = []
     g = oneday_df.groupby(stock_index)
     for stock, item in g:
-        pass
         try:
             r2value = r2_score(item['true'], item['pred'])
             lst.append([test_date, stock, r2value])
         except:
-            print()
+            print(f"trainPred Error {stock} {item.head()}")
     test_df = pd.DataFrame(lst,columns=["test_date", "stock", "r2value"])
     test_df = test_df.pivot(index='test_date',columns='stock')
     print(test_df)
+    print(f"=== {int(test_df.index[0])}:       <<< {test_df.mean().mean()} >>>\n"+"==="*20)
     from datetime import datetime
 
     # Get current date and time

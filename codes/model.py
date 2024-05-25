@@ -384,6 +384,7 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         '''
         
         X_scaled, y_scaled = X_scaled.astype(np.float32), y_scaled.astype(np.float32)
+
         
         # Get the training data using the slice_and_stack function
         X_train_window, y_train_window, _ = slice_and_stack_batch(X_scaled, y_scaled, num_stock, 0)  # Assuming i=0 as it's a single window
@@ -395,7 +396,17 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         # y_train_tensor_window = y_train_tensor_window.reshape(1, -1, 1)
 
         # Train the model with the training data
+        stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=500, batch_size=481)  # Adjust hyperparameters as needed
+        
+        
+        
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=8000, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=5000, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=3000, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=2500, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs =2000, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=1500, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=1000, batch_size=481)  # Adjust hyperparameters as needed
         stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=500, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=200, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=1000, batch_size=481)  # Adjust hyperparameters as needed
@@ -408,7 +419,14 @@ def model_nn(X_train, y_train, X_test, y_test, config):
 
         # Train the model
         start = time.time()
+        
+        # X_train_tensor_window = np.expand_dims(X_train_tensor_window, axis=0)
+        # y_train_tensor_window = np.expand_dims(y_train_tensor_window, axis=0)
+        
+        # X_train_tensor_window = X_train_tensor_window.unsqueeze(0)
+        # y_train_tensor_window = y_train_tensor_window.unsqueeze(0)
         stock_prediction_model.train(X_train_tensor_window, y_train_tensor_window)
+        
         print(f"Training time taken: ", time.time()-start)        
             
         # List to hold the last element of each prediction
@@ -424,14 +442,22 @@ def model_nn(X_train, y_train, X_test, y_test, config):
             # X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
             
             # Make a prediction using the trained model
+            # X_test_tensor_window = X_test_tensor_window.unsqueeze(0)
             y_pred_normalized = stock_prediction_model.predict(X_test_tensor_window)
+            # y_pred_normalized = y_pred_normalized.unsqueeze(0)
             
             # Extract the last element of the prediction and append it to the list
-            last_element = y_pred_normalized[0, -1, 0].item()
+            # last_element = y_pred_normalized[0, -1, 0].item()
+            last_element = y_pred_normalized[:, -1, 0]
             last_elements.append(last_element)
         
+        
+        result = torch.stack(last_elements, dim=1).reshape(-1, 1).numpy()
+        # result = torch.stack(last_elements, dim=1).unsqueeze(-1).numpy()
+        # result = result.reshape(-1, 1)
+        return result
         # Convert the list of last elements to a numpy array and return it
-        return np.array(last_elements).reshape(-1, 1)
+        # return np.array(last_elements).reshape(-1, 1)
 
 
 

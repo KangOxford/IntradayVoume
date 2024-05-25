@@ -145,24 +145,25 @@ if __name__ == '__main__':
     START = time.time()
 
     ray.shutdown()
-    ray.init(num_cpus=80,object_store_memory=40*1e9)
+    ray.init(num_cpus=64,object_store_memory=40*1e9)
+    # ray.init(num_cpus=80,object_store_memory=40*1e9)
 
-    regulator = "OLS"
+    # regulator = "OLS"
     # regulator = "XGB"
     # regulator = "Lasso"
     regulator = "Inception"
     # n_clusters = 2
     # n_clusters = 5
-    n_clusters = 1
-    # n_clusters = 10
+    # n_clusters = 1
+    n_clusters = 10
     # n_clusters = 20
     # n_clusters = 50
 
 
-    # ratio_cumsum = 0.80
+    ratio_cumsum = 0.80
     # ratio_cumsum = 0.99
     # ratio_cumsum = 0.9999
-    ratio_cumsum = 1.00
+    # ratio_cumsum = 1.00
     
     trainType='clustered'
     print(f'trainType {trainType}, regulator {regulator}, n_clusters {n_clusters}, ratio_cumsum {ratio_cumsum}')

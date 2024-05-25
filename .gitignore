@@ -29,3 +29,4 @@ tstex_modules/_api.ts
 **.ipynb
 codes/note.md
 .vscode/**
+runs/**

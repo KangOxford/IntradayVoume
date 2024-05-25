@@ -81,12 +81,12 @@ if __name__=="__main__":
     rayOn = True
     if rayOn:
         ray.shutdown()
-        ray.init(num_cpus=64,object_store_memory=40*1e9)
+        ray.init(num_cpus=32,object_store_memory=40*1e9)
     # /homes/80/kang/anaconda3/bin/python /homes/80/kang/cmem/codes/test_single_stock.py
-    regulator = "Lasso"
+    # regulator = "Lasso"
     # regulator = "XGB"
 
-    # regulator = "Inception"
+    regulator = "Inception"
     # regulator = "OLS"
     # regulator = "Ridge"
     # regulator = "CMEM"

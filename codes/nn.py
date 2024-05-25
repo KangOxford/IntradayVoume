@@ -3,15 +3,21 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
+from trainPred import BIN_SIZE, TRAIN_DAYS
+# from torch.utils.tensorboard import SummaryWriter
 
-# Define hyperparameters
-bin_size = 26
-train_days = 50 
+# # Define hyperparameters
+# bin_size = 26
+# train_days = 50 
+bin_size = BIN_SIZE
+train_days = TRAIN_DAYS
 
 class LSTMBlock(nn.Module):
     def __init__(self,numStock):
         super(LSTMBlock, self).__init__()
         self.numStock = numStock
+        # self.lstm = nn.LSTM(12,bin_size,num_layers=1,batch_first=True)  # TODO reduce 192 to lower !!!
+        # self.lstm = nn.LSTM(26,bin_size,num_layers=1,batch_first=True)  # TODO reduce 192 to lower !!!
         self.lstm = nn.LSTM(52,bin_size,num_layers=1,batch_first=True)  # TODO reduce 192 to lower !!!
         
         self.fc1 = nn.Linear(bin_size, 1) 
@@ -43,11 +49,11 @@ class InceptionBlock(nn.Module):
         self.numStock=numStock
 
 
-        # self.subblock1 = nn.Sequential(
-        #     nn.Conv2d(4, 4, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0)),  # Padding for first layer (m1, n1)
-        #     nn.Conv2d(4, 4, kernel_size=(5 * numStock, 1), stride=(1, 1), padding=((5 * numStock - 1) // 2+1, 0)),
-        #     nn.Conv2d(4, 4, kernel_size=(3 * numStock, 1), stride=(1, 1), padding=((3 * numStock - 1) // 2 , 0)),
-        # )
+        self.subblock1 = nn.Sequential(
+            nn.Conv2d(4, 4, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0)),  # No padding needed for 1x1 conv
+            nn.Conv2d(4, 4, kernel_size=(5 * numStock, 1), stride=(1, 1), padding=((5 * numStock - 1) // 2, 0)),  # Padding to keep height the same
+            nn.Conv2d(4, 4, kernel_size=(3 * numStock, 1), stride=(1, 1), padding=((3 * numStock - 1) // 2, 0))  # Padding to keep height the same
+        )
 
         self.subblock2 = nn.Sequential(
             nn.Conv2d(4, 4, kernel_size=(1, 1), stride=(1, 1)) ,
@@ -63,29 +69,42 @@ class InceptionBlock(nn.Module):
         )
         
         self.fc = nn.Sequential(
-            nn.Linear(24, 52),
+            nn.Linear(36, 26),
             nn.ReLU(),
         )
+        # self.fc = nn.Sequential(
+        #     nn.Linear(32, 52),
+        #     nn.ReLU(),
+        # )
+        # self.fc2 = nn.Sequential(
+        #     nn.Linear(4, 1),
+        #     nn.ReLU(), 
+        # )
 
-    def forward(self, x):
-        # x1 = self.subblock1(x)
-        x2 = self.subblock2(x)
-
-        x3 = self.subblock3(x) #TODO
-        # print(x.shape,x1.shape,'\n',x3.shape)
-        # print(x2.shape,'\n',x3.shape)
-        # stacked = torch.stack((x1, x3), dim=4)
-        stacked = torch.stack((x2, x3), dim=4)
-        # breakpoint()
-        # permuted = stacked.permute(0, 2, 1, 3, 4)
-        # reshaped = stacked.reshape(1, train_days*bin_size*self.numStock, 24)
-        reshaped = stacked.reshape(self.numStock, train_days*bin_size, 24)
-        # output = self.fc(24,52)
-        output = self.fc(reshaped)
+    def forward(self, x_input):
+        output = x_input.reshape(self.numStock, train_days*bin_size, 12)
+        # output = self.fc2(x)
         return output
-        # return reshaped
-
-        #'''Output reshaped shape: torch.Size([1, 1274, 192])'''
+    
+    
+    # def forward(self, x):
+    #     x1 = self.subblock1(x)
+    #     x2 = self.subblock2(x)
+    #     x3 = self.subblock3(x) #TODO
+    #     # print(x.shape,x1.shape,'\n',x3.shape)
+    #     # print(x2.shape,'\n',x3.shape)
+    #     # stacked = torch.stack((x1, x3), dim=4)
+    #     # breakpoint()
+    #     stacked = torch.stack((x1, x2, x3),dim=0)
+    #     # stacked = torch.stack((x2, x3), dim=4)
+    #     # permuted = stacked.permute(0, 2, 1, 3, 4)
+    #     # reshaped = stacked.reshape(1, train_days*bin_size*self.numStock, 24)
+    #     reshaped = stacked.reshape(self.numStock, train_days*bin_size, 36)
+    #     # output = self.fc(24,52)
+    #     output = self.fc(reshaped)
+    #     return output
+    #     # return reshaped
+    #     #'''Output reshaped shape: torch.Size([1, 1274, 192])'''
 
 
 
@@ -106,6 +125,7 @@ class ConvBlock(nn.Module):
         self.module3 = nn.Sequential(
             nn.Conv2d(4, 4, kernel_size=(1, 4)) 
         )
+
     def forward(self, x):
         x = self.module1(x)
         x = self.module2(x)
@@ -144,13 +164,13 @@ class CNNLSTM(nn.Module):
         self.conv = ConvBlock(numStock)
         self.inception = InceptionBlock(numStock)
         self.lstm_block = LSTMBlock(numStock)
-    def forward(self, x):
+    def forward(self, x_input):
         # TODO the input,x is wrong, should be with shape 1,1,1300*483,52
-        # x = self.conv(x) # ([7, 8, 1300, 1])
+        # x_conv = self.conv(x_input) # ([7, 8, 1300, 1])
         # print("self.conv(x)",x.shape)
-        # x = self.inception(x)
+        # x = self.inception(x_conv)
         # print("self.inception(x)",x.shape)
-        x = self.mlp(x)
+        x = self.mlp(x_input)
         # x = self.mlp2(x)
         # print(f"mlp_time : {time.time()-start1:.4f}s")
         x = self.lstm_block(x)
@@ -174,6 +194,7 @@ class NNPredictionModel:
         self.criterion = nn.MSELoss()  # Because using Mean Squared Error loss for regression task
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  # Because using CUDA or CPU device
         self.debug = debug
+        # self.writer = SummaryWriter()
         
     def train(self, X_train, y_train):
         self.model.to(self.device)
@@ -209,7 +230,9 @@ class NNPredictionModel:
                 
             # if self.debug:  
             #     print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
-            print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
+            # print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
+        #     self.writer.add_scalar('Loss/train', loss.item(), epoch)
+        # self.writer.close()
         print("Train completed")
         
     def predict(self, X_test):
@@ -222,7 +245,8 @@ class NNPredictionModel:
 if __name__ == "__main__":
     device = torch.device("cpu") 
     # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Because detecting if CUDA is available
-    numStock = 481
+    numStock = 1
+    # numStock = 481
     model = CNNLSTM(numStock).to(device)  # Because moving the model to CUDA device
     input_tensor = torch.rand((numStock, 1, 1300, 52)).to(device)   # Because generating input tensor, moving to CUDA device
     lstm_input_tensor = torch.rand((numStock, 1300, 52)).to(device)   # Because generating LSTM input tensor, moving to CUDA device
@@ -233,7 +257,8 @@ if __name__ == "__main__":
     print(f"LSTMBlock: {count_parameters(LSTMBlock(numStock))}".rjust(30))
     
     # Train the model with the training data
-    stock_prediction_model = NNPredictionModel(numStock, learning_rate=0.001, epochs=1000, batch_size=481)
+    stock_prediction_model = NNPredictionModel(numStock, learning_rate=0.001, epochs=2000, batch_size=481)
+    # stock_prediction_model = NNPredictionModel(numStock, learning_rate=0.001, epochs=1000, batch_size=481)
     # stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model)  # Because wrapping the model in DataParallel
     stock_prediction_model.model.to(device)  # Because sending the model to the device
     input_tensor_y = torch.rand((numStock, 1, 1300, 1)).to(device)   # Because generating target tensor, moving to CUDA device, 
