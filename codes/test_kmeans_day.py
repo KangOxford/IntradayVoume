@@ -80,15 +80,32 @@ def return_lst(list_, date_index,regulator,dfs):
 
 # date_index=0;n_components=len(path0702Files_filtered)
 
-def process_data(total_num_stocks,date_index,regulator,ratio_cumsum,n_clusters,features,dfs):
+def process_data(total_num_stocks,date_index,regulator,ratio_cumsum,n_clusters,features,dfs,stock_names):
     """Process the data of all stocks within each date_index."""
     print(f">>> index BEGIN, {date_index}")
     
     # def classifyStocks(features):
     train_start_Index = (date_index * bin_size ) # for classification of stocks
     train_end_Index = (date_index * bin_size + train_size)  # for classification
+    
+    # The line `np.savetxt("corr_matrix_volume.csv", corr_matrix, delimiter=",")` is saving the
+    # `corr_matrix` numpy array to a CSV file named "corr_matrix_volume.csv". The `delimiter=","`
+    # argument specifies that the values in the CSV file will be separated by commas. This allows you
+    # to store the correlation matrix data in a CSV format that can be easily read and manipulated
+    # using tools like Excel or pandas in Python.
 
-    corr_matrix = get_corr_matrix(train_start_Index, train_end_Index, features)
+    train_end_Index = 2886
+
+    corr_matrix = get_corr_matrix(train_start_Index, train_end_Index, features,stock_names)
+    
+    # file_path = "/homes/80/kang/cmem/corr_matrix_volume.csv"
+    file_path = "/homes/80/kang/cmem/corr_matrix_features.csv"
+    if os.path.exists(file_path):
+        os.remove(file_path)
+    np.savetxt(file_path, corr_matrix, delimiter=",")
+    
+    # np.savetxt("corr_matrix_features.csv", corr_matrix, delimiter=",")
+    # np.savetxt("corr_matrix_volume.csv", corr_matrix, delimiter=",")
     labels =get_labels_byPCA(corr_matrix,ratio_cumsum,n_components=len(path0702Files_filtered),n_clusters=n_clusters)
     # The labels used to indicate how to group.
 
@@ -105,36 +122,36 @@ def process_data(total_num_stocks,date_index,regulator,ratio_cumsum,n_clusters,f
 
 
 
-def get_r2df(total_num_stocks,n_clusters,ratio_cumsum,regulator,dfs):
+def get_r2df(total_num_stocks,n_clusters,ratio_cumsum,regulator,dfs,stock_names):
 
-    # # in sequential
-    # start = time.time()
-    # results = []
-    # # for i in tqdm(range(2)): # for debug only
-    # for date_index in tqdm(range(total_test_days)):
-    #     # "Process the data of all stocks within each date_index."
-    #     result = process_data(total_num_stocks,date_index,regulator,ratio_cumsum,n_clusters,features,dfs)
-    #     results.append(result)
-    #     # results.append(process_data(i,regulator))
-    # end = time.time()
-    # print(f"time {(end-start)/60}")
-    
-    
-    # in parrallel
+    # in sequential
     start = time.time()
-    ids=[process_data_ray.remote(total_num_stocks,date_index,regulator,ratio_cumsum,n_clusters,features,dfs) for date_index in tqdm(range(total_test_days))]
-    results = [ray.get(id_) for id_ in ids]
+    results = []
+    # for i in tqdm(range(2)): # for debug only
+    for date_index in tqdm(range(total_test_days)):
+        # "Process the data of all stocks within each date_index."
+        result = process_data(total_num_stocks,date_index,regulator,ratio_cumsum,n_clusters,features,dfs,stock_names)
+        results.append(result)
+        # results.append(process_data(i,regulator))
     end = time.time()
     print(f"time {(end-start)/60}")
+    
+    
+    # # in parrallel
+    # start = time.time()
+    # ids=[process_data_ray.remote(total_num_stocks,date_index,regulator,ratio_cumsum,n_clusters,features,dfs) for date_index in tqdm(range(total_test_days))]
+    # results = [ray.get(id_) for id_ in ids]
+    # end = time.time()
+    # print(f"time {(end-start)/60}")
 
-    summaries_list = [result[0] for result in results]
-    details_list = [result[1] for result in results]
-    details_df = pd.concat(details_list)
-    df1 = pd.concat(summaries_list)
-    df1.columns = ['test_date','stock_index','r2']
-    assert np.unique(df1.stock_index).shape == (len(path0702Files_filtered),)
-    df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
-    return df2, details_df
+    # summaries_list = [result[0] for result in results]
+    # details_list = [result[1] for result in results]
+    # details_df = pd.concat(details_list)
+    # df1 = pd.concat(summaries_list)
+    # df1.columns = ['test_date','stock_index','r2']
+    # assert np.unique(df1.stock_index).shape == (len(path0702Files_filtered),)
+    # df2 = df1.pivot(index="test_date",columns="stock_index",values="r2")
+    # return df2, details_df
 
 
 @ray.remote
@@ -168,7 +185,7 @@ if __name__ == '__main__':
     trainType='clustered'
     print(f'trainType {trainType}, regulator {regulator}, n_clusters {n_clusters}, ratio_cumsum {ratio_cumsum}')
     
-    dfs,num_of_stacked_stocks = getSingleDfs(trainType)
+    dfs,num_of_stacked_stocks,stock_names = getSingleDfs(trainType)
     print("dfs,num_of_stacked_stocks:",len(dfs),num_of_stacked_stocks)
     
     # new_dflst_lst,dflst = get_df_list(start_index=0, num = 481)
@@ -178,11 +195,11 @@ if __name__ == '__main__':
     # one_stock_shape = 109*26
     total_num_stocks = len(dfs)
     total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(dfs,total_num_stocks)    
-    features = get_features(dfs,x_list,type="volume")
-    # features = get_features(new_dflst_lst,x_list,type="features")
+    features = get_features(dfs,x_list,stock_names,type="volume")
+    # features = get_features(dfs,x_list,stock_names,type="features")
     print(features.shape)
     
-    df2, details_df = get_r2df(total_num_stocks=total_num_stocks,n_clusters=n_clusters,ratio_cumsum=ratio_cumsum,regulator=regulator,dfs=dfs)
+    df2, details_df = get_r2df(total_num_stocks=total_num_stocks,n_clusters=n_clusters,ratio_cumsum=ratio_cumsum,regulator=regulator,dfs=dfs,stock_names=stock_names)
     
 
     print(df2)

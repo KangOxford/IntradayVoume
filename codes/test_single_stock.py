@@ -38,6 +38,22 @@ path0702Files_filtered = list(filter(lambda x: x.endswith('.pkl'), path0702Files
 print(len(path0702Files_filtered))
 
 def getSingleDfs(trainType):
+    sector_stock = [
+        ['CommunicationServices', ['TMUS', 'CHTR', 'ATVI', 'GOOGL', 'GOOG', 'FOXA', 'FOX', 'FB', 'NFLX', 'NWS', 'NWSA', 'OMC', 'EA', 'VZ', 'IPG', 'TWTR', 'DISH', 'DISCK', 'TTWO', 'CMCSA', 'DISCA', 'DIS', 'CTL', 'T']],
+        ['ConsumerDiscretionary', ['HLT', 'HD', 'HBI', 'HAS', 'GRMN', 'GPS', 'GPC', 'GM', 'COTY', 'DRI', 'DHI', 'F', 'EXPE', 'HRB', 'EBAY', 'CMG', 'VFC', 'LB', 'KMX', 'TJX', 'TIF', 'TRIP', 'TSCO', 'SBUX', 'ROST', 'RL', 'RCL', 'PVH', 'UA', 'PHM', 'UAA', 'ORLY', 'NWL', 'NVR', 'NKE', 'ULTA', 'NCLH', 'MHK', 'MGM', 'MCD', 'MAR', 'M', 'LVS', 'LOW', 'LKQ', 'LEN', 'LEG', 'KSS', 'JWN', 'CCL', 'HOG', 'AMZN', 'BWA', 'AAP', 'WHR', 'BBY', 'AZO', 'WYNN']],
+        ['ConsumerStaples', ['MNST', 'CPB', 'HRL', 'SJM', 'MKC', 'TSN', 'PEP', 'COST', 'EL', 'WBA', 'GIS', 'PG', 'DG', 'MDLZ', 'PM', 'ADM', 'LW', 'WMT', 'DLTR', 'HSY', 'TGT', 'TAP', 'SYY', 'K', 'CHD', 'KHC', 'CAG', 'MO', 'KMB', 'CL', 'STZ', 'CLX', 'KO', 'KR']],
+        ['Energy', ['OXY', 'FANG', 'OKE', 'NOV', 'FTI', 'MPC', 'VLO', 'DVN', 'WMB', 'MRO', 'NBL', 'EOG', 'XEC', 'HES', 'HAL', 'SLB', 'PSX', 'HP', 'CVX', 'CXO', 'KMI', 'HFC', 'COG', 'APA', 'PXD']],
+        ['Financials', ['KEY', 'WRB', 'FRC', 'USB', 'JPM', 'ICE', 'L', 'JKHY', 'IVZ', 'MS', 'AXP', 'WLTW', 'AON', 'MKTX', 'AMP', 'AMG', 'LNC', 'MA', 'ALL', 'HIG', 'MET', 'FITB', 'UNM', 'GPN', 'MCO', 'HBAN', 'GS', 'MMC', 'MSCI', 'CB', 'MTB', 'BLK', 'PYPL', 'FIS', 'DFS', 'RF', 'RJF', 'SCHW', 'SIVB', 'TRV', 'COF', 'TROW', 'SPGI', 'STT', 'CME', 'C', 'CMA', 'CINF', 'SYF', 'CFG', 'WFC', 'CBOE', 'BK', 'PRU', 'RE', 'AIG', 'ETFC', 'PBCT', 'NTRS', 'BAC', 'V', 'AJG', 'NDAQ', 'AFL', 'PFG', 'AIZ', 'ADS', 'BEN', 'PNC', 'PGR']],
+        ['HealthCare', ['SYK', 'TFX', 'UHS', 'JNJ', 'ALGN', 'MYL', 'ABBV', 'MRK', 'MCK', 'PRGO', 'AMGN', 'LH', 'PFE', 'ABMD', 'LLY', 'ABT', 'RMD', 'MDT', 'REGN', 'PKI', 'UNH', 'ALXN', 'ISRG', 'ABC', 'A', 'BIIB', 'BMY', 'HUM', 'DHR', 'HSIC', 'CI', 'BAX', 'TMO', 'IDXX', 'EW', 'DGX', 'CNC', 'HCA', 'WCG', 'COO', 'CVS', 'GILD', 'VAR', 'WAT', 'HOLX', 'CERN', 'DVA', 'BDX', 'ANTM', 'VRTX', 'INCY', 'CAH', 'BSX', 'ILMN']],
+        ['Industrials', ['BA', 'FAST', 'DE', 'RHI', 'DAL', 'FBHS', 'FDX', 'UTX', 'PWR', 'ROK', 'ROL', 'RSG', 'RTN', 'NLSN', 'ODFL', 'UAL', 'VRSK', 'EMR', 'ETN', 'FLS', 'ADP', 'DOV', 'EFX', 'PH', 'IR', 'BR', 'NSC', 'WAB', 'EXPD', 'PAYX', 'NOC', 'PCAR', 'TXT', 'MMM', 'CSX', 'LUV', 'CTAS', 'UNP', 'LMT', 'HON', 'SWK', 'LDOS', 'URI', 'KSU', 'IEX', 'CHRW', 'UPS', 'TDG', 'INFO', 'CAT', 'JCI', 'JBHT', 'AAL', 'ITW', 'CMI', 'AOS', 'AME', 'WM', 'HII', 'MAS', 'ALLE', 'FTV', 'PNR', 'ALK', 'GWW', 'ARNC', 'GE', 'SNA', 'GD', 'CPRT']],
+        ['InformationTechnology', ['TEL', 'CTXS', 'ADBE', 'CDNS', 'TXN', 'CTSH', 'CDW', 'ROP', 'CRM', 'AAPL', 'WDC', 'SWKS', 'ACN', 'QCOM', 'QRVO', 'SNPS', 'ADI', 'STX', 'CSCO', 'IT', 'ANSS', 'ANET', 'MXIM', 'MU', 'FFIV', 'MSI', 'MSFT', 'FISV', 'FLIR', 'IBM', 'FLT', 'HPE', 'LRCX', 'AMD', 'FTNT', 'GLW', 'AMAT', 'AVGO', 'HPQ', 'MCHP', 'APH', 'AKAM', 'IPGP', 'ADSK', 'VRSN', 'JNPR', 'INTU', 'INTC', 'ORCL', 'KEYS', 'KLAC', 'NVDA', 'NTAP', 'NOW', 'WU']],
+        ['Materials', ['CF', 'CE', 'LYB', 'IP', 'IFF', 'PKG', 'MOS', 'AVY', 'PPG', 'ECL', 'EMN', 'BLL', 'VMC', 'WRK', 'APD', 'NUE', 'ALB', 'FCX', 'FMC', 'SEE', 'SHW', 'MLM', 'NEM']],
+        ['RealEstate', ['WY', 'VTR', 'VNO', 'UDR', 'IRM', 'SPG', 'EQIX', 'EQR', 'ESS', 'CCI', 'BXP', 'EXR', 'FRT', 'HST', 'KIM', 'DLR', 'MAA', 'MAC', 'AVB', 'ARE', 'SLG', 'SBAC', 'PSA', 'REG', 'AIV', 'O', 'AMT', 'PLD', 'DRE']],
+        ['Utilities', ['AES', 'AWK', 'AEP', 'ATO', 'WEC', 'AEE', 'CMS', 'CNP', 'D', 'ES', 'DUK', 'SO', 'PPL', 'PNW', 'PEG', 'NRG', 'NI', 'DTE', 'NEE', 'FE', 'EXC', 'ETR', 'SRE', 'EIX', 'ED', 'LNT', 'XEL']],
+    ]
+    stock_names = [stock for sector,stocks in sector_stock for stock in stocks]
+    
+    
     
     if trainType=="universal":
         print("getSingleDfs trainType:",trainType)
@@ -57,9 +73,12 @@ def getSingleDfs(trainType):
     elif trainType=="single" or trainType=='clustered':
         print("getSingleDfs trainType:",trainType)
         dfs=[]
-        for i in tqdm(range(len(path0702Files_filtered))):
+        # for i in tqdm(range(len(path0702Files_filtered))):
+        #     # print(f">>> {i}")
+        #     df=pd.read_pickle(path0702+path0702Files_filtered[i])
+        for stock in tqdm(stock_names):
             # print(f">>> {i}")
-            df=pd.read_pickle(path0702+path0702Files_filtered[i])
+            df=pd.read_pickle(path0702+stock+'.pkl')
             df=df.reset_index(drop=True)
             dfs.append(df)
         num_of_stacked_stocks = 1
@@ -68,8 +87,10 @@ def getSingleDfs(trainType):
             df = pd.concat([itm.iloc[-BIN_SIZE:,:] for idx, itm in df.groupby('date')]).reset_index(drop=True)
             return df
         dfs_truncated = [truncate_by_bin_size(df) for df in tqdm(dfs)]
+        
+        # stock_names=[itm[:-4] for itm in path0702Files_filtered]
 
-        return dfs_truncated, num_of_stacked_stocks
+        return dfs_truncated, num_of_stacked_stocks,stock_names
     else: raise NotImplementedError
 
 def print_mean(df3):
@@ -92,8 +113,8 @@ if __name__=="__main__":
     # regulator = "CMEM"
     
 
-    trainType = "universal"
-    # trainType = "single"
+    # trainType = "universal"
+    trainType = "single"
     # trainType = "clustered"
     
     print(f'trainType {trainType}, regulator {regulator}')

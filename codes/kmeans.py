@@ -14,15 +14,15 @@ path0600_1Files = readFromPath(path0600_1)
 print(len(path0600_1Files))
 
 
-def get_features(new_dflst_lst,x_list,type="volume"):
+def get_features(new_dflst_lst,x_list,stock_names,type="volume"):
     if type =="volume":
-        return get_volume_features(new_dflst_lst,x_list)
+        return get_volume_features(new_dflst_lst,x_list,stock_names)
     elif type =="features":
-        return get_features_features(new_dflst_lst,x_list)
+        return get_features_features(new_dflst_lst,x_list,stock_names)
     else:
         raise NotImplementedError
 
-def get_volume_features(new_dflst_lst,x_list):
+def get_volume_features(new_dflst_lst,x_list,stock_names):
     feature_list = []
     for index, item in enumerate(new_dflst_lst):
         pass
@@ -34,7 +34,7 @@ def get_volume_features(new_dflst_lst,x_list):
     features = pd.concat(feature_list,axis = 1)
     return features
 
-def get_features_features(new_dflst_lst,x_list):
+def get_features_features(new_dflst_lst,x_list,stock_names):
     nfeatures = []
     for col in x_list:
         feature_list = []
@@ -54,21 +54,32 @@ def get_features_features(new_dflst_lst,x_list):
     nfeatures.shape
     return nfeatures
 
-def get_corr_matrix(train_start_Index, train_end_Index, features):
+def get_corr_matrix(train_start_Index, train_end_Index, features, stock_names):
+    from scipy.stats import rankdata
     if len(features.shape) ==2:
+        '''correlation matrix from volume'''
         print(f"shape of features: {features.shape}")
         f = features.iloc[train_start_Index:train_end_Index,:]
         fv=f.values
-        corr_matrix = np.corrcoef(fv, rowvar=False)
+        
+        # ranked_fv = np.apply_along_axis(rankdata, 1, fv)
+        corr_matrix = np.corrcoef(np.apply_along_axis(rankdata, 0, fv), rowvar=False)
+        
+        # corr_matrix = np.corrcoef(fv, rowvar=False)
         # Print the shape of the correlation matrix
         print("Shape of correlation matrix:", corr_matrix.shape)
         return corr_matrix
     elif len(features.shape) ==3:
+        '''correlation matrix from features'''
         print(f"shape of features: {features.shape}")
         nfeatures = features
         f = np.array([nfeatures[i,train_start_Index:train_end_Index,:] for i in range(nfeatures.shape[0])])
         f.shape
-        ncorr_matrix = np.array([np.corrcoef(fv, rowvar=False) for fv in f])
+        
+        
+        # ncorr_matrix = np.array([np.corrcoef(np.apply_along_axis(rankdata, 1, fv), rowvar=True) for fv in f])
+        # ncorr_matrix = np.array([np.corrcoef(np.apply_along_axis(rankdata, 0, fv), rowvar=True) for fv in f])
+        ncorr_matrix = np.array([np.corrcoef(np.apply_along_axis(rankdata, 0, fv), rowvar=False) for fv in f])
         ncorr_matrix.shape
         corr_matrix = np.mean(ncorr_matrix,axis=0)
         # Print the shape of the correlation matrix
