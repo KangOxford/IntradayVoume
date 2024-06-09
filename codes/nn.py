@@ -3,7 +3,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
-from trainPred import BIN_SIZE, TRAIN_DAYS
+from get_results import BIN_SIZE, TRAIN_DAYS
+# from trainPred import BIN_SIZE, TRAIN_DAYS
 # from torch.utils.tensorboard import SummaryWriter
 
 # # Define hyperparameters

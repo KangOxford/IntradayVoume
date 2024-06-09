@@ -14,8 +14,9 @@ import os;os.sys.path.append("/homes/80/kang/cmem/")
 import os;os.sys.path.append("/homes/80/kang/cmem/codes/")
 from utils import *
 from model import *
-from trainPred import *
-from get_results import get_r2df, get_r2df_ray
+# from trainPred import *
+from get_results import * 
+# from get_results import get_r2df, get_r2df_ray
 import multiprocessing
 import time
 import ray
@@ -41,7 +42,7 @@ print(len(path0702Files))
 path0702Files_filtered = list(filter(lambda x: x.endswith('.pkl'), path0702Files))
 print(len(path0702Files_filtered))
 
-sector_stock = [
+SECTOR_STOCK = [
     ['CommunicationServices', ['TMUS', 'CHTR', 'ATVI', 'GOOGL', 'GOOG', 'FOXA', 'FOX', 'FB', 'NFLX', 'NWS', 'NWSA', 'OMC', 'EA', 'VZ', 'IPG', 'TWTR', 'DISH', 'DISCK', 'TTWO', 'CMCSA', 'DISCA', 'DIS', 'CTL', 'T']],
     ['ConsumerDiscretionary', ['HLT', 'HD', 'HBI', 'HAS', 'GRMN', 'GPS', 'GPC', 'GM', 'COTY', 'DRI', 'DHI', 'F', 'EXPE', 'HRB', 'EBAY', 'CMG', 'VFC', 'LB', 'KMX', 'TJX', 'TIF', 'TRIP', 'TSCO', 'SBUX', 'ROST', 'RL', 'RCL', 'PVH', 'UA', 'PHM', 'UAA', 'ORLY', 'NWL', 'NVR', 'NKE', 'ULTA', 'NCLH', 'MHK', 'MGM', 'MCD', 'MAR', 'M', 'LVS', 'LOW', 'LKQ', 'LEN', 'LEG', 'KSS', 'JWN', 'CCL', 'HOG', 'AMZN', 'BWA', 'AAP', 'WHR', 'BBY', 'AZO', 'WYNN']],
     ['ConsumerStaples', ['MNST', 'CPB', 'HRL', 'SJM', 'MKC', 'TSN', 'PEP', 'COST', 'EL', 'WBA', 'GIS', 'PG', 'DG', 'MDLZ', 'PM', 'ADM', 'LW', 'WMT', 'DLTR', 'HSY', 'TGT', 'TAP', 'SYY', 'K', 'CHD', 'KHC', 'CAG', 'MO', 'KMB', 'CL', 'STZ', 'CLX', 'KO', 'KR']],
@@ -54,26 +55,11 @@ sector_stock = [
     ['RealEstate', ['WY', 'VTR', 'VNO', 'UDR', 'IRM', 'SPG', 'EQIX', 'EQR', 'ESS', 'CCI', 'BXP', 'EXR', 'FRT', 'HST', 'KIM', 'DLR', 'MAA', 'MAC', 'AVB', 'ARE', 'SLG', 'SBAC', 'PSA', 'REG', 'AIV', 'O', 'AMT', 'PLD', 'DRE']],
     ['Utilities', ['AES', 'AWK', 'AEP', 'ATO', 'WEC', 'AEE', 'CMS', 'CNP', 'D', 'ES', 'DUK', 'SO', 'PPL', 'PNW', 'PEG', 'NRG', 'NI', 'DTE', 'NEE', 'FE', 'EXC', 'ETR', 'SRE', 'EIX', 'ED', 'LNT', 'XEL']],
 ]
-stock_names = [stock for sector,stocks in sector_stock for stock in stocks]
+STOCK_NAMES = [stock for sector,stocks in SECTOR_STOCK for stock in stocks]
 
 
 def getSingleDfs(trainType):
-    sector_stock = [
-        ['CommunicationServices', ['TMUS', 'CHTR', 'ATVI', 'GOOGL', 'GOOG', 'FOXA', 'FOX', 'FB', 'NFLX', 'NWS', 'NWSA', 'OMC', 'EA', 'VZ', 'IPG', 'TWTR', 'DISH', 'DISCK', 'TTWO', 'CMCSA', 'DISCA', 'DIS', 'CTL', 'T']],
-        ['ConsumerDiscretionary', ['HLT', 'HD', 'HBI', 'HAS', 'GRMN', 'GPS', 'GPC', 'GM', 'COTY', 'DRI', 'DHI', 'F', 'EXPE', 'HRB', 'EBAY', 'CMG', 'VFC', 'LB', 'KMX', 'TJX', 'TIF', 'TRIP', 'TSCO', 'SBUX', 'ROST', 'RL', 'RCL', 'PVH', 'UA', 'PHM', 'UAA', 'ORLY', 'NWL', 'NVR', 'NKE', 'ULTA', 'NCLH', 'MHK', 'MGM', 'MCD', 'MAR', 'M', 'LVS', 'LOW', 'LKQ', 'LEN', 'LEG', 'KSS', 'JWN', 'CCL', 'HOG', 'AMZN', 'BWA', 'AAP', 'WHR', 'BBY', 'AZO', 'WYNN']],
-        ['ConsumerStaples', ['MNST', 'CPB', 'HRL', 'SJM', 'MKC', 'TSN', 'PEP', 'COST', 'EL', 'WBA', 'GIS', 'PG', 'DG', 'MDLZ', 'PM', 'ADM', 'LW', 'WMT', 'DLTR', 'HSY', 'TGT', 'TAP', 'SYY', 'K', 'CHD', 'KHC', 'CAG', 'MO', 'KMB', 'CL', 'STZ', 'CLX', 'KO', 'KR']],
-        ['Energy', ['OXY', 'FANG', 'OKE', 'NOV', 'FTI', 'MPC', 'VLO', 'DVN', 'WMB', 'MRO', 'NBL', 'EOG', 'XEC', 'HES', 'HAL', 'SLB', 'PSX', 'HP', 'CVX', 'CXO', 'KMI', 'HFC', 'COG', 'APA', 'PXD']],
-        ['Financials', ['KEY', 'WRB', 'FRC', 'USB', 'JPM', 'ICE', 'L', 'JKHY', 'IVZ', 'MS', 'AXP', 'WLTW', 'AON', 'MKTX', 'AMP', 'AMG', 'LNC', 'MA', 'ALL', 'HIG', 'MET', 'FITB', 'UNM', 'GPN', 'MCO', 'HBAN', 'GS', 'MMC', 'MSCI', 'CB', 'MTB', 'BLK', 'PYPL', 'FIS', 'DFS', 'RF', 'RJF', 'SCHW', 'SIVB', 'TRV', 'COF', 'TROW', 'SPGI', 'STT', 'CME', 'C', 'CMA', 'CINF', 'SYF', 'CFG', 'WFC', 'CBOE', 'BK', 'PRU', 'RE', 'AIG', 'ETFC', 'PBCT', 'NTRS', 'BAC', 'V', 'AJG', 'NDAQ', 'AFL', 'PFG', 'AIZ', 'ADS', 'BEN', 'PNC', 'PGR']],
-        ['HealthCare', ['SYK', 'TFX', 'UHS', 'JNJ', 'ALGN', 'MYL', 'ABBV', 'MRK', 'MCK', 'PRGO', 'AMGN', 'LH', 'PFE', 'ABMD', 'LLY', 'ABT', 'RMD', 'MDT', 'REGN', 'PKI', 'UNH', 'ALXN', 'ISRG', 'ABC', 'A', 'BIIB', 'BMY', 'HUM', 'DHR', 'HSIC', 'CI', 'BAX', 'TMO', 'IDXX', 'EW', 'DGX', 'CNC', 'HCA', 'WCG', 'COO', 'CVS', 'GILD', 'VAR', 'WAT', 'HOLX', 'CERN', 'DVA', 'BDX', 'ANTM', 'VRTX', 'INCY', 'CAH', 'BSX', 'ILMN']],
-        ['Industrials', ['BA', 'FAST', 'DE', 'RHI', 'DAL', 'FBHS', 'FDX', 'UTX', 'PWR', 'ROK', 'ROL', 'RSG', 'RTN', 'NLSN', 'ODFL', 'UAL', 'VRSK', 'EMR', 'ETN', 'FLS', 'ADP', 'DOV', 'EFX', 'PH', 'IR', 'BR', 'NSC', 'WAB', 'EXPD', 'PAYX', 'NOC', 'PCAR', 'TXT', 'MMM', 'CSX', 'LUV', 'CTAS', 'UNP', 'LMT', 'HON', 'SWK', 'LDOS', 'URI', 'KSU', 'IEX', 'CHRW', 'UPS', 'TDG', 'INFO', 'CAT', 'JCI', 'JBHT', 'AAL', 'ITW', 'CMI', 'AOS', 'AME', 'WM', 'HII', 'MAS', 'ALLE', 'FTV', 'PNR', 'ALK', 'GWW', 'ARNC', 'GE', 'SNA', 'GD', 'CPRT']],
-        ['InformationTechnology', ['TEL', 'CTXS', 'ADBE', 'CDNS', 'TXN', 'CTSH', 'CDW', 'ROP', 'CRM', 'AAPL', 'WDC', 'SWKS', 'ACN', 'QCOM', 'QRVO', 'SNPS', 'ADI', 'STX', 'CSCO', 'IT', 'ANSS', 'ANET', 'MXIM', 'MU', 'FFIV', 'MSI', 'MSFT', 'FISV', 'FLIR', 'IBM', 'FLT', 'HPE', 'LRCX', 'AMD', 'FTNT', 'GLW', 'AMAT', 'AVGO', 'HPQ', 'MCHP', 'APH', 'AKAM', 'IPGP', 'ADSK', 'VRSN', 'JNPR', 'INTU', 'INTC', 'ORCL', 'KEYS', 'KLAC', 'NVDA', 'NTAP', 'NOW', 'WU']],
-        ['Materials', ['CF', 'CE', 'LYB', 'IP', 'IFF', 'PKG', 'MOS', 'AVY', 'PPG', 'ECL', 'EMN', 'BLL', 'VMC', 'WRK', 'APD', 'NUE', 'ALB', 'FCX', 'FMC', 'SEE', 'SHW', 'MLM', 'NEM']],
-        ['RealEstate', ['WY', 'VTR', 'VNO', 'UDR', 'IRM', 'SPG', 'EQIX', 'EQR', 'ESS', 'CCI', 'BXP', 'EXR', 'FRT', 'HST', 'KIM', 'DLR', 'MAA', 'MAC', 'AVB', 'ARE', 'SLG', 'SBAC', 'PSA', 'REG', 'AIV', 'O', 'AMT', 'PLD', 'DRE']],
-        ['Utilities', ['AES', 'AWK', 'AEP', 'ATO', 'WEC', 'AEE', 'CMS', 'CNP', 'D', 'ES', 'DUK', 'SO', 'PPL', 'PNW', 'PEG', 'NRG', 'NI', 'DTE', 'NEE', 'FE', 'EXC', 'ETR', 'SRE', 'EIX', 'ED', 'LNT', 'XEL']],
-    ]
-    stock_names = [stock for sector,stocks in sector_stock for stock in stocks]
-    
-    
+    stock_names, sector_stock = STOCK_NAMES,SECTOR_STOCK    
     
     if trainType=="universal":
         print("getSingleDfs trainType:",trainType)
@@ -128,6 +114,7 @@ if __name__=="__main__":
     # # /homes/80/kang/anaconda3/bin/python /homes/80/kang/cmem/codes/test_single_stock.py
     # regulator = "XGB"
     # regulator = "Inception"
+    # regulatot = 'Attention'
 
     # regulator = "CMEM"
     # regulator = "OLS"
@@ -135,8 +122,8 @@ if __name__=="__main__":
     # regulator = "Ridge"
     
 
-    # trainType = "universal"
-    trainType = "single"
+    trainType = "universal"
+    # trainType = "single"
     # trainType = "clustered"
     
     print(f'trainType {trainType}, regulator {regulator}')
@@ -153,6 +140,10 @@ if __name__=="__main__":
     }
     
     if trainType=="single":
+        '''
+        |The outter loop is the stock index   |
+        |---- the inner loop is the date index|        
+        '''
         if rayOn:
             ray.shutdown()
             # ray.init(num_cpus=32,object_store_memory=40 * 1e9)    
@@ -184,8 +175,13 @@ if __name__=="__main__":
     elif trainType=="universal":
         df3s=[];df33s=[]
         # idx=0;df=dfs[0];num=num_of_stacked_stocks
+        # NOTE remember to update the one file pkl before running
         for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs)):
-            df3,df33 = get_r2df(num=num_of_stacked_stocks,regulator=regulator,trainType=trainType,df=df)
+            print(f">>> len(dfd):{len(df)}")
+            config['stock_symbol'] = stock_names
+            config['dates'] = df.date.unique()
+            df3,df33 = get_r2df(config,df=df)
+            # df3,df33 = get_r2df(num=num_of_stacked_stocks,regulator=regulator,trainType=trainType,df=df)
             total_r2 = df3.mean(axis=1).mean()
             print('total r2: ',df3.mean(axis=1).mean()) # all mean
             df3s.append(df3)

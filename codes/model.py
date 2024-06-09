@@ -128,6 +128,8 @@ def regularity_ols(X_train, y_train, X_test, config):
             device='cuda',
             # n_gpus=4  
         )
+        # model = Attention()
+        
 
 
 
