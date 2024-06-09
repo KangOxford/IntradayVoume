@@ -58,9 +58,31 @@ def get_corr_matrix(train_start_Index, train_end_Index, features, stock_names):
     from scipy.stats import rankdata
     if len(features.shape) ==2:
         '''correlation matrix from volume'''
-        print(f"shape of features: {features.shape}")
         f = features.iloc[train_start_Index:train_end_Index,:]
         fv=f.values
+        print(f"shape of features: {features.shape}")
+        
+           
+        # ms=[]        
+        # for i in range(111):
+        #     train_start_Index=26*i
+        #     train_end_Index=26*(i+1)
+        #     f = features.iloc[train_start_Index:train_end_Index,:]
+        #     fv=f.values
+        #     corr_matrix = np.corrcoef(np.apply_along_axis(rankdata, 0, fv), rowvar=False)
+        #     ms.append(corr_matrix)
+        # msa=np.array(ms)
+        
+        # corr_matrix = np.mean(msa,axis=0)
+        # corr_matrix = np.median(msa,axis=0)
+        
+        
+        # file_path = "/homes/80/kang/cmem/corr_matrix_volume.csv"
+        # # file_path = "/homes/80/kang/cmem/corr_matrix_features.csv"
+        # if os.path.exists(file_path):
+        #     os.remove(file_path)
+        # np.savetxt(file_path, corr_matrix, delimiter=",")
+            
         
         # ranked_fv = np.apply_along_axis(rankdata, 1, fv)
         corr_matrix = np.corrcoef(np.apply_along_axis(rankdata, 0, fv), rowvar=False)
@@ -77,11 +99,39 @@ def get_corr_matrix(train_start_Index, train_end_Index, features, stock_names):
         f.shape
         
         
+        
+        
+        # ms=[]        
+        # for i in range(111):
+        #     train_start_Index=26*i
+        #     train_end_Index=26*(i+1)
+        #     nfeatures = features
+        #     f = np.array([nfeatures[i,train_start_Index:train_end_Index,:] for i in range(nfeatures.shape[0])])
+        #     ncorr_matrix = np.array([np.corrcoef(np.apply_along_axis(rankdata, 0, fv), rowvar=False) for fv in f])
+        #     corr_matrix = np.mean(ncorr_matrix,axis=0)
+        #     ms.append(corr_matrix)
+        # msa=np.array(ms)
+        
+        # corr_matrix = np.mean(msa,axis=0)
+        # corr_matrix = np.median(msa,axis=0)
+        
+        
+        # file_path = "/homes/80/kang/cmem/corr_matrix_features.csv"
+        # if os.path.exists(file_path):
+        #     os.remove(file_path)
+        # np.savetxt(file_path, corr_matrix, delimiter=",")
+        
+        
+        
+        
         # ncorr_matrix = np.array([np.corrcoef(np.apply_along_axis(rankdata, 1, fv), rowvar=True) for fv in f])
         # ncorr_matrix = np.array([np.corrcoef(np.apply_along_axis(rankdata, 0, fv), rowvar=True) for fv in f])
+        
         ncorr_matrix = np.array([np.corrcoef(np.apply_along_axis(rankdata, 0, fv), rowvar=False) for fv in f])
         ncorr_matrix.shape
         corr_matrix = np.mean(ncorr_matrix,axis=0)
+        corr_matrix
+        
         # Print the shape of the correlation matrix
         # print("Shape of correlation matrix:", corr_matrix.shape)
         return corr_matrix

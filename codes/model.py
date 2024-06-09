@@ -118,8 +118,19 @@ def regularity_ols(X_train, y_train, X_test, config):
         
         
         # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160,reg_lambda=0.1,reg_alpha=0.1)
-        model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160)
-        
+        # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160)
+        # model = xgb.XGBRegressor(max_depth=5, learning_rate=0.1, n_estimators=160, tree_method='hist', device='cuda')
+        model = xgb.XGBRegressor(
+            max_depth=5,
+            learning_rate=0.1,
+            n_estimators=160,
+            tree_method='hist',
+            device='cuda',
+            # n_gpus=4  
+        )
+
+
+
 
         # print(model.get_params())
         model.fit(X_train, y_train)

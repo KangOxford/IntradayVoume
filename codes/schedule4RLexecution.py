@@ -4,6 +4,7 @@ import pandas as pd
 from os import listdir;
 from os.path import isfile, join;
 from sklearn.metrics import r2_score
+import random
 
 
 
@@ -19,6 +20,9 @@ import multiprocessing
 import time
 import ray
 
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
 
 def check_GPU_memory():
     import GPUtil
@@ -36,6 +40,22 @@ path0702Files = readFromPath(path0702)
 print(len(path0702Files))
 path0702Files_filtered = list(filter(lambda x: x.endswith('.pkl'), path0702Files))
 print(len(path0702Files_filtered))
+
+sector_stock = [
+    ['CommunicationServices', ['TMUS', 'CHTR', 'ATVI', 'GOOGL', 'GOOG', 'FOXA', 'FOX', 'FB', 'NFLX', 'NWS', 'NWSA', 'OMC', 'EA', 'VZ', 'IPG', 'TWTR', 'DISH', 'DISCK', 'TTWO', 'CMCSA', 'DISCA', 'DIS', 'CTL', 'T']],
+    ['ConsumerDiscretionary', ['HLT', 'HD', 'HBI', 'HAS', 'GRMN', 'GPS', 'GPC', 'GM', 'COTY', 'DRI', 'DHI', 'F', 'EXPE', 'HRB', 'EBAY', 'CMG', 'VFC', 'LB', 'KMX', 'TJX', 'TIF', 'TRIP', 'TSCO', 'SBUX', 'ROST', 'RL', 'RCL', 'PVH', 'UA', 'PHM', 'UAA', 'ORLY', 'NWL', 'NVR', 'NKE', 'ULTA', 'NCLH', 'MHK', 'MGM', 'MCD', 'MAR', 'M', 'LVS', 'LOW', 'LKQ', 'LEN', 'LEG', 'KSS', 'JWN', 'CCL', 'HOG', 'AMZN', 'BWA', 'AAP', 'WHR', 'BBY', 'AZO', 'WYNN']],
+    ['ConsumerStaples', ['MNST', 'CPB', 'HRL', 'SJM', 'MKC', 'TSN', 'PEP', 'COST', 'EL', 'WBA', 'GIS', 'PG', 'DG', 'MDLZ', 'PM', 'ADM', 'LW', 'WMT', 'DLTR', 'HSY', 'TGT', 'TAP', 'SYY', 'K', 'CHD', 'KHC', 'CAG', 'MO', 'KMB', 'CL', 'STZ', 'CLX', 'KO', 'KR']],
+    ['Energy', ['OXY', 'FANG', 'OKE', 'NOV', 'FTI', 'MPC', 'VLO', 'DVN', 'WMB', 'MRO', 'NBL', 'EOG', 'XEC', 'HES', 'HAL', 'SLB', 'PSX', 'HP', 'CVX', 'CXO', 'KMI', 'HFC', 'COG', 'APA', 'PXD']],
+    ['Financials', ['KEY', 'WRB', 'FRC', 'USB', 'JPM', 'ICE', 'L', 'JKHY', 'IVZ', 'MS', 'AXP', 'WLTW', 'AON', 'MKTX', 'AMP', 'AMG', 'LNC', 'MA', 'ALL', 'HIG', 'MET', 'FITB', 'UNM', 'GPN', 'MCO', 'HBAN', 'GS', 'MMC', 'MSCI', 'CB', 'MTB', 'BLK', 'PYPL', 'FIS', 'DFS', 'RF', 'RJF', 'SCHW', 'SIVB', 'TRV', 'COF', 'TROW', 'SPGI', 'STT', 'CME', 'C', 'CMA', 'CINF', 'SYF', 'CFG', 'WFC', 'CBOE', 'BK', 'PRU', 'RE', 'AIG', 'ETFC', 'PBCT', 'NTRS', 'BAC', 'V', 'AJG', 'NDAQ', 'AFL', 'PFG', 'AIZ', 'ADS', 'BEN', 'PNC', 'PGR']],
+    ['HealthCare', ['SYK', 'TFX', 'UHS', 'JNJ', 'ALGN', 'MYL', 'ABBV', 'MRK', 'MCK', 'PRGO', 'AMGN', 'LH', 'PFE', 'ABMD', 'LLY', 'ABT', 'RMD', 'MDT', 'REGN', 'PKI', 'UNH', 'ALXN', 'ISRG', 'ABC', 'A', 'BIIB', 'BMY', 'HUM', 'DHR', 'HSIC', 'CI', 'BAX', 'TMO', 'IDXX', 'EW', 'DGX', 'CNC', 'HCA', 'WCG', 'COO', 'CVS', 'GILD', 'VAR', 'WAT', 'HOLX', 'CERN', 'DVA', 'BDX', 'ANTM', 'VRTX', 'INCY', 'CAH', 'BSX', 'ILMN']],
+    ['Industrials', ['BA', 'FAST', 'DE', 'RHI', 'DAL', 'FBHS', 'FDX', 'UTX', 'PWR', 'ROK', 'ROL', 'RSG', 'RTN', 'NLSN', 'ODFL', 'UAL', 'VRSK', 'EMR', 'ETN', 'FLS', 'ADP', 'DOV', 'EFX', 'PH', 'IR', 'BR', 'NSC', 'WAB', 'EXPD', 'PAYX', 'NOC', 'PCAR', 'TXT', 'MMM', 'CSX', 'LUV', 'CTAS', 'UNP', 'LMT', 'HON', 'SWK', 'LDOS', 'URI', 'KSU', 'IEX', 'CHRW', 'UPS', 'TDG', 'INFO', 'CAT', 'JCI', 'JBHT', 'AAL', 'ITW', 'CMI', 'AOS', 'AME', 'WM', 'HII', 'MAS', 'ALLE', 'FTV', 'PNR', 'ALK', 'GWW', 'ARNC', 'GE', 'SNA', 'GD', 'CPRT']],
+    ['InformationTechnology', ['TEL', 'CTXS', 'ADBE', 'CDNS', 'TXN', 'CTSH', 'CDW', 'ROP', 'CRM', 'AAPL', 'WDC', 'SWKS', 'ACN', 'QCOM', 'QRVO', 'SNPS', 'ADI', 'STX', 'CSCO', 'IT', 'ANSS', 'ANET', 'MXIM', 'MU', 'FFIV', 'MSI', 'MSFT', 'FISV', 'FLIR', 'IBM', 'FLT', 'HPE', 'LRCX', 'AMD', 'FTNT', 'GLW', 'AMAT', 'AVGO', 'HPQ', 'MCHP', 'APH', 'AKAM', 'IPGP', 'ADSK', 'VRSN', 'JNPR', 'INTU', 'INTC', 'ORCL', 'KEYS', 'KLAC', 'NVDA', 'NTAP', 'NOW', 'WU']],
+    ['Materials', ['CF', 'CE', 'LYB', 'IP', 'IFF', 'PKG', 'MOS', 'AVY', 'PPG', 'ECL', 'EMN', 'BLL', 'VMC', 'WRK', 'APD', 'NUE', 'ALB', 'FCX', 'FMC', 'SEE', 'SHW', 'MLM', 'NEM']],
+    ['RealEstate', ['WY', 'VTR', 'VNO', 'UDR', 'IRM', 'SPG', 'EQIX', 'EQR', 'ESS', 'CCI', 'BXP', 'EXR', 'FRT', 'HST', 'KIM', 'DLR', 'MAA', 'MAC', 'AVB', 'ARE', 'SLG', 'SBAC', 'PSA', 'REG', 'AIV', 'O', 'AMT', 'PLD', 'DRE']],
+    ['Utilities', ['AES', 'AWK', 'AEP', 'ATO', 'WEC', 'AEE', 'CMS', 'CNP', 'D', 'ES', 'DUK', 'SO', 'PPL', 'PNW', 'PEG', 'NRG', 'NI', 'DTE', 'NEE', 'FE', 'EXC', 'ETR', 'SRE', 'EIX', 'ED', 'LNT', 'XEL']],
+]
+stock_names = [stock for sector,stocks in sector_stock for stock in stocks]
+
 
 def getSingleDfs(trainType):
     sector_stock = [
@@ -57,11 +77,13 @@ def getSingleDfs(trainType):
     
     if trainType=="universal":
         print("getSingleDfs trainType:",trainType)
+        # NOTE remeber to update the one file pkl
         df = pd.read_pickle(path0701+"one_file.pkl")
         dfs=[df]
         # num_of_stacked_stocks = 100
-        num_of_stacked_stocks = 481
-        return dfs, num_of_stacked_stocks
+        num_of_stacked_stocks = 469
+        # num_of_stacked_stocks = 481
+        return dfs, num_of_stacked_stocks, stock_names
     # if trainType=="universal":
     #     print("getSingleDfs trainType:",trainType)
     #     df = pd.read_pickle(path0700+"universal.pkl")
@@ -100,17 +122,17 @@ def print_mean(df3):
 
 if __name__=="__main__":
     rayOn = True
-    if rayOn:
-        ray.shutdown()
-        ray.init(num_cpus=32,object_store_memory=40*1e9)
-    # /homes/80/kang/anaconda3/bin/python /homes/80/kang/cmem/codes/test_single_stock.py
-    # regulator = "Lasso"
+    # if rayOn:
+    #     ray.shutdown()
+    #     ray.init(num_cpus=32,object_store_memory=40*1e9)
+    # # /homes/80/kang/anaconda3/bin/python /homes/80/kang/cmem/codes/test_single_stock.py
     # regulator = "XGB"
+    # regulator = "Inception"
 
-    regulator = "Inception"
-    # regulator = "OLS"
-    # regulator = "Ridge"
     # regulator = "CMEM"
+    # regulator = "OLS"
+    regulator = "Lasso"
+    # regulator = "Ridge"
     
 
     # trainType = "universal"
@@ -120,37 +142,50 @@ if __name__=="__main__":
     print(f'trainType {trainType}, regulator {regulator}')
     
 
-    dfs,num_of_stacked_stocks = getSingleDfs(trainType)
+    dfs,num_of_stacked_stocks,stock_names = getSingleDfs(trainType)
     print("dfs,num_of_stacked_stocks:",len(dfs),num_of_stacked_stocks)
     
+    config = {
+        'num':num_of_stacked_stocks,
+        'regulator':regulator,
+        'trainType':trainType,
+        'task_id':str(random.randint(1000, 9999))     
+    }
+    
     if trainType=="single":
-        rayOn = False
         if rayOn:
-
             ray.shutdown()
-            ray.init(num_cpus=64,object_store_memory=40 * 1e9)    
-            ids = [get_r2df_ray.remote(num=num_of_stacked_stocks,regulator=regulator,df=df) for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs))]
+            # ray.init(num_cpus=32,object_store_memory=40 * 1e9)    
+            ray.init(num_gpus=8)  
+            # ray.init(num_gpus=4)  
+            ids=[]
+            for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs)):
+                config['stock_symbol'] = stock_names[idx]
+                ids.append(get_r2df_ray.remote(config,df=df))
+            # ids = [get_r2df_ray.remote(config,df=df) for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs))]
+            # ids = [get_r2df_ray.remote(num=num_of_stacked_stocks,regulator=regulator,trainType=trainType,df=df) for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs))]
             results = [ray.get(id_) for id_ in tqdm(ids)]
         else: 
             results=[]
             for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs)):
-                result = get_r2df(num=num_of_stacked_stocks,regulator=regulator,df=df)
+                config['stock_symbol'] = stock_names[idx]
+                result = get_r2df(config,df=df)
+                # result = get_r2df(num=num_of_stacked_stocks,regulator=regulator,trainType=trainType,df=df)
                 results.append(result)
         df3s=[result[0] for result in results]
         df33s=[result[1] for result in results]
 
-        names = [name[:-4] for name in path0702Files_filtered]
         df3s_=pd.concat(df3s,axis=1)
-        df3s_.columns = names
-        for i in range(len(df33s)):df33s[i].stock_index = names[i] 
+        df3s_.columns = stock_names
+        for i in range(len(df33s)):df33s[i].stock_index = stock_names[i] 
         df33s_=pd.concat(df33s,axis=0)
-        print("df3_.mean(axis=0):",df3s_.mean(axis=0))
-        print("df3_.mean(axis=0).mean():",df3s_.mean(axis=0).mean())
+        # print("df3_.mean(axis=0):",df3s_.mean(axis=0))
+        # print("df3_.mean(axis=0).mean():",df3s_.mean(axis=0).mean())
     elif trainType=="universal":
         df3s=[];df33s=[]
         # idx=0;df=dfs[0];num=num_of_stacked_stocks
         for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs)):
-            df3,df33 = get_r2df(num=num_of_stacked_stocks,regulator=regulator,df=df)
+            df3,df33 = get_r2df(num=num_of_stacked_stocks,regulator=regulator,trainType=trainType,df=df)
             total_r2 = df3.mean(axis=1).mean()
             print('total r2: ',df3.mean(axis=1).mean()) # all mean
             df3s.append(df3)

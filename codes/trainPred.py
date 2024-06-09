@@ -11,7 +11,7 @@ TRAIN_DAYS = 50
 
 def train_and_pred(index,df,config):
     
-    num,regulator = config["num"],config["regulator"]
+    num,regulator,trainType,task_id = config["num"],config["regulator"],config['trainType'],config['task_id']
 
     total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df,num) 
     # here already wrong, need to check the codes
@@ -62,6 +62,10 @@ def train_and_pred(index,df,config):
         y_pred_clipped = np.exp(y_pred)
         # y_pred_clipped = np.exp(y_pred_clipped) # TODO caution 
     test_date = df.date.iloc[train_end_index]
+    df.date.iloc[train_end_index-1]
+    df.date.iloc[train_end_index+1]
+    # TODO 
+    df.date.iloc[train_end_index-1:train_end_index+10000]
     '''prob in the y_pred shapes'''
 
     # r2 = r2_score(y_test, y_pred_clipped)
@@ -86,27 +90,30 @@ def train_and_pred(index,df,config):
             print(f"trainPred Error {stock} {item.head()}")
     test_df = pd.DataFrame(lst,columns=["test_date", "stock", "r2value"])
     test_df = test_df.pivot(index='test_date',columns='stock')
-    print(test_df)
-    print(f"=== {int(test_df.index[0])}:       <<< {test_df.mean().mean()} >>>\n"+"==="*20)
-    from datetime import datetime
+    # print(test_df)
+    # print(f"=== {int(test_df.index[0])}:       <<< {test_df.mean().mean()} >>>\n"+"==="*20)
+    
+    # def _save_data():
+    # from datetime import datetime
 
-    # Get current date and time
-    current_time = datetime.now()
+    # # Get current date and time
+    # current_time = datetime.now()
 
-    # Format date and time to be used in the file name
-    date_str = current_time.strftime("%Y-%m-%d")
-    time_str = current_time.strftime("%H")
+    # # Format date and time to be used in the file name
+    # date_str = current_time.strftime("%Y-%m-%d")
+    # time_str = current_time.strftime("%H")
 
-    # Combine date and time to form the file name
-    # Get the short Git hash
-    short_hash = config["short_hash"]
-    idnetificator = f"_{date_str}_{time_str}_{short_hash}"
-    # In subsequent iterations, append without the header
-    test_df.to_csv('/homes/80/kang/cmem/'+'data_summary_'+regulator+idnetificator+'.csv', mode='a', header=False, index=True)
-    # test_df.to_csv('/homes/80/kang/cmem/'+'data_summary.csv', mode='a', header=False, index=True)
-    # print(index,test_date,test_df.r2value.mean())
-    oneday_df.to_csv('/homes/80/kang/cmem/'+'data_allValues_'+regulator+idnetificator+'.csv', mode='a', header=False, index=False)
-    # oneday_df.to_csv('/homes/80/kang/cmem/'+'data_all_values.csv', mode='a', header=False, index=False)
+    # # Combine date and time to form the file name
+    # # Get the short Git hash
+    # short_hash = config["short_hash"]
+    # idnetificator = f"_{task_id}_{short_hash}"
+    # # In subsequent iterations, append without the header
+    # test_df.to_csv('/homes/80/kang/cmem/'+'data_summary_'+trainType+regulator+idnetificator+'.csv', mode='a', header=False, index=True)
+    # # test_df.to_csv('/homes/80/kang/cmem/'+'data_summary.csv', mode='a', header=False, index=True)
+    # # print(index,test_date,test_df.r2value.mean())
+    # oneday_df.to_csv('/homes/80/kang/cmem/'+'data_allValues_'+trainType+regulator+idnetificator+'.csv', mode='a', header=False, index=False)
+    # # oneday_df.to_csv('/homes/80/kang/cmem/'+'data_all_values.csv', mode='a', header=False, index=False)
+    # print(f'results would be saved into {trainType+regulator+idnetificator}')
     return lst,oneday_df
 
 

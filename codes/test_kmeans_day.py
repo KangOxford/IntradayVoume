@@ -18,10 +18,14 @@ from kmeans import *
 from kmeans import get_features,get_labels_byPCA
 from universal import *
 # from universal import get_df_list
-from test_single_stock import getSingleDfs
+from codes.schedule4RLexecution import getSingleDfs
 from trainPred import *
 # import multiprocessing
 import ray
+
+
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
 
 readFromPath = lambda data_path: sorted([f for f in listdir(data_path) if isfile(join(data_path, f)) and f != '.DS_Store'])
 
@@ -98,8 +102,8 @@ def process_data(total_num_stocks,date_index,regulator,ratio_cumsum,n_clusters,f
 
     corr_matrix = get_corr_matrix(train_start_Index, train_end_Index, features,stock_names)
     
-    # file_path = "/homes/80/kang/cmem/corr_matrix_volume.csv"
-    file_path = "/homes/80/kang/cmem/corr_matrix_features.csv"
+    file_path = "/homes/80/kang/cmem/corr_matrix_volume.csv"
+    # file_path = "/homes/80/kang/cmem/corr_matrix_features.csv"
     if os.path.exists(file_path):
         os.remove(file_path)
     np.savetxt(file_path, corr_matrix, delimiter=",")
