@@ -29,7 +29,7 @@ def get_r2df_ray(config,df):
     return get_r2df(config,df)
     # return get_r2df(num,regulator,trainType,df)
 
-@ray.remote
+@ray.remote(num_gpus=1)
 def train_and_pred_ray(index,df,config):
     print(f">>> date index BEGIN: {index}")
     result = train_and_pred(index,df,config)
@@ -63,60 +63,74 @@ def get_r2df(config,df):
         'task_id':task_id
     }
     
-    # suquentially
-    start = time.time()
-    # with multiprocessing.Pool(processes=num_processes) as pool:
-    r2results = [];oneday_dfs=[]
-    print("total_test_days",total_test_days)
-    # index=0
     test_dates = dates[-total_test_days:]
+    print("total_test_days",total_test_days)
     config['total_test_days']=total_test_days
-    for index in range(total_test_days):     
-        config['test_date'] = test_dates[index]
-        # try:
-        #     r2result,oneday_df = train_and_pred(index,df,config)     
-        #     r2results.append(r2result)
-        #     oneday_dfs.append(oneday_df)
-        # except Exception as e:
-        #     print(f"An error occurred: {e}")
+    if trainType =='single' or  trainType =='clustered':
+        # suquentially
+        start = time.time()
+        # with multiprocessing.Pool(processes=num_processes) as pool:
+        r2results = [];oneday_dfs=[]
+        # index=0
+        for index in range(total_test_days):     
+            config['test_date'] = test_dates[index]
+            # try:
+            #     r2result,oneday_df = train_and_pred(index,df,config)     
+            #     r2results.append(r2result)
+            #     oneday_dfs.append(oneday_df)
+            # except Exception as e:
+            #     print(f"An error occurred: {e}")
+            
+            r2result,oneday_df = train_and_pred(index,df,config)
+            if trainType == 'universal':
+                oneday_df_stock_symbol = np.repeat(stock_symbol, BIN_SIZE)
+                oneday_df['stock_symbol'] = oneday_df_stock_symbol
+            elif trainType == 'single':
+                oneday_df_stock_symbol = np.repeat(stock_symbol, 1)
+                oneday_df['stock_symbol'] = oneday_df_stock_symbol[0]
+            else: raise NotImplementedError
         
-        r2result,oneday_df = train_and_pred(index,df,config)
-        if trainType == 'universal':
-            oneday_df_stock_symbol = np.repeat(stock_symbol, BIN_SIZE)
-        elif trainType == 'single':
-            oneday_df_stock_symbol = np.repeat(stock_symbol, 1)
-        else: raise NotImplementedError
+            oneday_df.drop(columns=['stock_index'],inplace=True)
+            r2results.append(r2result)
+            if len(r2result) != num:
+                print("len(r2result) != num in get_results line 92")
+                raise NotImplementedError
+            oneday_dfs.append(oneday_df)
+            print(pd.DataFrame(np.array(r2results)[0],columns=['date','stock','r2']))
+            print(pd.DataFrame(np.array(r2results)[0],columns=['date','stock','r2']).mean())
+            # print(oneday_dfs)
+        end = time.time()
+    
+    if trainType == 'universal':
+        # in parallel
+        start = time.time()
+        # ids=[train_and_pred_ray.remote(index,df,config) for index in tqdm(3)]
+        ids = [ ]
+        # for index in tqdm(range(3)):
+        for index in tqdm(range(total_test_days)):
+            config['test_date'] = test_dates[index]
+            ids.append(train_and_pred_ray.remote(index,df,config))
+        # ids=[train_and_pred_ray.remote(index,df,config) for index in tqdm(range(total_test_days))]
+        results = [ray.get(id_) for id_ in tqdm(ids)]
+        r2results  = [result[0] for result in results]
+        _oneday_dfs = [result[1] for result in results]
+        oneday_dfs = []
+        for oneday_df in _oneday_dfs:
+            oneday_df['stock_symbol'] = np.repeat(stock_symbol, BIN_SIZE)
+            oneday_df.drop(columns=['stock_index'],inplace=True)
+            oneday_dfs.append(oneday_df)
+        # r2results,oneday_dfs=zip(*results)
+        end = time.time()
+        print(f"get r2results,oneday_dfs time taken {end-start}")
+        # breakpoint()
         
-        oneday_df['stock_symbol'] = oneday_df_stock_symbol[0] if trainType == 'single' else oneday_df_stock_symbol
-        oneday_df.drop(columns=['stock_index'],inplace=True)
-        r2results.append(r2result)
-        if len(r2result) != num:
-            print("len(r2result) != num in get_results line 92")
-            raise NotImplementedError
-        oneday_dfs.append(oneday_df)
-        print(pd.DataFrame(np.array(r2results)[0],columns=['date','stock','r2']))
-        print(pd.DataFrame(np.array(r2results)[0],columns=['date','stock','r2']).mean())
-        # print(oneday_dfs)
-    end = time.time()
-    
-    # # in parallel
-    # start = time.time()
-    # # ids=[train_and_pred_ray.remote(index,df,config) for index in tqdm(3)]
-    # ids=[train_and_pred_ray.remote(index,df,config) for index in tqdm(range(total_test_days))]
-    # results = [ray.get(id_) for id_ in tqdm(ids)]
-    # r2results  = [result[0] for result in results]
-    # oneday_dfs = [result[1] for result in results]
-    # # r2results,oneday_dfs=zip(*results)
-    # end = time.time()
-    # print(f"get r2results,oneday_dfs time taken {end-start}")
-    # # breakpoint()
-    
     
     def get_r2df_from_results(r2results, stock_symbol, config):
         r2arr = np.array(r2results).reshape(-1, 3)
         df1 = pd.DataFrame(r2arr)
         df1.columns = ['test_date', 'stock_symbol', 'r2']
-        df1['stock_symbol']=np.tile(stock_symbol,config['total_test_days'])
+        # breakpoint()
+        # df1['stock_symbol']=np.tile(stock_symbol,config['total_test_days'])
         # df1['stock_symbol']=np.tile(stock_symbol,config['num'])
         # assert np.unique(df1['stock_index']).shape == (len(path060000Files),)
         df2 = df1.pivot(index="test_date", columns="stock_symbol", values="r2")
@@ -304,7 +318,8 @@ def param_define(df,num):
                         'log_ntn_8', 'log_volBuyNotional_8', 'log_volSellNotional_8', 'log_nrTrades_8', 'log_ntr_8',
                         'log_volBuyNrTrades_lit_8', 'log_volSellNrTrades_lit_8', 'log_volBuyQty_8', 'log_volSellQty_8']
     x_list = ['log_x', 'log_eta*seas', 'log_eta', 'log_seas', 'log_mu']
-    x_list = x_list + our_log_features
+    x_list = our_log_features
+    # x_list = x_list + our_log_features
     y_list = ['log_turnover']
     # x_list = ['log_eta', 'log_seas', 'log_mu']
     # y_list = ['log_turnover']

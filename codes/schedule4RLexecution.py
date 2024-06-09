@@ -113,17 +113,17 @@ if __name__=="__main__":
     #     ray.init(num_cpus=32,object_store_memory=40*1e9)
     # # /homes/80/kang/anaconda3/bin/python /homes/80/kang/cmem/codes/test_single_stock.py
     # regulator = "XGB"
-    regulator = "Inception"
+    # regulator = "Inception"
     # regulator = 'Attention'
 
     # regulator = "CMEM"
     # regulator = "OLS"
     # regulator = "Lasso"
-    # regulator = "Ridge"
+    regulator = "Ridge"
     
 
-    # trainType = "universal"
-    trainType = "single"
+    trainType = "universal"
+    # trainType = "single"
     # trainType = "clustered"
     
     print(f'trainType {trainType}, regulator {regulator}')
@@ -158,6 +158,11 @@ if __name__=="__main__":
             # ids = [get_r2df_ray.remote(num=num_of_stacked_stocks,regulator=regulator,trainType=trainType,df=df) for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs))]
             results = [ray.get(id_) for id_ in tqdm(ids)]
         else: 
+            ray.shutdown()
+            # ray.init(num_cpus=32,object_store_memory=40 * 1e9)    
+            ray.init(num_gpus=8)  
+            # ray.init(num_gpus=4)  
+            
             results=[]
             for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs)):
                 config['stock_symbol'] = stock_names[idx]
