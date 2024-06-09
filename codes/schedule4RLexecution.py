@@ -107,23 +107,23 @@ def print_mean(df3):
     print(f">>>> aggregate mean: \n",df3.mean(axis=1).mean())
 
 if __name__=="__main__":
-    rayOn = True
+    rayOn = False
     # if rayOn:
     #     ray.shutdown()
     #     ray.init(num_cpus=32,object_store_memory=40*1e9)
     # # /homes/80/kang/anaconda3/bin/python /homes/80/kang/cmem/codes/test_single_stock.py
     # regulator = "XGB"
-    # regulator = "Inception"
-    # regulatot = 'Attention'
+    regulator = "Inception"
+    # regulator = 'Attention'
 
     # regulator = "CMEM"
     # regulator = "OLS"
-    regulator = "Lasso"
+    # regulator = "Lasso"
     # regulator = "Ridge"
     
 
-    trainType = "universal"
-    # trainType = "single"
+    # trainType = "universal"
+    trainType = "single"
     # trainType = "clustered"
     
     print(f'trainType {trainType}, regulator {regulator}')
@@ -152,6 +152,7 @@ if __name__=="__main__":
             ids=[]
             for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs)):
                 config['stock_symbol'] = stock_names[idx]
+                config['dates'] = df.date.unique()
                 ids.append(get_r2df_ray.remote(config,df=df))
             # ids = [get_r2df_ray.remote(config,df=df) for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs))]
             # ids = [get_r2df_ray.remote(num=num_of_stacked_stocks,regulator=regulator,trainType=trainType,df=df) for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs))]
@@ -160,6 +161,7 @@ if __name__=="__main__":
             results=[]
             for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs)):
                 config['stock_symbol'] = stock_names[idx]
+                config['dates'] = df.date.unique()
                 result = get_r2df(config,df=df)
                 # result = get_r2df(num=num_of_stacked_stocks,regulator=regulator,trainType=trainType,df=df)
                 results.append(result)

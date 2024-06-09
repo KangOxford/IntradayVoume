@@ -169,6 +169,55 @@ def regularity_ols(X_train, y_train, X_test, config):
         # y_pred_flatten = denormalize_predictions(y_pred_flatten.numpy(), scaler_y)
         # '''caution how y_pred is flattened deserves attention!!!'''
         # return y_pred_flatten
+    elif regulator == "Attention":
+        from attention import AttentionModel, ModelTrainer
+        import torch
+        from torch.utils.data import DataLoader, TensorDataset
+        from torch.utils.tensorboard import SummaryWriter
+        
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        
+        # Define hyperparameters
+        num_features = 52  # number of features
+        hidden_size = 128  # size of MLP hidden state
+        attention_size = 64  # size of attention mechanism
+        batch_size = 32000
+        num_epochs = 100
+        bin_size=26
+        num_stocks=469
+        train_days=50
+        
+
+        # Create the model
+        model = AttentionModel(num_features, hidden_size, attention_size).to(device)
+        trainer = ModelTrainer(model,learning_rate=0.0005)
+
+        # Prepare the data
+        X_train_tensor = torch.tensor(X_train.to_numpy(), dtype=torch.float32).to(device)
+        y_train_tensor = torch.tensor(y_train.to_numpy(), dtype=torch.float32).to(device)
+        X_test_tensor = torch.tensor(X_test.to_numpy(), dtype=torch.float32).to(device)
+        X_train_tensor = X_train_tensor.view(num_stocks * bin_size, train_days, num_features)  # (num_stocks*bin_size, sequence_length, num_features)
+        y_train_tensor = y_train_tensor.view(num_stocks * bin_size, train_days, 1)  # (num_stocks*bin_size, sequence_length, num_features)
+        X_test_tensor = X_test_tensor.view(num_stocks * bin_size, 1, num_features)  # (num_stocks*bin_size, sequence_length, num_features)
+        print(f"X_train_tensor.shape: {X_train_tensor.shape}")
+        print(f"y_train_tensor.shape: {y_train_tensor.shape}")
+        print(f"X_test_tensor.shape: {X_test_tensor.shape}")
+
+        # Create DataLoader for training
+        train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
+        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+
+        # Initialize TensorBoard SummaryWriter
+        writer = SummaryWriter(log_dir='/homes/80/kang/cmem/codes/logs/')
+        # writer = SummaryWriter(log_dir='./logs')
+
+        # Train the model
+        trainer.train(train_loader, num_epochs, writer)
+
+        # Predict on new data
+        predictions, attn_weights = trainer.predict(X_test_tensor)
+        y_pred = predictions.cpu().numpy().flatten()
+        return y_pred
     else:
         raise NotImplementedError
 

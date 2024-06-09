@@ -87,14 +87,15 @@ def get_r2df(config,df):
             oneday_df_stock_symbol = np.repeat(stock_symbol, 1)
         else: raise NotImplementedError
         
-        oneday_df['stock_symbol'] = oneday_df_stock_symbol
+        oneday_df['stock_symbol'] = oneday_df_stock_symbol[0] if trainType == 'single' else oneday_df_stock_symbol
         oneday_df.drop(columns=['stock_index'],inplace=True)
         r2results.append(r2result)
         if len(r2result) != num:
             print("len(r2result) != num in get_results line 92")
             raise NotImplementedError
         oneday_dfs.append(oneday_df)
-        # print(r2results)
+        print(pd.DataFrame(np.array(r2results)[0],columns=['date','stock','r2']))
+        print(pd.DataFrame(np.array(r2results)[0],columns=['date','stock','r2']).mean())
         # print(oneday_dfs)
     end = time.time()
     
