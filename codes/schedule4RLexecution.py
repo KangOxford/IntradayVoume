@@ -107,19 +107,19 @@ def print_mean(df3):
     print(f">>>> aggregate mean: \n",df3.mean(axis=1).mean())
 
 if __name__=="__main__":
-    rayOn = False
+    rayOn = True
     # if rayOn:
     #     ray.shutdown()
     #     ray.init(num_cpus=32,object_store_memory=40*1e9)
     # # /homes/80/kang/anaconda3/bin/python /homes/80/kang/cmem/codes/test_single_stock.py
-    # regulator = "XGB"
+    regulator = "XGB"
     # regulator = "Inception"
     # regulator = 'Attention'
 
     # regulator = "CMEM"
     # regulator = "OLS"
     # regulator = "Lasso"
-    regulator = "Ridge"
+    # regulator = "Ridge"
     
 
     trainType = "universal"
@@ -183,6 +183,7 @@ if __name__=="__main__":
         df3s=[];df33s=[]
         # idx=0;df=dfs[0];num=num_of_stacked_stocks
         # NOTE remember to update the one file pkl before running
+        print("CAUTION run universal to generate file first")
         for idx, df in tqdm(enumerate(dfs), desc="get_r2df", total=len(dfs)):
             print(f">>> len(dfd):{len(df)}")
             config['stock_symbol'] = stock_names

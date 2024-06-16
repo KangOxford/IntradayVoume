@@ -14,7 +14,7 @@ import os;os.sys.path.append("/homes/80/kang/cmem/codes/")
 from utils import *
 from model import *
 from dates import *
-from trainPred import BIN_SIZE, TRAIN_DAYS
+from get_results import BIN_SIZE, TRAIN_DAYS
 import multiprocessing
 import time
 
@@ -148,10 +148,14 @@ def main2(path060000Files):
 
 
 if __name__=="__main__":   
-    path060000Files = readFromPath(path060000_fractional_shares)
+    path0702Files = readFromPath(path0702)
     # path060000Files = readFromPath(path060000)
-    print(len(path060000Files)) 
-    main1(path060000Files)
+    print(len(path0702Files)) 
+    main1(path0702Files)
+    # path060000Files = readFromPath(path060000_fractional_shares)
+    # # path060000Files = readFromPath(path060000)
+    # print(len(path060000Files)) 
+    # main1(path060000Files)
     # main2(path060000Files)
     
     

@@ -317,9 +317,10 @@ def param_define(df,num):
                         'log_volBuyNrTrades_lit_2', 'log_volSellNrTrades_lit_2', 'log_volBuyQty_2', 'log_volSellQty_2',
                         'log_ntn_8', 'log_volBuyNotional_8', 'log_volSellNotional_8', 'log_nrTrades_8', 'log_ntr_8',
                         'log_volBuyNrTrades_lit_8', 'log_volSellNrTrades_lit_8', 'log_volBuyQty_8', 'log_volSellQty_8']
-    x_list = ['log_x', 'log_eta*seas', 'log_eta', 'log_seas', 'log_mu']
-    x_list = our_log_features
-    # x_list = x_list + our_log_features
+    # x_list = ['log_x', 'log_eta*seas', 'log_eta', 'log_seas', 'log_mu']
+    x_list = ['log_x_clipped', 'log_eta_clipped', 'log_eta*seas_clipped','log_seas', 'log_mu']
+    # x_list = our_log_features
+    x_list = x_list + our_log_features
     y_list = ['log_turnover']
     # x_list = ['log_eta', 'log_seas', 'log_mu']
     # y_list = ['log_turnover']

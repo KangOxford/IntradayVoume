@@ -25,7 +25,8 @@ path0600_1_22 = path00+'output/0600_1_22_r_output_raw_csv/'
 
 path0700 = path00+"output/0700_universal_fractional_shares_clipped/"
 path0701 = path00+"output/0701_one_file_fractional_shares_clipped/"
-path0702 = path00+"output/0702_single_fractional_shares_clipped/" 
+# path0702 = path00+"output/0702_single_fractional_shares_clipped/" 
+path0702 = path00+"output/NEW15JUNE_0702_single_fractional_shares_clipped_NaNremoved_MinmaxClipped/" 
 # path0700 = path00+"output/0700_universal/"
 # path0701 = path00+"output/0701_one_file/"
 # path0702 = path00+"output/0702_single/" 
