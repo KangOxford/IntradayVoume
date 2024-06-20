@@ -112,12 +112,12 @@ if __name__=="__main__":
     #     ray.shutdown()
     #     ray.init(num_cpus=32,object_store_memory=40*1e9)
     # # /homes/80/kang/anaconda3/bin/python /homes/80/kang/cmem/codes/test_single_stock.py
-    regulator = "XGB"
+    # regulator = "XGB"
     # regulator = "Inception"
     # regulator = 'Attention'
 
     # regulator = "CMEM"
-    # regulator = "OLS"
+    regulator = "OLS"
     # regulator = "Lasso"
     # regulator = "Ridge"
     
