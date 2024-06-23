@@ -341,10 +341,11 @@ def model_nn(X_train, y_train, X_test, y_test, config):
                 1 bins of stock2 of day50, end to index 2 (not included)
         ''' 
         if num_stock ==1 :
-            X_train_window=X_scaled[i:train_days*bin_size+i, :]
+            X_train_window=X_scaled[i:train_days*bin_size+i,:]
             y_train_window=y_scaled[i:train_days*bin_size+i,:]
             X_test_window=X_scaled[i+1:train_days*bin_size+i+1, :]
-            return X_train_window, y_train_window, X_test_window
+            y_test_window=y_scaled[i+1:train_days*bin_size+i+1, :]
+            return X_train_window, y_train_window, X_test_window, y_test_window
         else:
             '''It include the situation of num_stock to be 1'''
             num_bins_per_day = bin_size  # Number of bins for each stock each day
@@ -356,6 +357,7 @@ def model_nn(X_train, y_train, X_test, y_test, config):
             X_train_window = np.zeros((total_bins, X_scaled.shape[1]))
             y_train_window = np.zeros((total_bins, y_scaled.shape[1]))
             X_test_window = np.zeros((total_bins, X_scaled.shape[1]))
+            y_test_window = np.zeros((total_bins, y_scaled.shape[1]))
             
             # Loop to populate the training and test data
             for j in range(num_days):  # For each of the 'num_days' days
@@ -373,19 +375,17 @@ def model_nn(X_train, y_train, X_test, y_test, config):
                     
                     # Slice and copy data for test window
                     X_test_window[out_start_idx:out_end_idx, :] = X_scaled[start_idx + 1:end_idx + 1, :]
+                    y_test_window[out_start_idx:out_end_idx, :] = y_scaled[start_idx + 1:end_idx + 1, :]
             
-            return X_train_window, y_train_window, X_test_window
+            return X_train_window, y_train_window, X_test_window, y_test_window
         
     def slice_and_stack_batch(X_scaled, y_scaled, num_stock, idx):
-        '''idx is not used here'''
-        X_train_window, y_train_window, _ = slice_and_stack(X_scaled, y_scaled, num_stock, 0)
-        '''idx is used here'''
-        _, _, X_test_window = slice_and_stack(X_scaled, y_scaled, num_stock, idx)
+        '''idx is not used here and always be zero'''
+        X_train_window, y_train_window,X_test_window, y_test_window= slice_and_stack(X_scaled, y_scaled, num_stock, 0)
         
         num_bins_per_day = bin_size  # Number of bins for each stock each day
         num_days = train_days  # Number of days you want to consider
         # Number of bins for 'num_stock' stocks for 'num_days' days
-        total_bins = num_bins_per_day * num_stock * num_days
         '''
         >>> Only one model trained and the X_train is sliding window 
         26 bins of stock1 of day1
@@ -418,22 +418,9 @@ def model_nn(X_train, y_train, X_test, y_test, config):
             return X_3D
         X_train_reshaped = reshape_X_2Dinto3D_V2(X_train_window,num_days_=num_days)
         y_train_reshaped = reshape_X_2Dinto3D_V2(y_train_window,num_days_=num_days)
-        def reshape_X_test2Dinto3D_V2(X,idx):
-            if idx ==0:
-                return reshape_X_2Dinto3D_V2(X,num_days_=num_days)
-            else:
-                first_index = (bin_size-idx)*num_stock
-                end_index = -1*idx*num_stock
-                X1 = X[:first_index,:]
-                X2 = X[first_index:idx,end_index:]
-                X3 = X[end_index:,:]
-                X1_3D=reshape_X_2Dinto3D_V2(X1,num_days_=1) #（483,25,52）
-                X2_3D=reshape_X_2Dinto3D_V2(X2,num_days_=num_days-2) #（483,1274,52）
-                X3_3D=reshape_X_2Dinto3D_V2(X3,num_days_=1) #（483,1,52）
-                X_3D = np.concatenate((X1_3D, X2_3D, X3_3D), axis=1) # stack by second dimension:（483,1300,52）
-                return X_3D
-        X_test_reshaped  = reshape_X_test2Dinto3D_V2(X_test_window,idx) # TODO reamain to be tested
-        return X_train_reshaped, y_train_reshaped, X_test_reshaped
+        X_all_reshaped = np.concatenate((X_train_reshaped, reshape_X_2Dinto3D_V2(X_test_window,num_days_=num_days)[:,-bin_size:,:]), axis=1)
+        y_all_reshaped = np.concatenate((y_train_reshaped, reshape_X_2Dinto3D_V2(y_test_window,num_days_=num_days)[:,-bin_size:,:]), axis=1)
+        return X_train_reshaped, y_train_reshaped, X_all_reshaped, y_all_reshaped
     
     # def slice_and_stack_single_distribution(X_scaled, y_scaled, num_stock, i):
         
@@ -446,19 +433,37 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         '''
         
         X_scaled, y_scaled = X_scaled.astype(np.float32), y_scaled.astype(np.float32)
+        '''here contains the train days and one test day 11= 10 + 1
+        need to know how the data inside is stacked from the universal file
+        X_scaled in shape
+        26bins of day1
+        26bins of day1
+        ...
+        [469] 26bins of day1
+        
+        then day2
+        then day3
+        ...  until day 11 
+        '''
 
         
         # Get the training data using the slice_and_stack function
-        X_train_window, y_train_window, _ = slice_and_stack_batch(X_scaled, y_scaled, num_stock, 0)  # Assuming i=0 as it's a single window
+        X_train_window, y_train_window, X_all_window, y_all_window = slice_and_stack_batch(X_scaled, y_scaled, num_stock, 0)  # Assuming i=0 as it's a single window
         # X_train_window, y_train_window, _ = slice_and_stack(X_scaled, y_scaled, num_stock, 0)  # Assuming i=0 as it's a single window
+        '''
+        checked, the stack way of the slice_and_stack_batch is correct
+        means that the trian data is right
+        '''
 
         # Convert to Torch tensors and Reshape
         X_train_tensor_window, y_train_tensor_window = to_torch_tensors(X_train_window, y_train_window, device)
+        X_all_tensor_window, y_all_tensor_window  = to_torch_tensors(X_all_window, y_all_window, device)
         # X_train_tensor_window = X_train_tensor_window.reshape(1, -1, num_feature).unsqueeze(1)
         # y_train_tensor_window = y_train_tensor_window.reshape(1, -1, 1)
 
         # Train the model with the training data
         stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=500, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=500, batch_size=481)  # Adjust hyperparameters as needed
         
         
         
@@ -469,7 +474,7 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs =2000, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=1500, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=1000, batch_size=481)  # Adjust hyperparameters as needed
-        stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=500, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=500, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=200, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.001, epochs=1000, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.002, epochs=200, batch_size=481)  # Adjust hyperparameters as needed
@@ -493,31 +498,51 @@ def model_nn(X_train, y_train, X_test, y_test, config):
             
         # List to hold the last element of each prediction
         last_elements = []
+        true_elements = []
         
-        # Iterate over the bins, making a prediction on each iteration
-        for i in range(26):
-            # Obtain the test data for the current bin using the slice_and_stack function
-            _, _, X_test_window = slice_and_stack(X_scaled, y_scaled, num_stock, i)
+        for i in range(bin_size):
+            X_test_tensor_window = X_all_tensor_window[:, i:i+bin_size*train_days, :]
+            y_test_tensor_window = y_all_tensor_window[:, i:i+bin_size*train_days, :]
             
-            # Convert the test data to Torch tensor and Reshape
-            X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float32).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
-            # X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
             
-            # Make a prediction using the trained model
-            # X_test_tensor_window = X_test_tensor_window.unsqueeze(0)
+            # X_test_tensor_window = X_all_tensor_window[:, i, :].unsqueeze(1)
             y_pred_normalized = stock_prediction_model.predict(X_test_tensor_window)
             # y_pred_normalized = y_pred_normalized.unsqueeze(0)
             
             # Extract the last element of the prediction and append it to the list
             # last_element = y_pred_normalized[0, -1, 0].item()
-            last_element = y_pred_normalized[:, -1, 0]
+            last_element = y_pred_normalized[:, -1, :]
+            true_element = y_test_tensor_window[:, -1, :]
             last_elements.append(last_element)
+            true_elements.append(true_element)
         
+        # # Iterate over the bins, making a prediction on each iteration
+        # for i in range(26):
+        #     # Obtain the test data for the current bin using the slice_and_stack function
+        #     _, _, X_test_window = slice_and_stack(X_scaled, y_scaled, num_stock, i)
+            
+        #     # Convert the test data to Torch tensor and Reshape
+        #     X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float32).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
+        #     # X_test_tensor_window = torch.tensor(X_test_window, dtype=torch.float64).to(device).reshape(num_stock, -1, num_feature).unsqueeze(1)
+            
+        #     # Make a prediction using the trained model
+        #     # X_test_tensor_window = X_test_tensor_window.unsqueeze(0)
+        #     y_pred_normalized = stock_prediction_model.predict(X_test_tensor_window)
+        #     # y_pred_normalized = y_pred_normalized.unsqueeze(0)
+            
+        #     # Extract the last element of the prediction and append it to the list
+        #     # last_element = y_pred_normalized[0, -1, 0].item()
+        #     last_element = y_pred_normalized[:, -1, 0]
+        #     last_elements.append(last_element)
         
-        result = torch.stack(last_elements, dim=1).reshape(-1, 1).numpy()
+        result = torch.stack([last_element.squeeze() for last_element in last_elements]).flatten().numpy()
+        truth = torch.stack([true_element.squeeze() for true_element in true_elements]).flatten().numpy()
+        
+        # result = torch.stack(last_elements, dim=1).reshape(-1, 1).numpy()
+        # truth = torch.stack(true_elements, dim=1).reshape(-1, 1).numpy()
         # result = torch.stack(last_elements, dim=1).unsqueeze(-1).numpy()
         # result = result.reshape(-1, 1)
-        return result
+        return result, truth
         # Convert the list of last elements to a numpy array and return it
         # return np.array(last_elements).reshape(-1, 1)
 
@@ -548,11 +573,13 @@ def model_nn(X_train, y_train, X_test, y_test, config):
     # check_GPU_memory()
     # Train model and predict with sliding window
     # last_preds = train_and_predict_with_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device)
-    last_preds = train_and_predict_without_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device)
+    last_preds,last_truth = train_and_predict_without_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device)
+    # last_preds = train_and_predict_without_sliding_window(X_scaled, y_scaled, num_stock, num_feature, device)
     
     # Denormalize predictions
     last_preds_denorm = denormalize_predictions(last_preds, scaler_y)
+    last_truth_denorm = denormalize_predictions(last_truth, scaler_y)
     
-    return last_preds_denorm
+    return last_preds_denorm, last_truth_denorm
 
 

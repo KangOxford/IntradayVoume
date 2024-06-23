@@ -58,7 +58,7 @@ def get_df_list(start_index, num):
         df_lst.append(df)
     
 
-    d = generate_unusual_date(year=2017)
+    d = generate_unusual_date(year=2017) 
     shape_lst = [df.shape[0] for df in df_lst]
     from statistics import mode
     try:
@@ -78,23 +78,34 @@ def get_df_list(start_index, num):
     and across different dates
     26bins*121days==3146rows
     up to here, it is all right'''
-    return new_dflst_lst, dflst_filtered
+    return new_dflst_lst
 
 
 
 def get_universal_df(start_index, num):
-    new_dflst_lst,dflst_filtered = get_df_list(start_index, num=469)
-    gs=[[df for date, df in list(dflst.groupby("date") )] for dflst in new_dflst_lst]
-    dff = []
+    '''dflst_filtered this is a sample from the new_dflst_lst'''
+    new_dflst_lst = get_df_list(start_index, num=469)
+    gs=[[itm for date, itm in list(df.groupby("date") )] for df in new_dflst_lst]
+    dflst_filtered =  new_dflst_lst[0]
+    num_days = dflst_filtered.shape[0]//BIN_SIZE
+    
+    
+    print(gs[468][0].iloc[-1,:])
+    df =new_dflst_lst[468]
+    
+    '''this check seems to be unnecessary'''
     def truncate_df_wrt_bin_size(dflst_filtered):
         dflst_filtered = pd.concat([itm.iloc[-BIN_SIZE:,:] for idx,itm in dflst_filtered.groupby('date')])
         return dflst_filtered
     dflst_filtered =  truncate_df_wrt_bin_size(dflst_filtered)
-    num_days = dflst_filtered.shape[0]//BIN_SIZE
     assert dflst_filtered.shape[0]//BIN_SIZE == dflst_filtered.shape[0]/BIN_SIZE
+    '''this check seems to be unnecessary'''
+    
+    
     # num_days = dflst_filtered.shape[0]//26
     num_stocks = len(new_dflst_lst)
     # for i in tqdm(range(num_days+1)):
+    dff = []
     for i in tqdm(range(num_days)):
         for j in range(num_stocks):
             group = gs[j][i].iloc[-BIN_SIZE:,:]    

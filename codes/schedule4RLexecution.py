@@ -16,6 +16,7 @@ from utils import *
 from model import *
 # from trainPred import *
 from get_results import * 
+from universal import get_universal_df
 # from get_results import get_r2df, get_r2df_ray
 import multiprocessing
 import time
@@ -64,7 +65,8 @@ def getSingleDfs(trainType):
     if trainType=="universal":
         print("getSingleDfs trainType:",trainType)
         # NOTE remeber to update the one file pkl
-        df = pd.read_pickle(path0701+"one_file.pkl")
+        df = get_universal_df(start_index=0, num=469)
+        # df = pd.read_pickle(path0701+"one_file.pkl")
         dfs=[df]
         # num_of_stacked_stocks = 100
         num_of_stacked_stocks = 469
@@ -112,8 +114,8 @@ if __name__=="__main__":
     #     ray.shutdown()
     #     ray.init(num_cpus=32,object_store_memory=40*1e9)
     # # /homes/80/kang/anaconda3/bin/python /homes/80/kang/cmem/codes/test_single_stock.py
-    regulator = "XGB"
-    # regulator = "Inception"
+    # regulator = "XGB"
+    regulator = "Inception"
     # regulator = 'Attention'
 
     # regulator = "CMEM"
@@ -127,6 +129,8 @@ if __name__=="__main__":
     # trainType = "clustered"
     
     print(f'trainType {trainType}, regulator {regulator}')
+    import time
+    begin = time.time()
     
 
     dfs,num_of_stacked_stocks,stock_names = getSingleDfs(trainType)
@@ -136,7 +140,8 @@ if __name__=="__main__":
         'num':num_of_stacked_stocks,
         'regulator':regulator,
         'trainType':trainType,
-        'task_id':str(random.randint(1000, 9999))     
+        'task_id':str(random.randint(1000, 9999)),   
+        'rayOn':rayOn,  
     }
     
     if trainType=="single":
@@ -205,6 +210,8 @@ if __name__=="__main__":
     # elif trainType=='clustered':
         
     else: raise NotImplementedError
+    
+    print("time taken for the whole process:",time.time()-begin)
         
         
     

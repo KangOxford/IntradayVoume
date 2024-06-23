@@ -246,11 +246,12 @@ class NNPredictionModel:
 if __name__ == "__main__":
     device = torch.device("cpu") 
     # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Because detecting if CUDA is available
-    numStock = 1
+    # numStock = 1
+    numStock = 3
     # numStock = 481
     model = CNNLSTM(numStock).to(device)  # Because moving the model to CUDA device
-    input_tensor = torch.rand((numStock, 1, 1300, 52)).to(device)   # Because generating input tensor, moving to CUDA device
-    lstm_input_tensor = torch.rand((numStock, 1300, 52)).to(device)   # Because generating LSTM input tensor, moving to CUDA device
+    input_tensor = torch.rand((numStock, 1, train_days*bin_size, 52)).to(device)   # Because generating input tensor, moving to CUDA device
+    lstm_input_tensor = torch.rand((numStock, train_days*bin_size, 52)).to(device)   # Because generating LSTM input tensor, moving to CUDA device
     
     output_tensor = model(input_tensor)  
     print("Output shape:", output_tensor.shape)
@@ -262,7 +263,7 @@ if __name__ == "__main__":
     # stock_prediction_model = NNPredictionModel(numStock, learning_rate=0.001, epochs=1000, batch_size=481)
     # stock_prediction_model.model = nn.DataParallel(stock_prediction_model.model)  # Because wrapping the model in DataParallel
     stock_prediction_model.model.to(device)  # Because sending the model to the device
-    input_tensor_y = torch.rand((numStock, 1, 1300, 1)).to(device)   # Because generating target tensor, moving to CUDA device, 
+    input_tensor_y = torch.rand((numStock, 1, train_days*bin_size, 1)).to(device)   # Because generating target tensor, moving to CUDA device, 
     print(f'input tenshor X shape: {input_tensor.shape}')
     print(f'input tenshor y shape: {input_tensor_y.shape}')
     stock_prediction_model.train(input_tensor, input_tensor_y)  

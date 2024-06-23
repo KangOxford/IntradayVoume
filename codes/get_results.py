@@ -17,8 +17,8 @@ BIN_SIZE = 26
 # BIN_SIZE = 2
 # TRAIN_DAYS = 2
 # TRAIN_DAYS = 5
-TRAIN_DAYS = 10
-# TRAIN_DAYS = 50
+# TRAIN_DAYS = 10
+TRAIN_DAYS = 50
 
 import ray
 # @ray.remote(num_cpus=32)
@@ -44,6 +44,7 @@ def get_r2df(config,df):
     task_id = config['task_id']
     stock_symbol = config['stock_symbol']
     dates = config['dates']
+    rayOn = config['rayOn']
     
     print("universal data loaded")
     total_test_days, bin_size, train_size, test_size, x_list, y_list, original_space = param_define(df,num)
@@ -60,7 +61,8 @@ def get_r2df(config,df):
         'trainType':trainType,
         # "tile_array":np.arange(num),
         "short_hash":get_git_hash(),
-        'task_id':task_id
+        'task_id':task_id,
+        'rayOn':rayOn,
     }
     
     test_dates = dates[-total_test_days:]
@@ -107,11 +109,18 @@ def get_r2df(config,df):
         # ids=[train_and_pred_ray.remote(index,df,config) for index in tqdm(3)]
         ids = [ ]
         # for index in tqdm(range(3)):
-        for index in tqdm(range(total_test_days)):
-            config['test_date'] = test_dates[index]
-            ids.append(train_and_pred_ray.remote(index,df,config))
-        # ids=[train_and_pred_ray.remote(index,df,config) for index in tqdm(range(total_test_days))]
-        results = [ray.get(id_) for id_ in tqdm(ids)]
+        if config['rayOn']:
+            for index in tqdm(range(total_test_days)):
+                config['test_date'] = test_dates[index]
+                ids.append(train_and_pred_ray.remote(index,df,config))
+            # ids=[train_and_pred_ray.remote(index,df,config) for index in tqdm(range(total_test_days))]
+            results = [ray.get(id_) for id_ in tqdm(ids)]
+        else:
+            results = []
+            for index in tqdm(range(total_test_days)):
+                config['test_date'] = test_dates[index]
+                result = train_and_pred(index,df,config)
+                results.append(result)
         r2results  = [result[0] for result in results]
         _oneday_dfs = [result[1] for result in results]
         oneday_dfs = []
@@ -232,7 +241,8 @@ def train_and_pred(index,df,config):
     # breakpoint()
     # print(regulator)
     if regulator == "Inception":
-        y_pred = model_nn(X_train, y_train, X_test, y_test, config)
+        y_pred, y_true = model_nn(X_train, y_train, X_test, y_test, config)
+        # y_pred = model_nn(X_train, y_train, X_test, y_test, config)
         # y_pred = regularity_nn(X_train, y_train, X_test,y_test, regulator,num)
     else:
         y_pred = regularity_ols(X_train, y_train, X_test, config)
@@ -262,7 +272,11 @@ def train_and_pred(index,df,config):
     # stock_index = np.tile(tile_array, 26) # original [[bin,483] 26]
     stock_index = np.arange(num).repeat(bin_size)
     original_images['stock_index'] = stock_index
-    oneday_df = pd.concat([original_images, y_pred_clipped], axis=1)[['date','stock_index','true','pred']]
+    # oneday_df = pd.concat([original_images, y_pred_clipped], axis=1)[['date','stock_index','true','pred']]
+    y_true_df = pd.DataFrame(np.exp(y_true),columns=['true'])
+    oneday_df = pd.concat([y_true_df,y_pred_clipped],axis=1)
+    oneday_df['date']=test_date
+    oneday_df['stock_index'] = np.tile(np.arange(469),26)
     
     lst = []
     g = oneday_df.groupby(stock_index)
@@ -274,6 +288,7 @@ def train_and_pred(index,df,config):
             print(f"trainPred Error {stock} {item.head()}")
     test_df = pd.DataFrame(lst,columns=["test_date", "stock", "r2value"])
     test_df = test_df.pivot(index='test_date',columns='stock')
+    test_df.mean().mean()
     return lst,oneday_df
 
 

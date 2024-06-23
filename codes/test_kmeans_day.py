@@ -19,7 +19,7 @@ from kmeans import get_features,get_labels_byPCA
 from universal import *
 # from universal import get_df_list
 from codes.schedule4RLexecution import getSingleDfs
-from trainPred import *
+from codes.dec_trainPred import *
 # import multiprocessing
 import ray
 
