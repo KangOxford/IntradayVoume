@@ -10,15 +10,15 @@ from utils import get_git_hash
 from utils import check_GPU_memory
 from tqdm import tqdm 
 from model import *
-import pandas as pd
+
 from sklearn.metrics import r2_score
 
 BIN_SIZE = 26
 # BIN_SIZE = 2
 # TRAIN_DAYS = 2
 # TRAIN_DAYS = 5
-# TRAIN_DAYS = 10
-TRAIN_DAYS = 50
+TRAIN_DAYS = 10
+# TRAIN_DAYS = 50
 
 import ray
 # @ray.remote(num_cpus=32)
