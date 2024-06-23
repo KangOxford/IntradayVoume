@@ -17,9 +17,9 @@ class LSTMBlock(nn.Module):
     def __init__(self,numStock):
         super(LSTMBlock, self).__init__()
         self.numStock = numStock
-        # self.lstm = nn.LSTM(12,bin_size,num_layers=1,batch_first=True)  # TODO reduce 192 to lower !!!
+        self.lstm = nn.LSTM(12,bin_size,num_layers=1,batch_first=True)  # TODO reduce 192 to lower !!!
         # self.lstm = nn.LSTM(26,bin_size,num_layers=1,batch_first=True)  # TODO reduce 192 to lower !!!
-        self.lstm = nn.LSTM(52,bin_size,num_layers=1,batch_first=True)  # TODO reduce 192 to lower !!!
+        # self.lstm = nn.LSTM(52,bin_size,num_layers=1,batch_first=True)  # TODO reduce 192 to lower !!!
         
         self.fc1 = nn.Linear(bin_size, 1) 
         self.sigmoid = nn.Sigmoid()
@@ -167,11 +167,13 @@ class CNNLSTM(nn.Module):
         self.lstm_block = LSTMBlock(numStock)
     def forward(self, x_input):
         # TODO the input,x is wrong, should be with shape 1,1,1300*483,52
-        # x_conv = self.conv(x_input) # ([7, 8, 1300, 1])
-        # print("self.conv(x)",x.shape)
-        # x = self.inception(x_conv)
+        # print("x_input",x_input.shape)
+        x = x_input.unsqueeze(1)
+        x_conv = self.conv(x) # ([7, 8, 1300, 1])
+        # print("self.conv(x)",x_conv.shape)
+        x = self.inception(x_conv)
         # print("self.inception(x)",x.shape)
-        x = self.mlp(x_input)
+        # x = self.mlp(x_input)
         # x = self.mlp2(x)
         # print(f"mlp_time : {time.time()-start1:.4f}s")
         x = self.lstm_block(x)
