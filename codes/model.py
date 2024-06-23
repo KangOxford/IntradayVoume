@@ -462,8 +462,14 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         # y_train_tensor_window = y_train_tensor_window.reshape(1, -1, 1)
 
         # Train the model with the training data
-        stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=500, batch_size=481)  # Adjust hyperparameters as needed
+        stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=3000, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=2000, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=1500, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=1230, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=1000, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=750, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=500, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=300, batch_size=481)  # Adjust hyperparameters as needed
         
         
         

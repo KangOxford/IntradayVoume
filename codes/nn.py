@@ -5,7 +5,7 @@ import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 from get_results import BIN_SIZE, TRAIN_DAYS
 # from trainPred import BIN_SIZE, TRAIN_DAYS
-# from torch.utils.tensorboard import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 
 # # Define hyperparameters
 # bin_size = 26
@@ -195,7 +195,7 @@ class NNPredictionModel:
         self.criterion = nn.MSELoss()  # Because using Mean Squared Error loss for regression task
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  # Because using CUDA or CPU device
         self.debug = debug
-        # self.writer = SummaryWriter()
+        self.writer = SummaryWriter()
         
     def train(self, X_train, y_train):
         self.model.to(self.device)
@@ -232,8 +232,8 @@ class NNPredictionModel:
             # if self.debug:  
             #     print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
             # print(f"Epoch [{epoch+1}/{self.epochs}], Loss: {loss.item():.20f}, Time: {time.time()-epoch_start:.4f}s")
-        #     self.writer.add_scalar('Loss/train', loss.item(), epoch)
-        # self.writer.close()
+            self.writer.add_scalar('Loss/train', loss.item(), epoch)
+        self.writer.close()
         print("Train completed")
         
     def predict(self, X_test):
