@@ -11,7 +11,7 @@ from torch.utils.tensorboard import SummaryWriter
 # bin_size = 26
 # train_days = 50 
 bin_size = BIN_SIZE
-train_days = TRAIN_DAYS
+train_days = TRAIN_DAYS - 1
 
 class LSTMBlock(nn.Module):
     def __init__(self,numStock):
@@ -208,9 +208,6 @@ class NNPredictionModel:
             epoch_start = time.time()
             self.model.train()
             for batch_idx, (X_batch, y_batch) in enumerate(train_loader):
-            #     print(batch_idx)
-            #     print(X_batch.shape)
-            #     print(y_batch.shape)
                 self.optimizer.zero_grad()
                 
                 if self.debug: forward_start = time.time()

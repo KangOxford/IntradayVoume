@@ -416,10 +416,12 @@ def model_nn(X_train, y_train, X_test, y_test, config):
                     # Insert sliced data into the right position in the big_array
                     X_3D[j, i * bin_size:(i + 1) * bin_size, :] = sliced #(num_stock, bin_size*num_days, num_features)
             return X_3D
-        X_train_reshaped = reshape_X_2Dinto3D_V2(X_train_window,num_days_=num_days)
-        y_train_reshaped = reshape_X_2Dinto3D_V2(y_train_window,num_days_=num_days)
-        X_all_reshaped = np.concatenate((X_train_reshaped, reshape_X_2Dinto3D_V2(X_test_window,num_days_=num_days)[:,-bin_size:,:]), axis=1)
-        y_all_reshaped = np.concatenate((y_train_reshaped, reshape_X_2Dinto3D_V2(y_test_window,num_days_=num_days)[:,-bin_size:,:]), axis=1)
+        X_train_reshaped = reshape_X_2Dinto3D_V2(X_train_window,num_days_=num_days-1)
+        y_train_reshaped = reshape_X_2Dinto3D_V2(y_train_window,num_days_=num_days-1)
+        X_val_window = reshape_X_2Dinto3D_V2(X_train_window,num_days_=num_days)[:,-bin_size:,:]
+        y_val_window = reshape_X_2Dinto3D_V2(y_train_window,num_days_=num_days)[:,-bin_size:,:]
+        X_all_reshaped = np.concatenate((X_train_reshaped, X_val_window, reshape_X_2Dinto3D_V2(X_test_window,num_days_=num_days)[:,-bin_size:,:]), axis=1)
+        y_all_reshaped = np.concatenate((y_train_reshaped, y_val_window, reshape_X_2Dinto3D_V2(y_test_window,num_days_=num_days)[:,-bin_size:,:]), axis=1)
         return X_train_reshaped, y_train_reshaped, X_all_reshaped, y_all_reshaped
     
     # def slice_and_stack_single_distribution(X_scaled, y_scaled, num_stock, i):
@@ -462,15 +464,18 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         # y_train_tensor_window = y_train_tensor_window.reshape(1, -1, 1)
 
         # Train the model with the training data
-        stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=10000, batch_size=481)  # Adjust hyperparameters as needed
+        stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=100000, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=30000, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=10000, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=3000, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=2000, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=1500, batch_size=481)  # Adjust hyperparameters as needed
-        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=1230, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=1250, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=1000, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=750, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=500, batch_size=481)  # Adjust hyperparameters as needed
         # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=300, batch_size=481)  # Adjust hyperparameters as needed
+        # stock_prediction_model = NNPredictionModel(num, learning_rate=0.0001, epochs=100, batch_size=481)  # Adjust hyperparameters as needed
         
         
         
@@ -508,8 +513,11 @@ def model_nn(X_train, y_train, X_test, y_test, config):
         true_elements = []
         
         for i in range(bin_size):
-            X_test_tensor_window = X_all_tensor_window[:, i:i+bin_size*train_days, :]
-            y_test_tensor_window = y_all_tensor_window[:, i:i+bin_size*train_days, :]
+
+            X_test_tensor_window = X_all_tensor_window[:, bin_size+i:bin_size+i+bin_size*(train_days-1), :]
+            y_test_tensor_window = y_all_tensor_window[:, bin_size+i:bin_size+i+bin_size*(train_days-1), :]
+            # X_test_tensor_window = X_all_tensor_window[:, i:i+bin_size*train_days, :]
+            # y_test_tensor_window = y_all_tensor_window[:, i:i+bin_size*train_days, :]
             
             
             # X_test_tensor_window = X_all_tensor_window[:, i, :].unsqueeze(1)
@@ -518,8 +526,10 @@ def model_nn(X_train, y_train, X_test, y_test, config):
             
             # Extract the last element of the prediction and append it to the list
             # last_element = y_pred_normalized[0, -1, 0].item()
+            
             last_element = y_pred_normalized[:, -1, :]
             true_element = y_test_tensor_window[:, -1, :]
+            
             last_elements.append(last_element)
             true_elements.append(true_element)
         

@@ -23,8 +23,8 @@ import time
 import ray
 
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '5,6,7'
-# os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '5,6,7'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
 
 def check_GPU_memory():
@@ -117,13 +117,13 @@ if __name__=="__main__":
     #     ray.init(num_cpus=32,object_store_memory=40*1e9)
     # # /homes/80/kang/anaconda3/bin/python /homes/80/kang/cmem/codes/test_single_stock.py
     # regulator = "XGB"
-    regulator = "Inception"
+    # regulator = "Inception"
     # regulator = 'Attention'
 
     # regulator = "CMEM"
     # regulator = "OLS"
     # regulator = "Lasso"
-    # regulator = "Ridge"
+    regulator = "Ridge"
     
 
     trainType = "universal"
@@ -131,7 +131,7 @@ if __name__=="__main__":
     # trainType = "clustered"
     
     print(f'trainType {trainType}, regulator {regulator}')
-    import time
+
     begin = time.time()
     
 
